@@ -11,26 +11,20 @@
 
     <link rel="stylesheet" href="{% static 'panel_admin/css/dashboard.css' %}">
 
-    <!-- Iconos -->
     <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
 
     <!-- MENÚ LATERAL -->
-
     <aside class="sidebar">
 
         <div class="logo">
-
             <span class="logo-icon">
                 <i class="fa-solid fa-paw"></i>
             </span>
-
             <h2>BackHome</h2>
-
         </div>
 
         <div class="menu-title">
@@ -41,64 +35,45 @@
 
             <a href="{% url 'dashboard' %}"
                class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-
                 <i class="fa-solid fa-house"></i>
-
                 <span>Dashboard</span>
-
             </a>
 
             <a href="{% url 'gestion_usuarios' %}"
                class="{% if request.resolver_match.url_name == 'gestion_usuarios' %}active{% endif %}">
-
                 <i class="fa-solid fa-users"></i>
-
                 <span>Usuarios</span>
-
             </a>
 
-            <!-- GESTIÓN DE REFUGIOS -->
             <a href="{% url 'gestion_refugios' %}"
                class="{% if request.resolver_match.url_name == 'gestion_refugios' %}active{% endif %}">
-
                 <i class="fa-solid fa-house-chimney"></i>
-
                 <span>Refugios</span>
-
             </a>
 
-            <!-- GESTIÓN DE DONACIONES -->
             <a href="{% url 'gestion_donaciones' %}"
                class="{% if request.resolver_match.url_name == 'gestion_donaciones' %}active{% endif %}">
-
                 <i class="fa-solid fa-heart"></i>
-
                 <span>Donaciones</span>
-
             </a>
 
-            <a href="#">
-
+            <!-- GESTIÓN DE CONSEJOS -->
+            <a href="{% url 'gestion_consejos' %}"
+               class="{% if request.resolver_match.url_name == 'gestion_consejos' %}active{% endif %}">
                 <i class="fa-solid fa-lightbulb"></i>
-
                 <span>Consejos</span>
-
             </a>
 
-            <a href="#">
-
+            <!-- GESTIÓN DE SOPORTE -->
+            <a href="{% url 'gestion_soporte' %}"
+               class="{% if request.resolver_match.url_name == 'gestion_soporte' %}active{% endif %}">
                 <i class="fa-solid fa-headset"></i>
-
                 <span>Soporte</span>
-
             </a>
 
             <a href="#">
-
                 <i class="fa-solid fa-chart-pie"></i>
-
                 <span>Reportes</span>
-
             </a>
 
         </nav>
@@ -106,21 +81,14 @@
         <div class="sidebar-bottom">
 
             <div class="sidebar-decoration">
-
                 <i class="fa-solid fa-heart"></i>
-
                 <p>Un hogar para cada huellita</p>
-
                 <span>Gracias por ayudar 🐾</span>
-
             </div>
 
             <div class="sidebar-footer">
-
                 <i class="fa-solid fa-shield-heart"></i>
-
                 Panel de administración
-
             </div>
 
         </div>
@@ -129,45 +97,32 @@
 
 
     <!-- CONTENIDO PRINCIPAL -->
-
     <main class="main-content">
 
         <!-- ENCABEZADO -->
-
         <header class="topbar">
 
             <div class="topbar-left">
-
                 <span class="topbar-label">BACKHOME / ADMINISTRACIÓN</span>
-
                 <h2>Panel de Administrador</h2>
-
             </div>
 
             <div class="topbar-right">
 
                 <button class="icon-button" type="button" aria-label="Notificaciones">
-
                     <i class="fa-regular fa-bell"></i>
-
                     <span class="notification-dot"></span>
-
                 </button>
 
                 <div class="profile">
 
                     <div class="profile-avatar">
-
                         <i class="fa-solid fa-user"></i>
-
                     </div>
 
                     <div class="profile-info">
-
                         <strong>Administradora</strong>
-
                         <span>Superadministrador</span>
-
                     </div>
 
                     <i class="fa-solid fa-chevron-down profile-arrow"></i>
@@ -179,22 +134,17 @@
         </header>
 
 
-        <!-- CONTENIDO DINÁMICO DE CADA PÁGINA -->
-
+        <!-- CONTENIDO DINÁMICO -->
         {% block content %}
 
         <!-- BIENVENIDA -->
-
         <section class="welcome">
 
             <div class="welcome-content">
 
                 <span class="welcome-tag">
-
                     <i class="fa-solid fa-heart"></i>
-
                     BIENVENIDA
-
                 </span>
 
                 <h1>¡Hola, Administradora! 🌸</h1>
@@ -205,50 +155,35 @@
                 </p>
 
                 <div class="welcome-message">
-
                     <i class="fa-solid fa-paw"></i>
-
                     Cada huellita merece un hogar lleno de amor.
-
                 </div>
 
             </div>
 
             <div class="welcome-decoration">
-
                 <i class="fa-solid fa-paw paw-one"></i>
-
                 <i class="fa-solid fa-heart heart-one"></i>
-
                 <i class="fa-solid fa-paw paw-two"></i>
-
                 <i class="fa-solid fa-heart heart-two"></i>
-
             </div>
 
         </section>
 
 
         <!-- ESTADÍSTICAS -->
-
         <section class="section">
 
             <div class="section-heading">
 
                 <div>
-
                     <span class="section-subtitle">RESUMEN DE BACKHOME</span>
-
                     <h2>Tu plataforma en números</h2>
-
                 </div>
 
                 <span class="date-label">
-
                     <i class="fa-regular fa-calendar"></i>
-
                     Resumen general
-
                 </span>
 
             </div>
@@ -256,23 +191,16 @@
             <div class="stats">
 
                 <!-- USUARIOS -->
-
                 <article class="stat-card">
 
                     <div class="stat-top">
-
                         <div class="stat-icon pink">
-
                             <i class="fa-solid fa-users"></i>
-
                         </div>
-
                         <span class="stat-number">01</span>
-
                     </div>
 
                     <p>Usuarios registrados</p>
-
                     <h3>0</h3>
 
                     <span class="stat-description">
@@ -283,23 +211,16 @@
 
 
                 <!-- REFUGIOS -->
-
                 <article class="stat-card">
 
                     <div class="stat-top">
-
                         <div class="stat-icon purple">
-
                             <i class="fa-solid fa-house-chimney"></i>
-
                         </div>
-
                         <span class="stat-number">02</span>
-
                     </div>
 
                     <p>Refugios registrados</p>
-
                     <h3>0</h3>
 
                     <span class="stat-description">
@@ -310,23 +231,16 @@
 
 
                 <!-- DONACIONES -->
-
                 <article class="stat-card">
 
                     <div class="stat-top">
-
                         <div class="stat-icon peach">
-
                             <i class="fa-solid fa-hand-holding-heart"></i>
-
                         </div>
-
                         <span class="stat-number">03</span>
-
                     </div>
 
                     <p>Donaciones</p>
-
                     <h3>0</h3>
 
                     <span class="stat-description">
@@ -337,23 +251,16 @@
 
 
                 <!-- SOPORTE -->
-
                 <article class="stat-card">
 
                     <div class="stat-top">
-
                         <div class="stat-icon blue">
-
                             <i class="fa-solid fa-headset"></i>
-
                         </div>
-
                         <span class="stat-number">04</span>
-
                     </div>
 
                     <p>Soportes pendientes</p>
-
                     <h3>0</h3>
 
                     <span class="stat-description">
@@ -368,7 +275,6 @@
 
 
         <!-- RESUMEN GENERAL -->
-
         <section class="bottom-grid">
 
             <div class="content-card activity-card">
@@ -376,17 +282,12 @@
                 <div class="card-heading">
 
                     <div>
-
                         <span class="section-subtitle">ACTIVIDAD</span>
-
                         <h2>Resumen general</h2>
-
                     </div>
 
                     <div class="heading-icon">
-
                         <i class="fa-solid fa-chart-line"></i>
-
                     </div>
 
                 </div>
@@ -397,34 +298,25 @@
                 </p>
 
                 <div class="empty-state">
-
                     <i class="fa-solid fa-paw"></i>
-
                     <span>¡Pronto verás aquí toda la actividad de BackHome!</span>
-
                 </div>
 
             </div>
 
 
             <!-- ACCESOS RÁPIDOS -->
-
             <div class="content-card quick-card">
 
                 <div class="card-heading">
 
                     <div>
-
                         <span class="section-subtitle">ACCESOS DIRECTOS</span>
-
                         <h2>Gestión rápida</h2>
-
                     </div>
 
                     <div class="heading-icon">
-
                         <i class="fa-solid fa-bolt"></i>
-
                     </div>
 
                 </div>
@@ -432,9 +324,7 @@
                 <a href="{% url 'gestion_usuarios' %}" class="quick-link">
 
                     <span class="quick-icon">
-
                         <i class="fa-solid fa-users"></i>
-
                     </span>
 
                     <span>Gestionar usuarios</span>
@@ -443,13 +333,11 @@
 
                 </a>
 
-                <!-- ACCESO A GESTIÓN DE REFUGIOS -->
+
                 <a href="{% url 'gestion_refugios' %}" class="quick-link">
 
                     <span class="quick-icon">
-
                         <i class="fa-solid fa-house"></i>
-
                     </span>
 
                     <span>Gestionar refugios</span>
@@ -458,15 +346,27 @@
 
                 </a>
 
-                <a href="#" class="quick-link">
+
+                <a href="{% url 'gestion_soporte' %}" class="quick-link">
 
                     <span class="quick-icon">
-
                         <i class="fa-solid fa-headset"></i>
-
                     </span>
 
                     <span>Revisar soporte</span>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </a>
+
+
+                <a href="{% url 'gestion_consejos' %}" class="quick-link">
+
+                    <span class="quick-icon">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </span>
+
+                    <span>Gestionar consejos</span>
 
                     <i class="fa-solid fa-chevron-right"></i>
 
@@ -480,17 +380,12 @@
 
 
         <!-- PIE DE PÁGINA -->
-
         <footer class="main-footer">
 
             <p>
-
                 Hecho con
-
                 <i class="fa-solid fa-heart"></i>
-
                 para proteger cada huellita.
-
             </p>
 
             <span>BackHome © 2026</span>
@@ -500,5 +395,4 @@
     </main>
 
 </body>
-
 </html>

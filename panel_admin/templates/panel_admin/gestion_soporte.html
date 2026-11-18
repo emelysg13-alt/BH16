@@ -1,0 +1,312 @@
+
+{% extends 'panel_admin/dashboard.html' %}
+
+{% block content %}
+
+<div class="gs-page">
+
+    <header class="gs-header">
+        <div>
+            <span class="gs-eyebrow"><i class="fa-solid fa-headset"></i> BACKHOME / ADMINISTRACIÓN</span>
+            <h1>Gestión de soporte</h1>
+            <p>Revisa los mensajes y solicitudes que envían los usuarios de BackHome.</p>
+        </div>
+        <div class="gs-header-icon"><i class="fa-solid fa-comments"></i></div>
+    </header>
+
+    {% if messages %}
+    <div class="gs-messages">
+        {% for message in messages %}
+        <div class="gs-message {% if message.tags != 'success' %}gs-error{% endif %}">
+            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <section class="gs-stats">
+        <article class="gs-stat">
+            <div class="gs-stat-top">
+                <span>Total de mensajes</span>
+                <div class="gs-stat-icon pink"><i class="fa-solid fa-inbox"></i></div>
+            </div>
+            <strong>{{ estadisticas.total }}</strong>
+            <small>Mensajes registrados</small>
+        </article>
+
+        <article class="gs-stat">
+            <div class="gs-stat-top">
+                <span>Mensajes de hoy</span>
+                <div class="gs-stat-icon purple"><i class="fa-solid fa-calendar-day"></i></div>
+            </div>
+            <strong>{{ estadisticas.hoy }}</strong>
+            <small>Recibidos durante el día</small>
+        </article>
+
+        <article class="gs-stat gs-help">
+            <div class="gs-help-icon"><i class="fa-solid fa-heart"></i></div>
+            <div>
+                <strong>La comunidad cuenta contigo</strong>
+                <p>Lee cada solicitud para conocer las inquietudes de los usuarios.</p>
+            </div>
+        </article>
+    </section>
+
+    <section class="gs-panel">
+        <div class="gs-panel-heading">
+            <div>
+                <span class="gs-label">ATENCIÓN A USUARIOS</span>
+                <h2>Bandeja de mensajes</h2>
+                <p>Mensajes recibidos a través del formulario de soporte.</p>
+            </div>
+            <span class="gs-counter">{{ solicitudes|length }} resultados</span>
+        </div>
+
+        <form method="GET" class="gs-search">
+            <div class="gs-search-input">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" name="buscar" value="{{ buscar }}" placeholder="Buscar por cliente, correo o mensaje...">
+            </div>
+            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+            {% if buscar %}
+            <a href="{% url 'gestion_soporte' %}" class="gs-clear">Limpiar</a>
+            {% endif %}
+        </form>
+
+        {% if solicitudes %}
+        <div class="gs-table-wrap">
+            <table class="gs-table">
+                <thead>
+                    <tr>
+                        <th>Solicitud</th>
+                        <th>Cliente</th>
+                        <th>Mensaje</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        <td><span class="gs-id">#{{ solicitud.id_mensaje }}</span></td>
+
+                        <td>
+                            <div class="gs-client">
+                                <div class="gs-avatar"><i class="fa-solid fa-user"></i></div>
+                                <div>
+                                    <strong>{{ solicitud.nombre_cliente|default:"Cliente" }}</strong>
+                                    <small>{{ solicitud.email_cliente }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <p class="gs-preview">{{ solicitud.mensaje_cliente|truncatechars:85 }}</p>
+                        </td>
+
+                        <td>
+                            <span class="gs-date">{{ solicitud.fecha_mensaje|date:"d/m/Y" }}</span>
+                            <small class="gs-time">{{ solicitud.fecha_mensaje|date:"h:i A" }}</small>
+                        </td>
+
+                        <td>
+                            <div class="gs-actions">
+                                <button
+                                    type="button"
+                                    class="gs-icon-btn gs-view"
+                                    title="Ver mensaje"
+                                    onclick="gsVerMensaje(
+                                        '{{ solicitud.id_mensaje|escapejs }}',
+                                        '{{ solicitud.nombre_cliente|escapejs }}',
+                                        '{{ solicitud.email_cliente|escapejs }}',
+                                        '{{ solicitud.telefono_cliente|escapejs }}',
+                                        '{{ solicitud.fecha_mensaje|date:'d/m/Y h:i A'|escapejs }}',
+                                        '{{ solicitud.mensaje_cliente|escapejs }}'
+                                    )">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+
+                                <form method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este mensaje? Esta acción no se puede deshacer.');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="accion" value="eliminar">
+                                    <input type="hidden" name="id_mensaje" value="{{ solicitud.id_mensaje }}">
+                                    <button type="submit" class="gs-icon-btn gs-delete" title="Eliminar mensaje">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="gs-empty">
+            <div><i class="fa-solid fa-inbox"></i></div>
+            <h3>{% if buscar %}No encontramos mensajes{% else %}Tu bandeja está vacía{% endif %}</h3>
+            <p>{% if buscar %}Prueba con otro nombre, correo o palabra.{% else %}Cuando los usuarios envíen mensajes, aparecerán aquí.{% endif %}</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+
+<!-- MODAL DETALLE DEL MENSAJE -->
+<dialog id="gsModalDetalle" class="gs-modal">
+    <div class="gs-modal-head">
+        <div class="gs-modal-title">
+            <div class="gs-modal-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+            <div>
+                <h2>Detalle del mensaje</h2>
+                <p>Información de la solicitud recibida.</p>
+            </div>
+        </div>
+        <button type="button" class="gs-close" onclick="gsCerrarModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="gs-modal-body">
+        <div class="gs-detail-id">
+            <span>IDENTIFICADOR DE SOLICITUD</span>
+            <strong id="gsDetalleId"></strong>
+        </div>
+
+        <div class="gs-detail-grid">
+            <div class="gs-detail-item">
+                <span>Nombre del cliente</span>
+                <strong id="gsDetalleNombre"></strong>
+            </div>
+            <div class="gs-detail-item">
+                <span>Correo electrónico</span>
+                <strong id="gsDetalleCorreo"></strong>
+            </div>
+            <div class="gs-detail-item">
+                <span>Teléfono</span>
+                <strong id="gsDetalleTelefono"></strong>
+            </div>
+            <div class="gs-detail-item">
+                <span>Fecha de envío</span>
+                <strong id="gsDetalleFecha"></strong>
+            </div>
+        </div>
+
+        <div class="gs-full-message">
+            <span><i class="fa-regular fa-message"></i> MENSAJE DEL USUARIO</span>
+            <p id="gsDetalleMensaje"></p>
+        </div>
+
+        <div class="gs-modal-footer">
+            <button type="button" class="gs-cancel" onclick="gsCerrarModal()">Cerrar</button>
+        </div>
+    </div>
+</dialog>
+
+
+<style>
+.gs-page{max-width:1500px;margin:auto;padding:30px;color:#574652}
+.gs-page *{box-sizing:border-box}
+.gs-header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}
+.gs-eyebrow{display:block;margin-bottom:8px;color:#c45d89;font-size:11px;font-weight:900;letter-spacing:1.3px}
+.gs-header h1{margin:0 0 7px;color:#684d5e;font-size:29px;font-weight:900}
+.gs-header p{margin:0;color:#a18d99;font-size:13px}
+.gs-header-icon{display:grid;place-items:center;width:57px;height:57px;border-radius:17px;background:#fff0f6;color:#d36b96;font-size:23px}
+.gs-messages{display:grid;gap:9px;margin-bottom:17px}
+.gs-message{padding:12px 15px;border-radius:11px;background:#e8f8ef;color:#32845c;font-size:12px;font-weight:800}
+.gs-message i{margin-right:7px}
+.gs-error{background:#fff0ef;color:#bd5a55}
+.gs-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.gs-stat{min-width:0;padding:18px;border:1px solid #f3e4eb;border-radius:17px;background:white;box-shadow:0 6px 25px #be6e910d}
+.gs-stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gs-stat-top>span{color:#a18d99;font-size:11px;font-weight:800}
+.gs-stat-icon{display:grid;place-items:center;width:37px;height:37px;border-radius:11px}
+.gs-stat-icon.pink{background:#fff0f6;color:#d85f91}
+.gs-stat-icon.purple{background:#f0edff;color:#8170c2}
+.gs-stat>strong{display:block;margin-top:11px;color:#684d5e;font-size:26px;font-weight:900}
+.gs-stat>small{display:block;margin-top:4px;color:#b09eaa;font-size:10px}
+.gs-help{display:flex;align-items:center;gap:13px;background:linear-gradient(120deg,#fff3f8,#fffafd)}
+.gs-help-icon{display:grid;place-items:center;flex:0 0 43px;width:43px;height:43px;border-radius:13px;background:#fce4ee;color:#d36b96}
+.gs-help strong{color:#79586b;font-size:13px;font-weight:900}
+.gs-help p{margin:5px 0 0;color:#a18d99;font-size:10px;line-height:1.6}
+.gs-panel{overflow:hidden;border:1px solid #f3e4eb;border-radius:18px;background:white;box-shadow:0 6px 25px #be6e910d}
+.gs-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:21px 22px 17px;border-bottom:1px solid #f7edf1}
+.gs-label{color:#c45d89;font-size:10px;font-weight:900;letter-spacing:1.2px}
+.gs-panel-heading h2{margin:5px 0 4px;color:#684d5e;font-size:18px;font-weight:900}
+.gs-panel-heading p{margin:0;color:#a18d99;font-size:11px}
+.gs-counter{padding:7px 11px;border-radius:20px;background:#fff2f7;color:#c45d89;font-size:10px;font-weight:900;white-space:nowrap}
+.gs-search{display:flex;align-items:center;gap:9px;padding:17px 22px}
+.gs-search-input{display:flex;align-items:center;gap:10px;flex:1;min-width:180px;min-height:42px;padding:0 13px;border:1px solid #efdee6;border-radius:10px;background:#fffafd;color:#c18ca3}
+.gs-search-input input{width:100%;border:0;outline:0;background:transparent;color:#574652;font:600 12px 'Nunito',sans-serif}
+.gs-search button,.gs-clear{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 14px;border:0;border-radius:10px;background:#684d5e;color:white;font:900 11px 'Nunito',sans-serif;text-decoration:none;cursor:pointer}
+.gs-clear{border:1px solid #f8dce8;background:#fff2f7;color:#c45d89}
+.gs-table-wrap{overflow-x:auto}
+.gs-table{width:100%;min-width:850px;border-collapse:collapse;text-align:left}
+.gs-table th{padding:13px 15px;background:#fff8fb;color:#a77b91;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.gs-table td{padding:14px 15px;border-top:1px solid #f7edf1;color:#796675;font-size:11px;vertical-align:middle}
+.gs-table tbody tr:hover{background:#fffafd}
+.gs-id{color:#c45d89;font-size:11px;font-weight:900}
+.gs-client{display:flex;align-items:center;gap:9px;min-width:190px}
+.gs-avatar{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border-radius:50%;background:#fce4ee;color:#c45d89}
+.gs-client strong{display:block;color:#684d5e;font-size:11px;font-weight:900}
+.gs-client small{display:block;max-width:190px;margin-top:3px;color:#aa99a3;font-size:9px;overflow-wrap:anywhere}
+.gs-preview{max-width:260px;margin:0;color:#8e7c88;font-size:11px;line-height:1.6}
+.gs-date{display:block;color:#796675;font-size:10px;white-space:nowrap}
+.gs-time{display:block;margin-top:4px;color:#aa99a3;font-size:9px}
+.gs-actions{display:flex;align-items:center;gap:6px}
+.gs-actions form{margin:0}
+.gs-icon-btn{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:9px;cursor:pointer;transition:.2s}
+.gs-icon-btn:hover{transform:scale(1.07)}
+.gs-view{background:#f0edff;color:#8170c2}
+.gs-delete{background:#fff0ef;color:#bd6b68}
+.gs-empty{display:flex;flex-direction:column;align-items:center;padding:48px 20px;text-align:center}
+.gs-empty>div{display:grid;place-items:center;width:65px;height:65px;margin-bottom:13px;border-radius:20px;background:#fff0f6;color:#d36b96;font-size:25px}
+.gs-empty h3{margin:0 0 6px;color:#684d5e;font-size:16px}
+.gs-empty p{margin:0;color:#a18d99;font-size:12px}
+.gs-modal{position:fixed;inset:0;margin:auto;width:min(620px,calc(100% - 28px));max-height:90vh;overflow:auto;padding:0;border:0;border-radius:20px;background:white;box-shadow:0 22px 70px #38263335}
+.gs-modal::backdrop{background:#38263380;backdrop-filter:blur(3px)}
+.gs-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 24px 18px;border-bottom:1px solid #f7e6ef;background:linear-gradient(135deg,#fff2f7,#fffafd)}
+.gs-modal-title{display:flex;align-items:center;gap:12px}
+.gs-modal-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:13px;background:#fce4ee;color:#c45d89}
+.gs-modal-head h2{margin:0 0 5px;color:#684d5e;font-size:17px;font-weight:900}
+.gs-modal-head p{margin:0;color:#a18d99;font-size:11px}
+.gs-close{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:9px;background:white;color:#9b8290;cursor:pointer}
+.gs-modal-body{padding:22px 24px 24px}
+.gs-detail-id{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:11px;background:#fff4f8}
+.gs-detail-id span,.gs-full-message>span{color:#b17d96;font-size:9px;font-weight:900;letter-spacing:1px}
+.gs-detail-id strong{color:#c45d89;font-size:12px;font-weight:900}
+.gs-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
+.gs-detail-item{min-width:0;padding:12px;border:1px solid #f3e8ee;border-radius:11px}
+.gs-detail-item span{display:block;margin-bottom:5px;color:#aa99a3;font-size:10px}
+.gs-detail-item strong{display:block;color:#684d5e;font-size:11px;font-weight:900;overflow-wrap:anywhere}
+.gs-full-message{padding:16px;border:1px solid #f3e4eb;border-radius:13px;background:#fffafd}
+.gs-full-message p{margin:12px 0 0;color:#796675;font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.gs-modal-footer{display:flex;justify-content:flex-end;margin-top:18px;padding-top:15px;border-top:1px solid #f7edf1}
+.gs-cancel{min-height:40px;padding:9px 17px;border:1px solid #efdee6;border-radius:10px;background:white;color:#806b79;font:800 12px 'Nunito',sans-serif;cursor:pointer}
+@media(max-width:1000px){.gs-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.gs-help{grid-column:1/-1}}
+@media(max-width:650px){.gs-page{padding:20px 13px}.gs-header h1{font-size:24px}.gs-stats{grid-template-columns:1fr}.gs-help{grid-column:auto}.gs-panel-heading,.gs-search{padding-left:14px;padding-right:14px}.gs-search{flex-wrap:wrap}.gs-search-input{flex-basis:100%}.gs-detail-grid{grid-template-columns:1fr}.gs-modal-head,.gs-modal-body{padding-left:17px;padding-right:17px}}
+</style>
+
+
+<script>
+function gsVerMensaje(id, nombre, correo, telefono, fecha, mensaje) {
+    document.getElementById("gsDetalleId").textContent = "#" + id;
+    document.getElementById("gsDetalleNombre").textContent = nombre || "No disponible";
+    document.getElementById("gsDetalleCorreo").textContent = correo || "No disponible";
+    document.getElementById("gsDetalleTelefono").textContent = telefono || "No disponible";
+    document.getElementById("gsDetalleFecha").textContent = fecha || "No disponible";
+    document.getElementById("gsDetalleMensaje").textContent = mensaje || "Sin contenido";
+    document.getElementById("gsModalDetalle").showModal();
+}
+
+function gsCerrarModal() {
+    document.getElementById("gsModalDetalle").close();
+}
+
+document.getElementById("gsModalDetalle").addEventListener("click", function(event) {
+    if (event.target === this) {
+        this.close();
+    }
+});
+</script>
+
+{% endblock %}
