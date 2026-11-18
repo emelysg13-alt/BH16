@@ -1,220 +1,407 @@
 
 {% extends 'panel_admin/dashboard.html' %}
-
 {% block content %}
+
 <style>
-.ref-page {padding:28px 30px;color:#705b69}
-.ref-heading {display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:22px}
-.ref-heading h1 {color:#c9578b;margin:0 0 7px}
-.ref-heading p {color:#9b8995;margin:0}
-.ref-stats {display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:22px}
-.ref-card,.ref-stat {background:white;border:1px solid #f7e6ef;border-radius:16px;padding:20px;box-shadow:0 5px 15px #dca7bd17}
-.ref-stat span {color:#988995;font-size:13px}
-.ref-stat strong {display:block;color:#d45c91;font-size:27px;margin-top:8px}
-.ref-form {display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
-.ref-form input,.ref-form select,.ref-form textarea,.ref-filter input,.ref-filter select {width:100%;box-sizing:border-box;padding:12px;border:1px solid #f0cbdc;border-radius:9px;font:inherit;color:#66515f}
-.ref-form textarea {grid-column:1/-1;min-height:75px}
-.ref-form button,.ref-filter button {border:0;border-radius:9px;padding:12px 18px;background:#d96f9e;color:white;font-weight:bold;cursor:pointer}
-.ref-table-wrap {overflow-x:auto}
-.ref-table {width:100%;min-width:850px;border-collapse:collapse;font-size:13px}
-.ref-table th {background:#fff0f6;color:#c45183;text-align:left;padding:14px}
-.ref-table td {padding:14px;border-bottom:1px solid #f5e5ed}
-.ref-filter {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-.ref-filter input {flex:1;min-width:200px}
-.ref-pill {padding:6px 10px;border-radius:20px;font-size:11px;font-weight:bold}
-.ref-active {background:#e0f7eb;color:#16865c}
-.ref-inactive {background:#fff0d5;color:#a96b00}
-.ref-actions {display:flex;gap:6px;flex-wrap:wrap}
-.ref-actions button {border:0;border-radius:7px;padding:8px;cursor:pointer;font-weight:bold}
-.ref-edit {background:#fce6f0;color:#bd5484}
-.ref-delete {background:#ffe3e5;color:#bd3f4c}
-.ref-state {background:#e0f7eb;color:#16865c}
-.ref-message {padding:12px;border-radius:9px;margin-bottom:10px;background:#fff0f6}
-@media(max-width:700px){.ref-stats{grid-template-columns:1fr}.ref-form{grid-template-columns:1fr}.ref-form textarea{grid-column:auto}}
+/* ===== MÓDULO REFUGIOS ===== */
+.refugios-page{padding:30px;color:#574652;max-width:1500px;margin:0 auto}
+.refugios-page *{box-sizing:border-box}
+.refugios-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:25px}
+.refugios-eyebrow{display:inline-flex;align-items:center;gap:7px;color:#c45d89;font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.refugios-heading h1{font-size:29px;line-height:1.2;color:#684d5e;margin:0 0 7px;font-weight:900}
+.refugios-heading p{margin:0;color:#a18d99;font-size:14px}
+.refugios-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:12px;padding:13px 18px;background:linear-gradient(135deg,#ed82aa,#d85f91);color:white;font:800 13px 'Nunito',sans-serif;box-shadow:0 8px 18px #d85f9133;cursor:pointer;transition:.2s}
+.refugios-primary:hover{transform:translateY(-2px);box-shadow:0 11px 22px #d85f9140}
+.refugios-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px}
+.refugios-stat{position:relative;overflow:hidden;background:#fff;border:1px solid #f3e4eb;border-radius:17px;padding:19px 20px;box-shadow:0 6px 25px #be6e910d}
+.refugios-stat:after{content:"";position:absolute;width:78px;height:78px;border-radius:50%;right:-22px;top:-27px;background:#fff2f7}
+.refugios-stat-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.refugios-stat-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:#fff0f6;color:#d85f91;font-size:16px}
+.refugios-stat span{font-size:12px;color:#a18d99;font-weight:700}
+.refugios-stat strong{display:block;margin-top:11px;font-size:28px;line-height:1;color:#684d5e;font-weight:900}
+.refugios-panel{background:white;border:1px solid #f3e4eb;border-radius:18px;box-shadow:0 6px 25px #be6e910d;overflow:hidden}
+.refugios-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:21px 22px 17px;border-bottom:1px solid #f7edf1}
+.refugios-panel-head h2{margin:0;color:#684d5e;font-size:17px;font-weight:900}
+.refugios-panel-head p{margin:4px 0 0;color:#a18d99;font-size:12px}
+.refugios-filter{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:17px 22px}
+.refugios-input{min-height:41px;border:1px solid #efdee6;border-radius:10px;background:#fffafd;padding:9px 12px;color:#574652;font:600 12px 'Nunito',sans-serif;outline:none}
+.refugios-input:focus{border-color:#e879a5;box-shadow:0 0 0 3px #fce4ee}
+.refugios-search{min-width:230px;flex:1}
+.refugios-filter-btn,.refugios-clear{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:41px;padding:9px 14px;border-radius:10px;font:800 12px 'Nunito',sans-serif;text-decoration:none;cursor:pointer}
+.refugios-filter-btn{border:0;background:#684d5e;color:#fff}
+.refugios-clear{background:#fff2f7;color:#c45d89;border:1px solid #f8dce8}
+.refugios-table-wrap{overflow-x:auto}
+.refugios-table{width:100%;min-width:850px;border-collapse:collapse;text-align:left}
+.refugios-table th{padding:13px 16px;background:#fff8fb;color:#a77b91;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:900;white-space:nowrap}
+.refugios-table td{padding:15px 16px;border-top:1px solid #f7edf1;font-size:12px;color:#796675;vertical-align:middle}
+.refugios-table tbody tr:hover{background:#fffafd}
+.refugios-name{display:flex;align-items:center;gap:11px;min-width:175px}
+.refugios-avatar{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:#fff0f6;color:#d85f91;font-size:15px}
+.refugios-name strong{display:block;color:#684d5e;font-size:13px;font-weight:900}
+.refugios-name small,.refugios-cell-muted{display:block;color:#aa99a3;font-size:11px;margin-top:3px}
+.refugios-contact{line-height:1.65}
+.refugios-badge{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:6px 10px;font-size:10px;font-weight:900;white-space:nowrap}
+.refugios-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.refugios-badge.active{background:#e8f8ef;color:#32845c}
+.refugios-badge.inactive{background:#f1edf0;color:#897b85}
+.refugios-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.refugios-action{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:8px;padding:8px 10px;font:800 11px 'Nunito',sans-serif;cursor:pointer;text-decoration:none}
+.refugios-action.edit{background:#fff0f6;color:#bd5484}
+.refugios-action.toggle{background:#f1f5ff;color:#6376b8}
+.refugios-action.delete{background:#fff0ef;color:#bd5a55}
+.refugios-actions details{position:relative}
+.refugios-edit-box{position:absolute;right:0;top:36px;z-index:5;width:285px;padding:15px;background:#fff;border:1px solid #f3e4eb;border-radius:14px;box-shadow:0 12px 35px #57465224}
+.refugios-edit-box h3{font-size:13px;color:#684d5e;margin:0 0 10px}
+.refugios-edit-box input,.refugios-edit-box select,.refugios-edit-box textarea{width:100%;margin:4px 0;border:1px solid #efdee6;border-radius:8px;padding:9px;font:600 11px 'Nunito',sans-serif;color:#574652}
+.refugios-edit-box button{margin-top:7px}
+.refugios-empty{text-align:center!important;padding:45px 20px!important;color:#a18d99!important}
+.refugios-empty i{display:block;font-size:27px;color:#e9a4bf;margin-bottom:9px}
+.refugios-message{padding:12px 15px;border-radius:11px;margin:0 0 13px;font-size:12px;font-weight:800;background:#e8f8ef;color:#32845c}
+.refugios-message.error{background:#fff0ef;color:#bd5a55}
+
+/* ===== MODAL NUEVO REFUGIO CENTRADO ===== */
+.refugios-dialog{
+    position:fixed;
+    inset:0;
+    margin:auto;
+    width:min(620px,calc(100% - 28px));
+    max-height:90vh;
+    overflow:auto;
+    border:0;
+    border-radius:20px;
+    padding:0;
+    color:#574652;
+    box-shadow:0 24px 80px #39233145;
+}
+
+.refugios-dialog::backdrop{
+    background:#38263380;
+    backdrop-filter:blur(3px);
+}
+
+.refugios-dialog-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding:23px 25px 18px;
+    background:linear-gradient(135deg,#fff2f7,#fffafd);
+    border-bottom:1px solid #f7e6ef;
+}
+
+.refugios-dialog-head h2{
+    margin:0 0 5px;
+    color:#684d5e;
+    font-size:19px;
+    font-weight:900;
+}
+
+.refugios-dialog-head p{margin:0;color:#a18d99;font-size:12px}
+.refugios-close{width:32px;height:32px;border:0;border-radius:9px;background:white;color:#9b8290;cursor:pointer;font-size:15px}
+.refugios-dialog-body{padding:22px 25px 25px}
+.refugios-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.refugios-field{display:flex;flex-direction:column;gap:6px}
+.refugios-field.full{grid-column:1/-1}
+.refugios-field label{font-size:11px;color:#806b79;font-weight:900}
+.refugios-field input,.refugios-field select,.refugios-field textarea{width:100%;border:1px solid #efdee6;border-radius:10px;padding:11px 12px;background:#fffafd;color:#574652;font:600 12px 'Nunito',sans-serif;outline:none}
+.refugios-field input:focus,.refugios-field select:focus,.refugios-field textarea:focus{border-color:#e879a5;box-shadow:0 0 0 3px #fce4ee}
+.refugios-form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px;padding-top:17px;border-top:1px solid #f7edf1}
+.refugios-cancel{border:1px solid #efdee6;background:white;color:#806b79;border-radius:10px;padding:10px 15px;font:800 12px 'Nunito',sans-serif;cursor:pointer}
+
+@media(max-width:700px){
+    .refugios-page{padding:20px 13px}
+    .refugios-stats{grid-template-columns:1fr}
+    .refugios-heading h1{font-size:24px}
+    .refugios-form-grid{grid-template-columns:1fr}
+    .refugios-field.full{grid-column:auto}
+    .refugios-dialog-head,.refugios-dialog-body{padding-left:17px;padding-right:17px}
+}
 </style>
 
-<section class="ref-page">
-    <div class="ref-heading">
+<div class="refugios-page">
+    <header class="refugios-heading">
         <div>
-            <h1>Gestión de refugios </h1>
-            <p>Administra los refugios registrados en BackHome.</p>
+            <span class="refugios-eyebrow"><i class="fa-solid fa-paw"></i> BackHome / Administración</span>
+            <h1>Gestión de refugios</h1>
+            <p>Organiza y supervisa los refugios que hacen parte de nuestra comunidad.</p>
         </div>
-    </div>
 
-    {% for message in messages %}
-        <div class="ref-message">{{ message }}</div>
-    {% endfor %}
+        <button class="refugios-primary" type="button" onclick="document.getElementById('modalNuevoRefugio').showModal()">
+            <i class="fa-solid fa-plus"></i> Nuevo refugio
+        </button>
+    </header>
 
-    <div class="ref-stats">
-        <div class="ref-stat">
-            <span>Total de refugios</span>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="refugios-message {% if message.tags != 'success' %}error{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="refugios-stats">
+        <article class="refugios-stat">
+            <div class="refugios-stat-top">
+                <span>Total de refugios</span>
+                <div class="refugios-stat-icon"><i class="fa-solid fa-house-chimney"></i></div>
+            </div>
             <strong>{{ estadisticas.total }}</strong>
-        </div>
-        <div class="ref-stat">
-            <span>Refugios activos</span>
+        </article>
+
+        <article class="refugios-stat">
+            <div class="refugios-stat-top">
+                <span>Refugios activos</span>
+                <div class="refugios-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
             <strong>{{ estadisticas.activos }}</strong>
-        </div>
-        <div class="ref-stat">
-            <span>Refugios inactivos</span>
+        </article>
+
+        <article class="refugios-stat">
+            <div class="refugios-stat-top">
+                <span>Refugios inactivos</span>
+                <div class="refugios-stat-icon"><i class="fa-solid fa-house-circle-xmark"></i></div>
+            </div>
             <strong>{{ estadisticas.inactivos }}</strong>
+        </article>
+    </section>
+
+    <section class="refugios-panel">
+        <div class="refugios-panel-head">
+            <div>
+                <h2>Directorio de refugios</h2>
+                <p>Consulta la información y administra cada registro.</p>
+            </div>
         </div>
-    </div>
 
-    <div class="ref-card">
-        <h2 style="color:#c9578b">Registrar nuevo refugio</h2>
+        <form method="get" class="refugios-filter">
+            <input class="refugios-input refugios-search" name="buscar" value="{{ buscar }}" placeholder="Buscar por nombre, dirección o localidad">
 
-        <form method="POST" class="ref-form">
-            {% csrf_token %}
-            <input type="hidden" name="accion" value="crear">
-
-            <input name="nombre" placeholder="Nombre del refugio" required>
-            <input name="direccion" placeholder="Dirección" required>
-            <input name="telefono" placeholder="Teléfono">
-            <input name="email" type="email" placeholder="Correo electrónico">
-
-            <select name="localidad_id" required>
-                <option value="">Selecciona una localidad</option>
-                {% for localidad in localidades %}
-                    <option value="{{ localidad.0 }}">{{ localidad.1 }}</option>
-                {% endfor %}
-            </select>
-
-            <textarea name="descripcion" placeholder="Descripción del refugio"></textarea>
-
-            <button type="submit">Registrar refugio</button>
-        </form>
-    </div>
-
-    <div class="ref-card" style="margin-top:22px">
-        <h2 style="color:#c9578b">Refugios registrados</h2>
-
-        <form method="GET" class="ref-filter">
-            <input name="buscar" value="{{ buscar }}" placeholder="Buscar por nombre, dirección, correo o localidad">
-
-            <select name="estado">
+            <select class="refugios-input" name="estado">
                 <option value="">Todos los estados</option>
-                <option value="activo" {% if filtro_estado == 'activo' %}selected{% endif %}>Activo</option>
-                <option value="inactivo" {% if filtro_estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                <option value="activo" {% if filtro_estado == 'activo' %}selected{% endif %}>Activos</option>
+                <option value="inactivo" {% if filtro_estado == 'inactivo' %}selected{% endif %}>Inactivos</option>
             </select>
 
-            <button type="submit">Buscar</button>
-            <a href="{% url 'gestion_refugios' %}" style="align-self:center;color:#c9578b">Limpiar</a>
+            <button class="refugios-filter-btn" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+
+            <a class="refugios-clear" href="{% url 'gestion_refugios' %}">
+                <i class="fa-solid fa-rotate-left"></i> Limpiar
+            </a>
         </form>
 
-        <div class="ref-table-wrap">
-            <table class="ref-table">
+        <div class="refugios-table-wrap">
+            <table class="refugios-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Refugio</th>
-                        <th>Localidad</th>
-                        <th>Dirección</th>
+                        <th>Ubicación</th>
                         <th>Contacto</th>
+                        <th>Donaciones</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        <th>Administrar</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                {% for refugio in refugios %}
+                {% for r in refugios %}
                     <tr>
-                        <td>{{ refugio.id_refugio }}</td>
-                        <td><strong>{{ refugio.nombre }}</strong></td>
-                        <td>{{ refugio.localidad }}</td>
-                        <td>{{ refugio.direccion }}</td>
                         <td>
-                            {{ refugio.telefono|default:"Sin teléfono" }}<br>
-                            {{ refugio.email|default:"Sin correo" }}
+                            <div class="refugios-name">
+                                <div class="refugios-avatar"><i class="fa-solid fa-house-chimney"></i></div>
+                                <div>
+                                    <strong>{{ r.nombre }}</strong>
+                                    <small>Registro #{{ r.id_refugio }}</small>
+                                </div>
+                            </div>
                         </td>
+
                         <td>
-                            <span class="ref-pill {% if refugio.estado == 'activo' %}ref-active{% else %}ref-inactive{% endif %}">
-                                {{ refugio.estado|title }}
+                            {{ r.direccion }}
+                            <span class="refugios-cell-muted">{{ r.n_localidad }}</span>
+                        </td>
+
+                        <td class="refugios-contact">
+                            {{ r.telefono|default:"Sin teléfono" }}
+                            <span class="refugios-cell-muted">{{ r.email|default:"Sin correo" }}</span>
+                        </td>
+
+                        <td><strong>{{ r.total_donaciones }}</strong></td>
+
+                        <td>
+                            <span class="refugios-badge {% if r.estado == 'activo' %}active{% else %}inactive{% endif %}">
+                                {{ r.estado|capfirst }}
                             </span>
                         </td>
-                        <td>
-                            <div class="ref-actions">
-                                <button type="button" class="ref-edit"
-                                    onclick="editarRefugio(
-                                        '{{ refugio.id_refugio }}',
-                                        '{{ refugio.nombre|escapejs }}',
-                                        '{{ refugio.descripcion|default_if_none:''|escapejs }}',
-                                        '{{ refugio.direccion|escapejs }}',
-                                        '{{ refugio.telefono|default_if_none:''|escapejs }}',
-                                        '{{ refugio.email|default_if_none:''|escapejs }}',
-                                        '{{ refugio.localidad_id }}'
-                                    )">
-                                    Editar
-                                </button>
 
-                                <form method="POST" action="{% url 'gestion_refugios' %}">
+                        <td>
+                            <div class="refugios-actions">
+                                <details>
+                                    <summary class="refugios-action edit">
+                                        <i class="fa-solid fa-pen"></i> Editar
+                                    </summary>
+
+                                    <div class="refugios-edit-box">
+                                        <h3>Editar refugio #{{ r.id_refugio }}</h3>
+
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="accion" value="editar">
+                                            <input type="hidden" name="id_refugio" value="{{ r.id_refugio }}">
+
+                                            <input name="nombre" value="{{ r.nombre }}" placeholder="Nombre" required>
+                                            <input name="direccion" value="{{ r.direccion }}" placeholder="Dirección" required>
+
+                                            <select name="localidad_id" required>
+                                                {% for id,nombre in localidades %}
+                                                    <option value="{{ id }}" {% if id == r.localidad_id %}selected{% endif %}>{{ nombre }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                            <input name="telefono" value="{{ r.telefono|default:'' }}" placeholder="Teléfono">
+                                            <input type="email" name="email" value="{{ r.email|default:'' }}" placeholder="Correo electrónico">
+                                            <textarea name="descripcion" rows="2" placeholder="Descripción">{{ r.descripcion }}</textarea>
+
+                                            <select name="estado">
+                                                <option value="activo" {% if r.estado == 'activo' %}selected{% endif %}>Activo</option>
+                                                <option value="inactivo" {% if r.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                            </select>
+
+                                            <button class="refugios-action edit" type="submit">
+                                                <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+                                            </button>
+                                        </form>
+                                    </div>
+                                </details>
+
+                                <form method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="accion" value="estado">
-                                    <input type="hidden" name="id_refugio" value="{{ refugio.id_refugio }}">
-                                    {% if refugio.estado == 'activo' %}
-                                        <input type="hidden" name="nuevo_estado" value="inactivo">
-                                        <button class="ref-actions ref-delete" type="submit">Desactivar</button>
-                                    {% else %}
-                                        <input type="hidden" name="nuevo_estado" value="activo">
-                                        <button class="ref-actions ref-state" type="submit">Activar</button>
-                                    {% endif %}
+                                    <input type="hidden" name="id_refugio" value="{{ r.id_refugio }}">
+                                    <input type="hidden" name="estado" value="{% if r.estado == 'activo' %}inactivo{% else %}activo{% endif %}">
+
+                                    <button class="refugios-action toggle" type="submit">
+                                        {% if r.estado == 'activo' %}
+                                            <i class="fa-solid fa-pause"></i> Desactivar
+                                        {% else %}
+                                            <i class="fa-solid fa-play"></i> Activar
+                                        {% endif %}
+                                    </button>
                                 </form>
 
-                                <form method="POST" action="{% url 'eliminar_refugio' refugio.id_refugio %}" onsubmit="return confirm('¿Seguro que deseas eliminar este refugio?')">
+                                <form method="post" onsubmit="return confirm('¿Eliminar este refugio? Las donaciones asociadas conservarán su registro.');">
                                     {% csrf_token %}
-                                    <button class="ref-delete" type="submit">Eliminar</button>
+                                    <input type="hidden" name="accion" value="eliminar">
+                                    <input type="hidden" name="id_refugio" value="{{ r.id_refugio }}">
+
+                                    <button class="refugios-action delete" type="submit" title="Eliminar">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
+
                 {% empty %}
-                    <tr><td colspan="7" style="text-align:center;padding:30px">No hay refugios registrados.</td></tr>
+                    <tr>
+                        <td colspan="6" class="refugios-empty">
+                            <i class="fa-solid fa-house-circle-exclamation"></i>
+                            No hay refugios que coincidan con la búsqueda.
+                        </td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
+    </section>
+</div>
+
+<!-- VENTANA PARA REGISTRAR UN NUEVO REFUGIO -->
+<dialog class="refugios-dialog" id="modalNuevoRefugio">
+    <div class="refugios-dialog-head">
+        <div>
+            <h2><i class="fa-solid fa-house-chimney" style="color:#d85f91"></i> Registrar nuevo refugio</h2>
+            <p>Completa los datos para agregarlo al directorio.</p>
+        </div>
+
+        <button class="refugios-close" type="button" aria-label="Cerrar" onclick="document.getElementById('modalNuevoRefugio').close()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
 
-    <div class="ref-card" id="editar-refugio" style="display:none;margin-top:22px">
-        <h2 style="color:#c9578b">Editar refugio</h2>
-
-        <form method="POST" class="ref-form">
+    <div class="refugios-dialog-body">
+        <form method="post">
             {% csrf_token %}
-            <input type="hidden" name="accion" value="editar">
-            <input type="hidden" name="id_refugio" id="edit-id">
+            <input type="hidden" name="accion" value="crear">
 
-            <input name="nombre" id="edit-nombre" placeholder="Nombre" required>
-            <input name="direccion" id="edit-direccion" placeholder="Dirección" required>
-            <input name="telefono" id="edit-telefono" placeholder="Teléfono">
-            <input name="email" id="edit-email" type="email" placeholder="Correo">
+            <div class="refugios-form-grid">
+                <div class="refugios-field">
+                    <label for="nuevo_nombre">Nombre del refugio *</label>
+                    <input id="nuevo_nombre" name="nombre" required maxlength="150" placeholder="Ej. Huellitas felices">
+                </div>
 
-            <select name="localidad_id" id="edit-localidad" required>
-                <option value="">Selecciona localidad</option>
-                {% for localidad in localidades %}
-                    <option value="{{ localidad.0 }}">{{ localidad.1 }}</option>
-                {% endfor %}
-            </select>
+                <div class="refugios-field">
+                    <label for="nuevo_direccion">Dirección *</label>
+                    <input id="nuevo_direccion" name="direccion" required maxlength="255" placeholder="Dirección del refugio">
+                </div>
 
-            <textarea name="descripcion" id="edit-descripcion" placeholder="Descripción"></textarea>
+                <div class="refugios-field">
+                    <label for="nuevo_localidad">Localidad *</label>
+                    <select id="nuevo_localidad" name="localidad_id" required>
+                        <option value="">Selecciona una localidad</option>
+                        {% for id,nombre in localidades %}
+                            <option value="{{ id }}">{{ nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <button type="submit">Guardar cambios</button>
-            <button type="button" onclick="document.getElementById('editar-refugio').style.display='none'">Cancelar</button>
+                <div class="refugios-field">
+                    <label for="nuevo_telefono">Teléfono</label>
+                    <input id="nuevo_telefono" name="telefono" maxlength="20" placeholder="Número de contacto">
+                </div>
+
+                <div class="refugios-field">
+                    <label for="nuevo_email">Correo electrónico</label>
+                    <input id="nuevo_email" type="email" name="email" maxlength="150" placeholder="correo@ejemplo.com">
+                </div>
+
+                <div class="refugios-field">
+                    <label for="nuevo_estado">Estado inicial</label>
+                    <select id="nuevo_estado" name="estado">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="refugios-field full">
+                    <label for="nuevo_descripcion">Descripción</label>
+                    <textarea id="nuevo_descripcion" name="descripcion" rows="3" placeholder="Cuéntanos brevemente sobre el refugio..."></textarea>
+                </div>
+            </div>
+
+            <div class="refugios-form-actions">
+                <button class="refugios-cancel" type="button" onclick="document.getElementById('modalNuevoRefugio').close()">
+                    Cancelar
+                </button>
+
+                <button class="refugios-primary" type="submit">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar refugio
+                </button>
+            </div>
         </form>
     </div>
-</section>
+</dialog>
 
 <script>
-function editarRefugio(id, nombre, descripcion, direccion, telefono, email, localidad) {
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-nombre').value = nombre;
-    document.getElementById('edit-descripcion').value = descripcion;
-    document.getElementById('edit-direccion').value = direccion;
-    document.getElementById('edit-telefono').value = telefono;
-    document.getElementById('edit-email').value = email;
-    document.getElementById('edit-localidad').value = localidad;
+(function(){
+    const modal = document.getElementById('modalNuevoRefugio');
 
-    const formulario = document.getElementById('editar-refugio');
-    formulario.style.display = 'block';
-    formulario.scrollIntoView({behavior: 'smooth'});
-}
+    if (!modal) return;
+
+    modal.addEventListener('click', function(event){
+        if (event.target === modal) {
+            modal.close();
+        }
+    });
+})();
 </script>
+
 {% endblock %}

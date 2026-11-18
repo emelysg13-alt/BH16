@@ -2,148 +2,311 @@
 {% extends 'panel_admin/dashboard.html' %}
 
 {% block content %}
+
 <style>
-.don-page {padding:28px 30px;color:#705b69}
-.don-heading {margin-bottom:22px}
-.don-heading h1 {color:#c9578b;margin:0 0 7px}
-.don-heading p {color:#9b8995}
-.don-stats {display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:22px}
-.don-stat,.don-card {background:white;border:1px solid #f7e6ef;border-radius:16px;padding:19px;box-shadow:0 5px 15px #dca7bd17}
-.don-stat span {font-size:12px;color:#988995}
-.don-stat strong {display:block;font-size:24px;color:#d45c91;margin-top:8px}
-.don-card h2 {font-size:19px;color:#c9578b}
-.don-filter {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-.don-filter input,.don-filter select {padding:12px;border:1px solid #f0cbdc;border-radius:9px;font:inherit}
-.don-filter input {flex:1;min-width:200px}
-.don-filter button {border:0;border-radius:9px;padding:12px 18px;background:#d96f9e;color:white;font-weight:bold;cursor:pointer}
-.don-table-wrap {overflow-x:auto}
-.don-table {width:100%;min-width:850px;border-collapse:collapse;font-size:13px}
-.don-table th {padding:14px;background:#fff0f6;color:#c45183;text-align:left}
-.don-table td {padding:14px;border-bottom:1px solid #f5e5ed}
-.don-pill {padding:6px 10px;border-radius:20px;font-size:11px;font-weight:bold}
-.pendiente {background:#fff0d5;color:#a96b00}
-.confirmada {background:#e0f7eb;color:#16865c}
-.cancelada {background:#ffe3e5;color:#bd3f4c}
-.don-state-form {display:flex;gap:5px;align-items:center}
-.don-state-form select {padding:7px;border:1px solid #f0cbdc;border-radius:7px}
-.don-state-form button {border:0;border-radius:7px;background:#dc79a5;color:white;padding:8px;cursor:pointer}
-.don-message {padding:12px;border-radius:9px;margin-bottom:10px;background:#fff0f6}
-@media(max-width:1000px){.don-stats{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.don-stats{grid-template-columns:1fr}}
+.donaciones-page{padding:30px;color:#574652;max-width:1500px;margin:0 auto}
+.donaciones-page *{box-sizing:border-box}
+.donaciones-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:25px}
+.donaciones-eyebrow{display:inline-flex;align-items:center;gap:7px;color:#c45d89;font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.donaciones-heading h1{font-size:29px;line-height:1.2;color:#684d5e;margin:0 0 7px;font-weight:900}
+.donaciones-heading p{margin:0;color:#a18d99;font-size:14px}
+.donaciones-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.donaciones-stat{background:#fff;border:1px solid #f3e4eb;border-radius:17px;padding:18px;box-shadow:0 6px 25px #be6e910d;min-width:0}
+.donaciones-stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.donaciones-stat-label{font-size:11px;color:#a18d99;font-weight:800}
+.donaciones-stat-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#fff0f6;color:#d85f91}
+.donaciones-stat strong{display:block;margin-top:12px;font-size:25px;line-height:1.1;color:#684d5e;font-weight:900;overflow-wrap:anywhere}
+.donaciones-stat small{display:block;margin-top:5px;color:#b09eaa;font-size:10px}
+.donaciones-stat.pending .donaciones-stat-icon{background:#fff6e8;color:#c28a37}
+.donaciones-stat.confirmed .donaciones-stat-icon{background:#e8f8ef;color:#32845c}
+.donaciones-stat.cancelled .donaciones-stat-icon{background:#fff0ef;color:#bd5a55}
+.donaciones-total-box{display:flex;align-items:center;justify-content:space-between;gap:15px;background:linear-gradient(115deg,#684d5e,#91677f);border-radius:17px;padding:18px 22px;margin-bottom:22px;color:white;box-shadow:0 8px 22px #684d5e25}
+.donaciones-total-box span{font-size:12px;font-weight:700;color:#f4e8ef}
+.donaciones-total-box strong{display:block;font-size:24px;font-weight:900;margin-top:3px}
+.donaciones-total-icon{width:45px;height:45px;display:grid;place-items:center;border-radius:14px;background:#ffffff20;font-size:19px}
+.donaciones-panel{background:white;border:1px solid #f3e4eb;border-radius:18px;box-shadow:0 6px 25px #be6e910d;overflow:hidden}
+.donaciones-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:21px 22px 17px;border-bottom:1px solid #f7edf1}
+.donaciones-panel-head h2{margin:0;color:#684d5e;font-size:17px;font-weight:900}
+.donaciones-panel-head p{margin:4px 0 0;color:#a18d99;font-size:12px}
+.donaciones-count{padding:6px 10px;border-radius:20px;background:#fff2f7;color:#c45d89;font-size:10px;font-weight:900}
+.donaciones-filter{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:17px 22px}
+.donaciones-input{min-height:41px;border:1px solid #efdee6;border-radius:10px;background:#fffafd;padding:9px 12px;color:#574652;font:600 12px 'Nunito',sans-serif;outline:none}
+.donaciones-input:focus{border-color:#e879a5;box-shadow:0 0 0 3px #fce4ee}
+.donaciones-search{min-width:230px;flex:1}
+.donaciones-filter-btn,.donaciones-clear{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:41px;padding:9px 14px;border-radius:10px;font:800 12px 'Nunito',sans-serif;text-decoration:none;cursor:pointer}
+.donaciones-filter-btn{border:0;background:#684d5e;color:#fff}
+.donaciones-clear{background:#fff2f7;color:#c45d89;border:1px solid #f8dce8}
+.donaciones-table-wrap{overflow-x:auto}
+.donaciones-table{width:100%;min-width:930px;border-collapse:collapse;text-align:left}
+.donaciones-table th{padding:13px 15px;background:#fff8fb;color:#a77b91;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:900;white-space:nowrap}
+.donaciones-table td{padding:15px;border-top:1px solid #f7edf1;font-size:12px;color:#796675;vertical-align:middle}
+.donaciones-table tbody tr:hover{background:#fffafd}
+.donaciones-id{font-size:11px;font-weight:900;color:#c45d89}
+.donaciones-person{display:flex;align-items:center;gap:10px;min-width:170px}
+.donaciones-avatar{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:50%;background:#fce4ee;color:#c45d89;font-size:13px}
+.donaciones-person strong{display:block;color:#684d5e;font-size:12px;font-weight:900}
+.donaciones-person small,.donaciones-muted{display:block;color:#aa99a3;font-size:10px;margin-top:3px}
+.donaciones-amount{font-size:14px;font-weight:900;color:#684d5e;white-space:nowrap}
+.donaciones-message{max-width:190px;line-height:1.5;color:#8e7c88}
+.donaciones-status{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:6px 10px;font-size:10px;font-weight:900;white-space:nowrap}
+.donaciones-status:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.donaciones-status.pendiente{background:#fff6e8;color:#b7822e}
+.donaciones-status.confirmada{background:#e8f8ef;color:#32845c}
+.donaciones-status.cancelada{background:#fff0ef;color:#bd5a55}
+.donaciones-update{display:flex;align-items:center;gap:6px;margin-top:8px}
+.donaciones-update select{min-width:112px;min-height:32px;border:1px solid #efdee6;border-radius:8px;padding:5px 7px;background:#fffafd;color:#796675;font:700 10px 'Nunito',sans-serif}
+.donaciones-update button{min-height:32px;border:0;border-radius:8px;padding:6px 9px;background:#684d5e;color:#fff;font:800 10px 'Nunito',sans-serif;cursor:pointer}
+.donaciones-empty{text-align:center!important;padding:45px 20px!important;color:#a18d99!important}
+.donaciones-empty i{display:block;font-size:27px;color:#e9a4bf;margin-bottom:9px}
+.donaciones-message-alert{padding:12px 15px;border-radius:11px;margin:0 0 13px;font-size:12px;font-weight:800;background:#e8f8ef;color:#32845c}
+.donaciones-message-alert.error{background:#fff0ef;color:#bd5a55}
+
+@media(max-width:1000px){
+    .donaciones-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:650px){
+    .donaciones-page{padding:20px 13px}
+    .donaciones-heading h1{font-size:24px}
+    .donaciones-stats{gap:9px}
+    .donaciones-stat{padding:14px}
+    .donaciones-stat strong{font-size:21px}
+    .donaciones-total-box{padding:15px}
+    .donaciones-total-box strong{font-size:20px}
+}
 </style>
 
-<section class="don-page">
-    <div class="don-heading">
-        <h1>Gestión de donaciones</h1>
-        <p>Consulta y administra las donaciones realizadas en BackHome.</p>
-    </div>
+<div class="donaciones-page">
 
-    {% for message in messages %}
-        <div class="don-message">{{ message }}</div>
-    {% endfor %}
+    <header class="donaciones-heading">
+        <div>
+            <span class="donaciones-eyebrow">
+                <i class="fa-solid fa-heart"></i> BackHome / Administración
+            </span>
+            <h1>Gestión de donaciones</h1>
+            <p>Haz seguimiento de los aportes y del apoyo que recibe cada refugio.</p>
+        </div>
+    </header>
 
-    <div class="don-stats">
-        <div class="don-stat">
-            <span>Total de donaciones</span>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="donaciones-message-alert {% if message.tags != 'success' %}error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="donaciones-stats">
+
+        <article class="donaciones-stat">
+            <div class="donaciones-stat-top">
+                <span class="donaciones-stat-label">Donaciones registradas</span>
+                <div class="donaciones-stat-icon">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                </div>
+            </div>
             <strong>{{ estadisticas.total }}</strong>
-        </div>
-        <div class="don-stat">
-            <span>Pendientes</span>
+            <small>Todos los registros</small>
+        </article>
+
+        <article class="donaciones-stat pending">
+            <div class="donaciones-stat-top">
+                <span class="donaciones-stat-label">Pendientes</span>
+                <div class="donaciones-stat-icon">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+            </div>
             <strong>{{ estadisticas.pendientes }}</strong>
-        </div>
-        <div class="don-stat">
-            <span>Confirmadas</span>
+            <small>Requieren seguimiento</small>
+        </article>
+
+        <article class="donaciones-stat confirmed">
+            <div class="donaciones-stat-top">
+                <span class="donaciones-stat-label">Confirmadas</span>
+                <div class="donaciones-stat-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
             <strong>{{ estadisticas.confirmadas }}</strong>
-        </div>
-        <div class="don-stat">
-            <span>Canceladas</span>
+            <small>Aportes confirmados</small>
+        </article>
+
+        <article class="donaciones-stat cancelled">
+            <div class="donaciones-stat-top">
+                <span class="donaciones-stat-label">Canceladas</span>
+                <div class="donaciones-stat-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+            </div>
             <strong>{{ estadisticas.canceladas }}</strong>
-        </div>
-        <div class="don-stat">
-            <span>Total confirmado</span>
-            <strong>${{ estadisticas.dinero_confirmado|floatformat:2 }}</strong>
-        </div>
-    </div>
+            <small>Donaciones canceladas</small>
+        </article>
 
-    <div class="don-card">
-        <h2>Donaciones registradas</h2>
+    </section>
 
-        <form method="GET" class="don-filter">
+    <section class="donaciones-total-box">
+        <div>
+            <span>Total de dinero confirmado</span>
+            <strong>${{ estadisticas.monto_confirmado|floatformat:2 }}</strong>
+        </div>
+        <div class="donaciones-total-icon">
+            <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+    </section>
+
+    <section class="donaciones-panel">
+
+        <div class="donaciones-panel-head">
+            <div>
+                <h2>Historial de donaciones</h2>
+                <p>Consulta los aportes y actualiza su estado.</p>
+            </div>
+            <span class="donaciones-count">{{ donaciones|length }} resultados</span>
+        </div>
+
+        <form method="get" class="donaciones-filter">
+
             <input
-                type="text"
+                class="donaciones-input donaciones-search"
                 name="buscar"
                 value="{{ buscar }}"
-                placeholder="Buscar por donante, correo, refugio o ID"
+                placeholder="Buscar por ID, donante, correo o refugio"
             >
 
-            <select name="estado">
+            <select class="donaciones-input" name="estado">
                 <option value="">Todos los estados</option>
-                <option value="pendiente" {% if filtro_estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                <option value="confirmada" {% if filtro_estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
-                <option value="cancelada" {% if filtro_estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                <option value="pendiente" {% if filtro_estado == 'pendiente' %}selected{% endif %}>Pendientes</option>
+                <option value="confirmada" {% if filtro_estado == 'confirmada' %}selected{% endif %}>Confirmadas</option>
+                <option value="cancelada" {% if filtro_estado == 'cancelada' %}selected{% endif %}>Canceladas</option>
             </select>
 
-            <button type="submit">Buscar</button>
-            <a href="{% url 'gestion_donaciones' %}" style="align-self:center;color:#c9578b">Limpiar</a>
+            <button class="donaciones-filter-btn" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+
+            <a class="donaciones-clear" href="{% url 'gestion_donaciones' %}">
+                <i class="fa-solid fa-rotate-left"></i> Limpiar
+            </a>
+
         </form>
 
-        <div class="don-table-wrap">
-            <table class="don-table">
+        <div class="donaciones-table-wrap">
+            <table class="donaciones-table">
+
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Donación</th>
                         <th>Donante</th>
-                        <th>Correo</th>
                         <th>Refugio</th>
                         <th>Monto</th>
-                        <th>Fecha</th>
                         <th>Mensaje</th>
-                        <th>Estado</th>
-                        <th>Administrar</th>
+                        <th>Fecha</th>
+                        <th>Estado y gestión</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                {% for donacion in donaciones %}
-                    <tr>
-                        <td>#{{ donacion.id_donacion }}</td>
-                        <td><strong>{{ donacion.donante }}</strong></td>
-                        <td>{{ donacion.email_donante }}</td>
-                        <td>{{ donacion.refugio|default:"Sin refugio asignado" }}</td>
-                        <td>${{ donacion.monto|floatformat:2 }}</td>
-                        <td>{{ donacion.fecha_donacion|date:"d/m/Y H:i" }}</td>
-                        <td>{{ donacion.mensaje|default:"Sin mensaje" }}</td>
-                        <td>
-                            <span class="don-pill {{ donacion.estado }}">
-                                {{ donacion.estado|title }}
-                            </span>
-                        </td>
-                        <td>
-                            <form method="POST" class="don-state-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="accion" value="estado">
-                                <input type="hidden" name="id_donacion" value="{{ donacion.id_donacion }}">
 
-                                <select name="nuevo_estado">
-                                    <option value="pendiente" {% if donacion.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                                    <option value="confirmada" {% if donacion.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
-                                    <option value="cancelada" {% if donacion.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
-                                </select>
+                    {% for d in donaciones %}
+                        <tr>
 
-                                <button type="submit">Guardar</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="9" style="text-align:center;padding:30px">
-                            No hay donaciones registradas.
-                        </td>
-                    </tr>
-                {% endfor %}
+                            <td>
+                                <span class="donaciones-id">#{{ d.id_donacion }}</span>
+                            </td>
+
+                            <td>
+                                <div class="donaciones-person">
+                                    <div class="donaciones-avatar">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+
+                                    <div>
+                                        <strong>
+                                            {{ d.primer_nombre }}
+                                            {{ d.segundo_nombre }}
+                                            {{ d.primer_apellido }}
+                                            {{ d.segundo_apellido }}
+                                        </strong>
+                                        <small>{{ d.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>{{ d.refugio|default:"Donación general" }}</td>
+
+                            <td>
+                                <span class="donaciones-amount">
+                                    ${{ d.monto|floatformat:2 }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="donaciones-message">
+                                    {{ d.mensaje|default:"Sin mensaje" }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ d.fecha_donacion|date:"d/m/Y" }}
+                                <span class="donaciones-muted">
+                                    {{ d.fecha_donacion|date:"H:i" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="donaciones-status {{ d.estado }}">
+                                    {{ d.estado|capfirst }}
+                                </span>
+
+                                <form method="post" class="donaciones-update">
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="id_donacion"
+                                        value="{{ d.id_donacion }}"
+                                    >
+
+                                    <select
+                                        name="estado"
+                                        aria-label="Nuevo estado para donación {{ d.id_donacion }}"
+                                    >
+                                        <option value="pendiente" {% if d.estado == 'pendiente' %}selected{% endif %}>
+                                            Pendiente
+                                        </option>
+
+                                        <option value="confirmada" {% if d.estado == 'confirmada' %}selected{% endif %}>
+                                            Confirmada
+                                        </option>
+
+                                        <option value="cancelada" {% if d.estado == 'cancelada' %}selected{% endif %}>
+                                            Cancelada
+                                        </option>
+                                    </select>
+
+                                    <button type="submit" title="Guardar estado">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="donaciones-empty">
+                                <i class="fa-solid fa-heart-crack"></i>
+                                No hay donaciones que coincidan con la búsqueda.
+                            </td>
+                        </tr>
+                    {% endfor %}
+
                 </tbody>
             </table>
         </div>
-    </div>
-</section>
+
+    </section>
+
+</div>
+
 {% endblock %}
