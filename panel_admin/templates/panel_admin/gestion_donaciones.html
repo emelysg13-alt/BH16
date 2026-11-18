@@ -1,0 +1,149 @@
+
+{% extends 'panel_admin/dashboard.html' %}
+
+{% block content %}
+<style>
+.don-page {padding:28px 30px;color:#705b69}
+.don-heading {margin-bottom:22px}
+.don-heading h1 {color:#c9578b;margin:0 0 7px}
+.don-heading p {color:#9b8995}
+.don-stats {display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:22px}
+.don-stat,.don-card {background:white;border:1px solid #f7e6ef;border-radius:16px;padding:19px;box-shadow:0 5px 15px #dca7bd17}
+.don-stat span {font-size:12px;color:#988995}
+.don-stat strong {display:block;font-size:24px;color:#d45c91;margin-top:8px}
+.don-card h2 {font-size:19px;color:#c9578b}
+.don-filter {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.don-filter input,.don-filter select {padding:12px;border:1px solid #f0cbdc;border-radius:9px;font:inherit}
+.don-filter input {flex:1;min-width:200px}
+.don-filter button {border:0;border-radius:9px;padding:12px 18px;background:#d96f9e;color:white;font-weight:bold;cursor:pointer}
+.don-table-wrap {overflow-x:auto}
+.don-table {width:100%;min-width:850px;border-collapse:collapse;font-size:13px}
+.don-table th {padding:14px;background:#fff0f6;color:#c45183;text-align:left}
+.don-table td {padding:14px;border-bottom:1px solid #f5e5ed}
+.don-pill {padding:6px 10px;border-radius:20px;font-size:11px;font-weight:bold}
+.pendiente {background:#fff0d5;color:#a96b00}
+.confirmada {background:#e0f7eb;color:#16865c}
+.cancelada {background:#ffe3e5;color:#bd3f4c}
+.don-state-form {display:flex;gap:5px;align-items:center}
+.don-state-form select {padding:7px;border:1px solid #f0cbdc;border-radius:7px}
+.don-state-form button {border:0;border-radius:7px;background:#dc79a5;color:white;padding:8px;cursor:pointer}
+.don-message {padding:12px;border-radius:9px;margin-bottom:10px;background:#fff0f6}
+@media(max-width:1000px){.don-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.don-stats{grid-template-columns:1fr}}
+</style>
+
+<section class="don-page">
+    <div class="don-heading">
+        <h1>Gestión de donaciones</h1>
+        <p>Consulta y administra las donaciones realizadas en BackHome.</p>
+    </div>
+
+    {% for message in messages %}
+        <div class="don-message">{{ message }}</div>
+    {% endfor %}
+
+    <div class="don-stats">
+        <div class="don-stat">
+            <span>Total de donaciones</span>
+            <strong>{{ estadisticas.total }}</strong>
+        </div>
+        <div class="don-stat">
+            <span>Pendientes</span>
+            <strong>{{ estadisticas.pendientes }}</strong>
+        </div>
+        <div class="don-stat">
+            <span>Confirmadas</span>
+            <strong>{{ estadisticas.confirmadas }}</strong>
+        </div>
+        <div class="don-stat">
+            <span>Canceladas</span>
+            <strong>{{ estadisticas.canceladas }}</strong>
+        </div>
+        <div class="don-stat">
+            <span>Total confirmado</span>
+            <strong>${{ estadisticas.dinero_confirmado|floatformat:2 }}</strong>
+        </div>
+    </div>
+
+    <div class="don-card">
+        <h2>Donaciones registradas</h2>
+
+        <form method="GET" class="don-filter">
+            <input
+                type="text"
+                name="buscar"
+                value="{{ buscar }}"
+                placeholder="Buscar por donante, correo, refugio o ID"
+            >
+
+            <select name="estado">
+                <option value="">Todos los estados</option>
+                <option value="pendiente" {% if filtro_estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="confirmada" {% if filtro_estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                <option value="cancelada" {% if filtro_estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+            </select>
+
+            <button type="submit">Buscar</button>
+            <a href="{% url 'gestion_donaciones' %}" style="align-self:center;color:#c9578b">Limpiar</a>
+        </form>
+
+        <div class="don-table-wrap">
+            <table class="don-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Donante</th>
+                        <th>Correo</th>
+                        <th>Refugio</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Mensaje</th>
+                        <th>Estado</th>
+                        <th>Administrar</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for donacion in donaciones %}
+                    <tr>
+                        <td>#{{ donacion.id_donacion }}</td>
+                        <td><strong>{{ donacion.donante }}</strong></td>
+                        <td>{{ donacion.email_donante }}</td>
+                        <td>{{ donacion.refugio|default:"Sin refugio asignado" }}</td>
+                        <td>${{ donacion.monto|floatformat:2 }}</td>
+                        <td>{{ donacion.fecha_donacion|date:"d/m/Y H:i" }}</td>
+                        <td>{{ donacion.mensaje|default:"Sin mensaje" }}</td>
+                        <td>
+                            <span class="don-pill {{ donacion.estado }}">
+                                {{ donacion.estado|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <form method="POST" class="don-state-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="accion" value="estado">
+                                <input type="hidden" name="id_donacion" value="{{ donacion.id_donacion }}">
+
+                                <select name="nuevo_estado">
+                                    <option value="pendiente" {% if donacion.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="confirmada" {% if donacion.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                                    <option value="cancelada" {% if donacion.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                </select>
+
+                                <button type="submit">Guardar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align:center;padding:30px">
+                            No hay donaciones registradas.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
