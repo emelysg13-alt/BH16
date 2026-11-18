@@ -2,18 +2,19 @@
 {% extends 'panel_admin/dashboard.html' %}
 
 {% block content %}
+
 <style>
     .users-page {
         padding: 28px 30px;
-        color: #66515f;
+        color: #705b69;
     }
 
     .users-heading {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 15px;
+        justify-content: space-between;
         flex-wrap: wrap;
+        gap: 15px;
         margin-bottom: 24px;
     }
 
@@ -28,10 +29,10 @@
         margin: 0;
     }
 
-    .btn-primary-users {
+    .btn-users {
         border: 0;
-        border-radius: 12px;
-        padding: 13px 19px;
+        border-radius: 11px;
+        padding: 12px 18px;
         color: white;
         background: linear-gradient(135deg, #ed8ab5, #cf6097);
         font-weight: 700;
@@ -39,24 +40,28 @@
         box-shadow: 0 5px 14px #e9a1c14a;
     }
 
-    .btn-primary-users:hover {
+    .btn-users:hover {
         filter: brightness(.96);
         transform: translateY(-1px);
     }
 
     .users-stats {
         display: grid;
-        grid-template-columns: repeat(4, minmax(150px, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 15px;
         margin-bottom: 22px;
     }
 
-    .user-stat {
+    .user-stat,
+    .users-card {
         background: white;
         border: 1px solid #f7e6ef;
         border-radius: 17px;
-        padding: 20px;
         box-shadow: 0 5px 15px #dca7bd17;
+    }
+
+    .user-stat {
+        padding: 20px;
     }
 
     .user-stat span {
@@ -72,86 +77,14 @@
     }
 
     .users-card {
-        background: white;
-        border: 1px solid #f7e6ef;
-        border-radius: 19px;
         padding: 22px;
-        box-shadow: 0 5px 18px #dca7bd1c;
         margin-bottom: 22px;
     }
 
     .users-card h2 {
         color: #c9578b;
         font-size: 19px;
-        margin: 0 0 17px;
-    }
-
-    .create-panel {
-        margin-bottom: 22px;
-        border-top: 4px solid #e987b2;
-    }
-
-    .create-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(180px, 1fr));
-        gap: 15px;
-    }
-
-    .field {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-
-    .field label {
-        color: #806b79;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .field input,
-    .field select,
-    .filter-control {
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        border: 1px solid #f0cbdc;
-        border-radius: 10px;
-        background: #fff;
-        color: #66515f;
-        padding: 12px;
-        outline: none;
-        font: inherit;
-    }
-
-    .field input:focus,
-    .field select:focus,
-    .filter-control:focus {
-        border-color: #df78a7;
-        box-shadow: 0 0 0 3px #fce8f1;
-    }
-
-    .required-note {
-        color: #a895a1;
-        font-size: 12px;
-        margin: 12px 0;
-    }
-
-    .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 18px;
-    }
-
-    .btn-secondary-users {
-        border: 1px solid #f0cbdc;
-        border-radius: 10px;
-        padding: 12px 17px;
-        background: white;
-        color: #9a7186;
-        cursor: pointer;
-        font-weight: 600;
+        margin: 0 0 18px;
     }
 
     .users-filters {
@@ -159,6 +92,24 @@
         grid-template-columns: minmax(200px, 1fr) 180px 180px auto;
         gap: 10px;
         margin-bottom: 20px;
+    }
+
+    .control {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        border: 1px solid #f0cbdc;
+        border-radius: 10px;
+        background: white;
+        color: #66515f;
+        padding: 12px;
+        outline: none;
+        font: inherit;
+    }
+
+    .control:focus {
+        border-color: #df78a7;
+        box-shadow: 0 0 0 3px #fce8f1;
     }
 
     .filter-button {
@@ -178,8 +129,8 @@
 
     .users-table {
         width: 100%;
+        min-width: 950px;
         border-collapse: collapse;
-        min-width: 850px;
         font-size: 13px;
     }
 
@@ -197,7 +148,7 @@
         vertical-align: middle;
     }
 
-    .users-table tr:hover td {
+    .users-table tbody tr:hover td {
         background: #fffafd;
     }
 
@@ -244,7 +195,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        align-items: center;
     }
 
     .action-form {
@@ -261,19 +211,24 @@
         cursor: pointer;
     }
 
+    .action-edit {
+        background: #fce6f0;
+        color: #bd5484;
+    }
+
     .action-activate {
-        color: #16865c;
         background: #e0f7eb;
+        color: #16865c;
     }
 
     .action-suspend {
-        color: #a96b00;
         background: #fff0d5;
+        color: #a96b00;
     }
 
     .action-block {
-        color: #bd3f4c;
         background: #ffe3e5;
+        color: #bd3f4c;
     }
 
     .empty-users {
@@ -303,12 +258,136 @@
         color: #ae4053;
     }
 
+    /* VENTANA EMERGENTE */
+
+    .modal-users {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #38233199;
+        padding: 20px;
+        overflow-y: auto;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-users.show {
+        display: flex;
+    }
+
+    .modal-content-users {
+        width: 100%;
+        max-width: 850px;
+        max-height: 92vh;
+        overflow-y: auto;
+        background: white;
+        border-radius: 20px;
+        padding: 27px;
+        box-shadow: 0 20px 60px #3c243344;
+        animation: modalAppear .2s ease-out;
+    }
+
+    @keyframes modalAppear {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal-header-users {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding-bottom: 17px;
+        border-bottom: 1px solid #f5e5ed;
+        margin-bottom: 20px;
+    }
+
+    .modal-header-users h2 {
+        margin: 0;
+        color: #c9578b;
+        font-size: 21px;
+    }
+
+    .modal-close-users {
+        border: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #fff0f6;
+        color: #c9578b;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .form-grid-users {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .field-users {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .field-users label {
+        color: #806b79;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .field-users input,
+    .field-users select {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #f0cbdc;
+        border-radius: 10px;
+        background: white;
+        color: #66515f;
+        padding: 12px;
+        outline: none;
+        font: inherit;
+    }
+
+    .field-users input:focus,
+    .field-users select:focus {
+        border-color: #df78a7;
+        box-shadow: 0 0 0 3px #fce8f1;
+    }
+
+    .modal-note-users {
+        color: #a18d9a;
+        font-size: 12px;
+        margin: 17px 0;
+    }
+
+    .modal-actions-users {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-cancel-users {
+        border: 1px solid #f0cbdc;
+        border-radius: 10px;
+        padding: 12px 17px;
+        background: white;
+        color: #9a7186;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
     @media (max-width: 1000px) {
         .users-stats {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .create-grid {
             grid-template-columns: repeat(2, 1fr);
         }
 
@@ -327,166 +406,95 @@
         }
 
         .users-stats,
-        .create-grid,
-        .users-filters {
+        .users-filters,
+        .form-grid-users {
             grid-template-columns: 1fr;
         }
 
         .users-card {
             padding: 15px;
         }
+
+        .modal-content-users {
+            padding: 18px;
+        }
     }
 </style>
 
+
 <div class="users-page">
+
+    <!-- ENCABEZADO -->
 
     <div class="users-heading">
         <div>
-            <h1>♟ Gestión de usuarios</h1>
+            <h1><i class="fa-solid fa-users"></i> Gestión de usuarios</h1>
             <p>Administra las cuentas registradas en BackHome 🐾</p>
         </div>
 
-        <button
-            type="button"
-            class="btn-primary-users"
-            onclick="document.getElementById('crearUsuario').scrollIntoView({behavior:'smooth'});"
-        >
-            + Crear usuario
+        <button type="button" class="btn-users" onclick="abrirCrearUsuario()">
+            <i class="fa-solid fa-plus"></i> Crear usuario
         </button>
     </div>
+
+
+    <!-- MENSAJES -->
 
     {% if messages %}
     <div class="messages-users">
         {% for message in messages %}
-            <div class="message-user {% if message.tags == 'success' %}success{% else %}error{% endif %}">
-                {{ message }}
-            </div>
+        <div class="message-user {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+            {{ message }}
+        </div>
         {% endfor %}
     </div>
     {% endif %}
 
+
     <!-- ESTADÍSTICAS -->
+
     <div class="users-stats">
+
         <div class="user-stat">
-            <span>♟ Total de usuarios</span>
+            <span><i class="fa-solid fa-users"></i> Total de usuarios</span>
             <strong>{{ estadisticas.total }}</strong>
         </div>
 
         <div class="user-stat">
-            <span>✓ Cuentas activas</span>
+            <span><i class="fa-solid fa-circle-check"></i> Cuentas activas</span>
             <strong>{{ estadisticas.activos }}</strong>
         </div>
 
         <div class="user-stat">
-            <span>Ⅱ Cuentas suspendidas</span>
+            <span><i class="fa-solid fa-circle-pause"></i> Cuentas suspendidas</span>
             <strong>{{ estadisticas.suspendidos }}</strong>
         </div>
 
         <div class="user-stat">
-            <span>🔒 Cuentas bloqueadas</span>
+            <span><i class="fa-solid fa-lock"></i> Cuentas bloqueadas</span>
             <strong>{{ estadisticas.bloqueados }}</strong>
         </div>
+
     </div>
 
-    <!-- FORMULARIO DE CREACIÓN -->
-    <section class="users-card create-panel" id="crearUsuario">
-        <h2>＋ Registrar nuevo usuario</h2>
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="accion" value="crear">
+    <!-- DIRECTORIO -->
 
-            <div class="create-grid">
-
-                <div class="field">
-                    <label>Tipo de documento *</label>
-                    <select name="tipo_documento" required>
-                        <option value="">Selecciona</option>
-                        {% for tipo in tipos_documento %}
-                            <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>Número de documento *</label>
-                    <input type="text" name="documento" maxlength="20" required>
-                </div>
-
-                <div class="field">
-                    <label>Primer nombre *</label>
-                    <input type="text" name="primer_nombre" maxlength="100" required>
-                </div>
-
-                <div class="field">
-                    <label>Segundo nombre</label>
-                    <input type="text" name="segundo_nombre" maxlength="100">
-                </div>
-
-                <div class="field">
-                    <label>Primer apellido *</label>
-                    <input type="text" name="primer_apellido" maxlength="100" required>
-                </div>
-
-                <div class="field">
-                    <label>Segundo apellido</label>
-                    <input type="text" name="segundo_apellido" maxlength="100">
-                </div>
-
-                <div class="field">
-                    <label>Correo electrónico *</label>
-                    <input type="email" name="email" maxlength="150" required>
-                </div>
-
-                <div class="field">
-                    <label>Teléfono *</label>
-                    <input type="tel" name="telefono" maxlength="20" required>
-                </div>
-
-                <div class="field">
-                    <label>Contraseña inicial *</label>
-                    <input type="password" name="password" minlength="8" required>
-                </div>
-
-                <div class="field">
-                    <label>Rol de usuario *</label>
-                    <select name="rol" required>
-                        <option value="">Selecciona un rol</option>
-                        <option value="Cliente">Cliente</option>
-                        <option value="Administrador">Administrador</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <p class="required-note">
-                * Los campos marcados son obligatorios. La contraseña debe tener mínimo 8 caracteres.
-            </p>
-
-            <div class="form-actions">
-                <button type="reset" class="btn-secondary-users">Limpiar</button>
-                <button type="submit" class="btn-primary-users">
-                    Registrar usuario
-                </button>
-            </div>
-        </form>
-    </section>
-
-    <!-- LISTADO -->
     <section class="users-card">
-        <h2>Directorio de usuarios</h2>
+
+        <h2><i class="fa-solid fa-address-book"></i> Directorio de usuarios</h2>
 
         <form method="GET" class="users-filters">
 
             <input
-                class="filter-control"
+                class="control"
                 type="search"
                 name="buscar"
                 placeholder="Buscar nombre, documento o correo..."
                 value="{{ buscar }}"
             >
 
-            <select class="filter-control" name="rol">
+            <select class="control" name="rol">
                 <option value="">Todos los roles</option>
                 <option value="Administrador" {% if filtro_rol == 'Administrador' %}selected{% endif %}>
                     Administradores
@@ -496,7 +504,7 @@
                 </option>
             </select>
 
-            <select class="filter-control" name="estado">
+            <select class="control" name="estado">
                 <option value="">Todos los estados</option>
                 <option value="activo" {% if filtro_estado == 'activo' %}selected{% endif %}>
                     Activos
@@ -509,11 +517,17 @@
                 </option>
             </select>
 
-            <button class="filter-button" type="submit">⌕ Buscar</button>
+            <button type="submit" class="filter-button">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+
         </form>
 
+
         <div class="table-wrapper">
+
             <table class="users-table">
+
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -528,12 +542,17 @@
                 </thead>
 
                 <tbody>
+
                     {% for usuario in usuarios %}
+
                     <tr>
+
                         <td>{{ usuario.id_persona }}</td>
 
                         <td>
-                            <div class="user-name">{{ usuario.nombre_completo|default:"Sin nombre" }}</div>
+                            <div class="user-name">
+                                {{ usuario.nombre_completo|default:"Sin nombre" }}
+                            </div>
                         </td>
 
                         <td>
@@ -558,6 +577,29 @@
                         <td>
                             <div class="actions">
 
+                                <!-- EDITAR -->
+
+                                <button
+                                    type="button"
+                                    class="action-button action-edit"
+                                    onclick="abrirEditarUsuario(this)"
+                                    data-id="{{ usuario.id_persona }}"
+                                    data-tipo="{{ usuario.t_documento_id }}"
+                                    data-documento="{{ usuario.n_documento }}"
+                                    data-primer-nombre="{{ usuario.primer_nombre }}"
+                                    data-segundo-nombre="{{ usuario.segundo_nombre|default_if_none:'' }}"
+                                    data-primer-apellido="{{ usuario.primer_apellido }}"
+                                    data-segundo-apellido="{{ usuario.segundo_apellido|default_if_none:'' }}"
+                                    data-email="{{ usuario.email }}"
+                                    data-telefono="{{ usuario.numero_tel }}"
+                                    data-rol="{{ usuario.rol }}"
+                                >
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </button>
+
+
+                                <!-- REACTIVAR -->
+
                                 {% if usuario.estado != 'activo' %}
                                 <form method="POST" class="action-form"
                                       onsubmit="return confirm('¿Deseas reactivar esta cuenta?');">
@@ -565,11 +607,15 @@
                                     <input type="hidden" name="accion" value="estado">
                                     <input type="hidden" name="id_persona" value="{{ usuario.id_persona }}">
                                     <input type="hidden" name="nuevo_estado" value="activo">
+
                                     <button class="action-button action-activate" type="submit">
-                                        ✓ Reactivar
+                                        <i class="fa-solid fa-check"></i>
                                     </button>
                                 </form>
                                 {% endif %}
+
+
+                                <!-- SUSPENDER -->
 
                                 {% if usuario.estado != 'suspendido' %}
                                 <form method="POST" class="action-form"
@@ -578,39 +624,265 @@
                                     <input type="hidden" name="accion" value="estado">
                                     <input type="hidden" name="id_persona" value="{{ usuario.id_persona }}">
                                     <input type="hidden" name="nuevo_estado" value="suspendido">
+
                                     <button class="action-button action-suspend" type="submit">
-                                        Ⅱ Suspender
+                                        <i class="fa-solid fa-pause"></i>
                                     </button>
                                 </form>
                                 {% endif %}
 
+
+                                <!-- BLOQUEAR -->
+
                                 {% if usuario.estado != 'bloqueado' %}
                                 <form method="POST" class="action-form"
-                                      onsubmit="return confirm('¿Estás segura de bloquear esta cuenta? Esta acción impedirá su acceso si el inicio de sesión valida el estado.');">
+                                      onsubmit="return confirm('¿Estás segura de bloquear esta cuenta?');">
                                     {% csrf_token %}
                                     <input type="hidden" name="accion" value="estado">
                                     <input type="hidden" name="id_persona" value="{{ usuario.id_persona }}">
                                     <input type="hidden" name="nuevo_estado" value="bloqueado">
+
                                     <button class="action-button action-block" type="submit">
-                                        🔒 Bloquear
+                                        <i class="fa-solid fa-lock"></i>
                                     </button>
                                 </form>
                                 {% endif %}
 
                             </div>
                         </td>
+
                     </tr>
+
                     {% empty %}
+
                     <tr>
                         <td colspan="8" class="empty-users">
-                            No se encontraron usuarios con esos criterios.
+                            <i class="fa-solid fa-users-slash"></i>
+                            <p>No se encontraron usuarios.</p>
                         </td>
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
+
     </section>
 
 </div>
+
+
+<!-- VENTANA PARA CREAR Y EDITAR -->
+
+<div class="modal-users" id="modalUsuario">
+
+    <div class="modal-content-users">
+
+        <div class="modal-header-users">
+
+            <h2 id="tituloModal">
+                <i class="fa-solid fa-user-plus"></i> Registrar nuevo usuario
+            </h2>
+
+            <button
+                type="button"
+                class="modal-close-users"
+                onclick="cerrarModalUsuario()"
+                aria-label="Cerrar"
+            >
+                &times;
+            </button>
+
+        </div>
+
+
+        <form method="POST" id="formUsuario">
+
+            {% csrf_token %}
+
+            <input type="hidden" name="accion" id="accionFormulario" value="crear">
+            <input type="hidden" name="id_persona" id="idPersona">
+
+            <div class="form-grid-users">
+
+                <div class="field-users">
+                    <label>Tipo de documento *</label>
+                    <select name="tipo_documento" id="tipoDocumento" required>
+                        <option value="">Selecciona</option>
+                        {% for tipo in tipos_documento %}
+                        <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-users">
+                    <label>Número de documento *</label>
+                    <input type="text" name="documento" id="documento" maxlength="20" required>
+                </div>
+
+                <div class="field-users">
+                    <label>Primer nombre *</label>
+                    <input type="text" name="primer_nombre" id="primerNombre" maxlength="100" required>
+                </div>
+
+                <div class="field-users">
+                    <label>Segundo nombre</label>
+                    <input type="text" name="segundo_nombre" id="segundoNombre" maxlength="100">
+                </div>
+
+                <div class="field-users">
+                    <label>Primer apellido *</label>
+                    <input type="text" name="primer_apellido" id="primerApellido" maxlength="100" required>
+                </div>
+
+                <div class="field-users">
+                    <label>Segundo apellido</label>
+                    <input type="text" name="segundo_apellido" id="segundoApellido" maxlength="100">
+                </div>
+
+                <div class="field-users">
+                    <label>Correo electrónico *</label>
+                    <input type="email" name="email" id="emailUsuario" maxlength="150" required>
+                </div>
+
+                <div class="field-users">
+                    <label>Teléfono *</label>
+                    <input type="tel" name="telefono" id="telefonoUsuario" maxlength="20" required>
+                </div>
+
+                <div class="field-users">
+                    <label id="labelPassword">Contraseña inicial *</label>
+                    <input type="password" name="password" id="passwordUsuario" minlength="8">
+                </div>
+
+                <div class="field-users">
+                    <label>Rol *</label>
+                    <select name="rol" id="rolUsuario" required>
+                        <option value="">Selecciona un rol</option>
+                        <option value="Cliente">Cliente</option>
+                        <option value="Administrador">Administrador</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <p class="modal-note-users" id="notaPassword">
+                * Todos los campos obligatorios deben completarse. La contraseña debe tener mínimo 8 caracteres.
+            </p>
+
+            <div class="modal-actions-users">
+
+                <button
+                    type="button"
+                    class="btn-cancel-users"
+                    onclick="cerrarModalUsuario()"
+                >
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn-users" id="botonGuardar">
+                    <i class="fa-solid fa-floppy-disk"></i> Registrar usuario
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const modalUsuario = document.getElementById('modalUsuario');
+    const formUsuario = document.getElementById('formUsuario');
+
+    function abrirCrearUsuario() {
+
+        formUsuario.reset();
+
+        document.getElementById('accionFormulario').value = 'crear';
+        document.getElementById('idPersona').value = '';
+
+        document.getElementById('tituloModal').innerHTML =
+            '<i class="fa-solid fa-user-plus"></i> Registrar nuevo usuario';
+
+        document.getElementById('labelPassword').textContent =
+            'Contraseña inicial *';
+
+        document.getElementById('passwordUsuario').required = true;
+
+        document.getElementById('notaPassword').textContent =
+            '* Completa los campos obligatorios. La contraseña debe tener mínimo 8 caracteres.';
+
+        document.getElementById('botonGuardar').innerHTML =
+            '<i class="fa-solid fa-floppy-disk"></i> Registrar usuario';
+
+        modalUsuario.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+
+    function abrirEditarUsuario(boton) {
+
+        formUsuario.reset();
+
+        document.getElementById('accionFormulario').value = 'editar';
+        document.getElementById('idPersona').value = boton.dataset.id;
+
+        document.getElementById('tipoDocumento').value = boton.dataset.tipo;
+        document.getElementById('documento').value = boton.dataset.documento;
+        document.getElementById('primerNombre').value = boton.dataset.primerNombre;
+        document.getElementById('segundoNombre').value = boton.dataset.segundoNombre;
+        document.getElementById('primerApellido').value = boton.dataset.primerApellido;
+        document.getElementById('segundoApellido').value = boton.dataset.segundoApellido;
+        document.getElementById('emailUsuario').value = boton.dataset.email;
+        document.getElementById('telefonoUsuario').value = boton.dataset.telefono;
+        document.getElementById('rolUsuario').value = boton.dataset.rol;
+
+        document.getElementById('passwordUsuario').value = '';
+        document.getElementById('passwordUsuario').required = false;
+
+        document.getElementById('labelPassword').textContent =
+            'Nueva contraseña (opcional)';
+
+        document.getElementById('notaPassword').textContent =
+            'Deja la contraseña vacía si no deseas cambiarla. Si la cambias, debe tener mínimo 8 caracteres.';
+
+        document.getElementById('tituloModal').innerHTML =
+            '<i class="fa-solid fa-user-pen"></i> Editar usuario';
+
+        document.getElementById('botonGuardar').innerHTML =
+            '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
+
+        modalUsuario.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+
+    function cerrarModalUsuario() {
+        modalUsuario.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+
+    modalUsuario.addEventListener('click', function(event) {
+        if (event.target === modalUsuario) {
+            cerrarModalUsuario();
+        }
+    });
+
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modalUsuario.classList.contains('show')) {
+            cerrarModalUsuario();
+        }
+    });
+
+</script>
+
 {% endblock %}
