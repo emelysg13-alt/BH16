@@ -1,0 +1,616 @@
+
+{% extends 'panel_admin/dashboard.html' %}
+
+{% block content %}
+<style>
+    .users-page {
+        padding: 28px 30px;
+        color: #66515f;
+    }
+
+    .users-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+    }
+
+    .users-heading h1 {
+        color: #c9578b;
+        font-size: 27px;
+        margin: 0 0 7px;
+    }
+
+    .users-heading p {
+        color: #9b8995;
+        margin: 0;
+    }
+
+    .btn-primary-users {
+        border: 0;
+        border-radius: 12px;
+        padding: 13px 19px;
+        color: white;
+        background: linear-gradient(135deg, #ed8ab5, #cf6097);
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 5px 14px #e9a1c14a;
+    }
+
+    .btn-primary-users:hover {
+        filter: brightness(.96);
+        transform: translateY(-1px);
+    }
+
+    .users-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .user-stat {
+        background: white;
+        border: 1px solid #f7e6ef;
+        border-radius: 17px;
+        padding: 20px;
+        box-shadow: 0 5px 15px #dca7bd17;
+    }
+
+    .user-stat span {
+        color: #988995;
+        font-size: 13px;
+    }
+
+    .user-stat strong {
+        display: block;
+        color: #d45c91;
+        font-size: 27px;
+        margin-top: 9px;
+    }
+
+    .users-card {
+        background: white;
+        border: 1px solid #f7e6ef;
+        border-radius: 19px;
+        padding: 22px;
+        box-shadow: 0 5px 18px #dca7bd1c;
+        margin-bottom: 22px;
+    }
+
+    .users-card h2 {
+        color: #c9578b;
+        font-size: 19px;
+        margin: 0 0 17px;
+    }
+
+    .create-panel {
+        margin-bottom: 22px;
+        border-top: 4px solid #e987b2;
+    }
+
+    .create-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .field label {
+        color: #806b79;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .filter-control {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        border: 1px solid #f0cbdc;
+        border-radius: 10px;
+        background: #fff;
+        color: #66515f;
+        padding: 12px;
+        outline: none;
+        font: inherit;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .filter-control:focus {
+        border-color: #df78a7;
+        box-shadow: 0 0 0 3px #fce8f1;
+    }
+
+    .required-note {
+        color: #a895a1;
+        font-size: 12px;
+        margin: 12px 0;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .btn-secondary-users {
+        border: 1px solid #f0cbdc;
+        border-radius: 10px;
+        padding: 12px 17px;
+        background: white;
+        color: #9a7186;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .users-filters {
+        display: grid;
+        grid-template-columns: minmax(200px, 1fr) 180px 180px auto;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .filter-button {
+        border: 0;
+        border-radius: 10px;
+        padding: 0 19px;
+        background: #dc79a5;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+        font-size: 13px;
+    }
+
+    .users-table th {
+        padding: 15px 12px;
+        background: #fff0f6;
+        color: #c45183;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .users-table td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #f5e5ed;
+        vertical-align: middle;
+    }
+
+    .users-table tr:hover td {
+        background: #fffafd;
+    }
+
+    .user-name {
+        font-weight: 700;
+        color: #70596a;
+    }
+
+    .user-email {
+        color: #988592;
+    }
+
+    .role-pill,
+    .status-pill {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .role-pill {
+        color: #bd5484;
+        background: #fce6f0;
+    }
+
+    .status-activo {
+        color: #16865c;
+        background: #e0f7eb;
+    }
+
+    .status-suspendido {
+        color: #a96b00;
+        background: #fff0d5;
+    }
+
+    .status-bloqueado {
+        color: #bd3f4c;
+        background: #ffe3e5;
+    }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .action-form {
+        display: inline;
+        margin: 0;
+    }
+
+    .action-button {
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .action-activate {
+        color: #16865c;
+        background: #e0f7eb;
+    }
+
+    .action-suspend {
+        color: #a96b00;
+        background: #fff0d5;
+    }
+
+    .action-block {
+        color: #bd3f4c;
+        background: #ffe3e5;
+    }
+
+    .empty-users {
+        padding: 35px;
+        text-align: center;
+        color: #a18d9a;
+    }
+
+    .messages-users {
+        margin-bottom: 18px;
+    }
+
+    .message-user {
+        border-radius: 10px;
+        padding: 13px 16px;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    .message-user.success {
+        background: #e5f8ed;
+        color: #237b53;
+    }
+
+    .message-user.error {
+        background: #ffe8eb;
+        color: #ae4053;
+    }
+
+    @media (max-width: 1000px) {
+        .users-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .create-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .users-filters {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .filter-button {
+            min-height: 42px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .users-page {
+            padding: 18px 12px;
+        }
+
+        .users-stats,
+        .create-grid,
+        .users-filters {
+            grid-template-columns: 1fr;
+        }
+
+        .users-card {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="users-page">
+
+    <div class="users-heading">
+        <div>
+            <h1>♟ Gestión de usuarios</h1>
+            <p>Administra las cuentas registradas en BackHome 🐾</p>
+        </div>
+
+        <button
+            type="button"
+            class="btn-primary-users"
+            onclick="document.getElementById('crearUsuario').scrollIntoView({behavior:'smooth'});"
+        >
+            + Crear usuario
+        </button>
+    </div>
+
+    {% if messages %}
+    <div class="messages-users">
+        {% for message in messages %}
+            <div class="message-user {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ESTADÍSTICAS -->
+    <div class="users-stats">
+        <div class="user-stat">
+            <span>♟ Total de usuarios</span>
+            <strong>{{ estadisticas.total }}</strong>
+        </div>
+
+        <div class="user-stat">
+            <span>✓ Cuentas activas</span>
+            <strong>{{ estadisticas.activos }}</strong>
+        </div>
+
+        <div class="user-stat">
+            <span>Ⅱ Cuentas suspendidas</span>
+            <strong>{{ estadisticas.suspendidos }}</strong>
+        </div>
+
+        <div class="user-stat">
+            <span>🔒 Cuentas bloqueadas</span>
+            <strong>{{ estadisticas.bloqueados }}</strong>
+        </div>
+    </div>
+
+    <!-- FORMULARIO DE CREACIÓN -->
+    <section class="users-card create-panel" id="crearUsuario">
+        <h2>＋ Registrar nuevo usuario</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="crear">
+
+            <div class="create-grid">
+
+                <div class="field">
+                    <label>Tipo de documento *</label>
+                    <select name="tipo_documento" required>
+                        <option value="">Selecciona</option>
+                        {% for tipo in tipos_documento %}
+                            <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Número de documento *</label>
+                    <input type="text" name="documento" maxlength="20" required>
+                </div>
+
+                <div class="field">
+                    <label>Primer nombre *</label>
+                    <input type="text" name="primer_nombre" maxlength="100" required>
+                </div>
+
+                <div class="field">
+                    <label>Segundo nombre</label>
+                    <input type="text" name="segundo_nombre" maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label>Primer apellido *</label>
+                    <input type="text" name="primer_apellido" maxlength="100" required>
+                </div>
+
+                <div class="field">
+                    <label>Segundo apellido</label>
+                    <input type="text" name="segundo_apellido" maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label>Correo electrónico *</label>
+                    <input type="email" name="email" maxlength="150" required>
+                </div>
+
+                <div class="field">
+                    <label>Teléfono *</label>
+                    <input type="tel" name="telefono" maxlength="20" required>
+                </div>
+
+                <div class="field">
+                    <label>Contraseña inicial *</label>
+                    <input type="password" name="password" minlength="8" required>
+                </div>
+
+                <div class="field">
+                    <label>Rol de usuario *</label>
+                    <select name="rol" required>
+                        <option value="">Selecciona un rol</option>
+                        <option value="Cliente">Cliente</option>
+                        <option value="Administrador">Administrador</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <p class="required-note">
+                * Los campos marcados son obligatorios. La contraseña debe tener mínimo 8 caracteres.
+            </p>
+
+            <div class="form-actions">
+                <button type="reset" class="btn-secondary-users">Limpiar</button>
+                <button type="submit" class="btn-primary-users">
+                    Registrar usuario
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- LISTADO -->
+    <section class="users-card">
+        <h2>Directorio de usuarios</h2>
+
+        <form method="GET" class="users-filters">
+
+            <input
+                class="filter-control"
+                type="search"
+                name="buscar"
+                placeholder="Buscar nombre, documento o correo..."
+                value="{{ buscar }}"
+            >
+
+            <select class="filter-control" name="rol">
+                <option value="">Todos los roles</option>
+                <option value="Administrador" {% if filtro_rol == 'Administrador' %}selected{% endif %}>
+                    Administradores
+                </option>
+                <option value="Cliente" {% if filtro_rol == 'Cliente' %}selected{% endif %}>
+                    Clientes
+                </option>
+            </select>
+
+            <select class="filter-control" name="estado">
+                <option value="">Todos los estados</option>
+                <option value="activo" {% if filtro_estado == 'activo' %}selected{% endif %}>
+                    Activos
+                </option>
+                <option value="suspendido" {% if filtro_estado == 'suspendido' %}selected{% endif %}>
+                    Suspendidos
+                </option>
+                <option value="bloqueado" {% if filtro_estado == 'bloqueado' %}selected{% endif %}>
+                    Bloqueados
+                </option>
+            </select>
+
+            <button class="filter-button" type="submit">⌕ Buscar</button>
+        </form>
+
+        <div class="table-wrapper">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Documento</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id_persona }}</td>
+
+                        <td>
+                            <div class="user-name">{{ usuario.nombre_completo|default:"Sin nombre" }}</div>
+                        </td>
+
+                        <td>
+                            {{ usuario.nombre_documento|default:"Documento" }}
+                            {{ usuario.n_documento }}
+                        </td>
+
+                        <td class="user-email">{{ usuario.email }}</td>
+
+                        <td>{{ usuario.numero_tel }}</td>
+
+                        <td>
+                            <span class="role-pill">{{ usuario.rol }}</span>
+                        </td>
+
+                        <td>
+                            <span class="status-pill status-{{ usuario.estado }}">
+                                {{ usuario.estado|capfirst }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="actions">
+
+                                {% if usuario.estado != 'activo' %}
+                                <form method="POST" class="action-form"
+                                      onsubmit="return confirm('¿Deseas reactivar esta cuenta?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="accion" value="estado">
+                                    <input type="hidden" name="id_persona" value="{{ usuario.id_persona }}">
+                                    <input type="hidden" name="nuevo_estado" value="activo">
+                                    <button class="action-button action-activate" type="submit">
+                                        ✓ Reactivar
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if usuario.estado != 'suspendido' %}
+                                <form method="POST" class="action-form"
+                                      onsubmit="return confirm('¿Deseas suspender temporalmente esta cuenta?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="accion" value="estado">
+                                    <input type="hidden" name="id_persona" value="{{ usuario.id_persona }}">
+                                    <input type="hidden" name="nuevo_estado" value="suspendido">
+                                    <button class="action-button action-suspend" type="submit">
+                                        Ⅱ Suspender
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if usuario.estado != 'bloqueado' %}
+                                <form method="POST" class="action-form"
+                                      onsubmit="return confirm('¿Estás segura de bloquear esta cuenta? Esta acción impedirá su acceso si el inicio de sesión valida el estado.');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="accion" value="estado">
+                                    <input type="hidden" name="id_persona" value="{{ usuario.id_persona }}">
+                                    <input type="hidden" name="nuevo_estado" value="bloqueado">
+                                    <button class="action-button action-block" type="submit">
+                                        🔒 Bloquear
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="empty-users">
+                            No se encontraron usuarios con esos criterios.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
