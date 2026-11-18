@@ -1,24 +1,27 @@
 
 from django.urls import path
 from . import views
-from . import consejos_soporte
+from . import reportes
+from .consejos_soporte import gestion_consejos, gestion_soporte
+
 
 urlpatterns = [
-    # Dashboard
+
+    # DASHBOARD
     path(
         '',
         views.dashboard,
         name='dashboard'
     ),
 
-    # Usuarios
+    # USUARIOS
     path(
         'usuarios/',
         views.gestion_usuarios,
         name='gestion_usuarios'
     ),
 
-    # Refugios
+    # REFUGIOS
     path(
         'refugios/',
         views.gestion_refugios,
@@ -31,24 +34,32 @@ urlpatterns = [
         name='eliminar_refugio'
     ),
 
-    # Donaciones
+    # DONACIONES
     path(
         'donaciones/',
         views.gestion_donaciones,
         name='gestion_donaciones'
     ),
 
-    # Consejos
+    # CONSEJOS
     path(
         'consejos/',
-        consejos_soporte.gestion_consejos,
+        gestion_consejos,
         name='gestion_consejos'
     ),
 
-    # Soporte
+    # SOPORTE
     path(
         'soporte/',
-        consejos_soporte.gestion_soporte,
+        gestion_soporte,
         name='gestion_soporte'
     ),
+
+    # REPORTES
+    path(
+        'reportes/',
+        reportes.gestion_reportes,
+        name='gestion_reportes'
+    ),
+
 ]

@@ -77,8 +77,9 @@
                 <span>Seguimientos</span>
             </a>
 
-            <!-- REPORTES -->
-            <a href="#">
+            <!-- GESTIÓN DE REPORTES -->
+            <a href="{% url 'gestion_reportes' %}"
+               class="{% if request.resolver_match.url_name == 'gestion_reportes' %}active{% endif %}">
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Reportes</span>
             </a>

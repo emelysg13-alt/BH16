@@ -1,0 +1,899 @@
+
+{% extends 'panel_admin/dashboard.html' %}
+
+{% block content %}
+
+<div class="reportes-container">
+
+    <div class="reportes-header">
+        <div>
+            <span class="reportes-etiqueta">BACKHOME / ADMINISTRACIÓN</span>
+            <h1><i class="fa-solid fa-chart-pie"></i> Gestión de reportes</h1>
+            <p>Genera informes personalizados utilizando múltiples criterios de búsqueda.</p>
+        </div>
+
+        <div class="header-icon">
+            <i class="fa-solid fa-file-circle-check"></i>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alerta-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        No se pudo generar el reporte: {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="GET" id="formReporte">
+
+        <input type="hidden" name="generar" value="1">
+
+        <section class="panel-reporte">
+
+            <div class="panel-titulo">
+                <div class="panel-icono">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                    <h2>1. Selecciona la información</h2>
+                    <p>Elige el módulo del que deseas obtener los datos.</p>
+                </div>
+            </div>
+
+            <div class="campo-principal">
+                <label for="tabla">Tipo de reporte</label>
+
+                <select name="tabla" id="tabla" onchange="cambiarTabla()">
+                    {% for tabla in tablas %}
+                    <option value="{{ tabla.nombre }}"
+                        {% if tabla.nombre == tabla_actual %}selected{% endif %}>
+                        {{ tabla.titulo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="campo-principal">
+                <label for="buscar">Búsqueda general</label>
+
+                <div class="input-icono">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input
+                        type="text"
+                        name="buscar"
+                        id="buscar"
+                        value="{{ buscar }}"
+                        placeholder="Busca por cualquier dato de la tabla..."
+                    >
+                </div>
+            </div>
+
+        </section>
+
+
+        <section class="panel-reporte">
+
+            <div class="panel-titulo">
+                <div class="panel-icono">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div>
+                    <h2>2. Filtros multicriterio</h2>
+                    <p>Combina diferentes condiciones para obtener resultados específicos.</p>
+                </div>
+            </div>
+
+            {% if fechas %}
+
+            <div class="subtitulo-filtros">
+                <i class="fa-regular fa-calendar"></i>
+                Filtro por fechas
+            </div>
+
+            <div class="filtros-fecha">
+
+                <div class="campo-principal">
+                    <label>Campo de fecha</label>
+
+                    <select name="fecha_columna">
+                        <option value="">Seleccionar fecha</option>
+
+                        {% for fecha in fechas %}
+                        <option value="{{ fecha }}"
+                            {% if fecha == fecha_columna %}selected{% endif %}>
+                            {{ fecha|capfirst }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-principal">
+                    <label>Desde</label>
+                    <input type="date" name="fecha_desde" value="{{ fecha_desde }}">
+                </div>
+
+                <div class="campo-principal">
+                    <label>Hasta</label>
+                    <input type="date" name="fecha_hasta" value="{{ fecha_hasta }}">
+                </div>
+
+            </div>
+            {% endif %}
+
+
+            <div class="subtitulo-filtros">
+                <i class="fa-solid fa-filter"></i>
+                Condiciones por campo
+            </div>
+
+            <div class="filtros-grid">
+
+                {% for columna in columnas %}
+
+                <div class="filtro-campo">
+                    <label>{{ columna.nombre|capfirst }}</label>
+
+                    <div class="filtro-controles">
+
+                        <select name="operador_{{ columna.nombre }}">
+                            <option value="contiene">Contiene</option>
+                            <option value="igual">Igual a</option>
+                            <option value="diferente">Diferente de</option>
+                            <option value="mayor">Mayor que</option>
+                            <option value="menor">Menor que</option>
+                        </select>
+
+                        <input
+                            type="text"
+                            name="filtro_{{ columna.nombre }}"
+                            placeholder="Valor..."
+                        >
+
+                    </div>
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <p class="ayuda-filtros">
+                <i class="fa-solid fa-circle-info"></i>
+                Los filtros que dejes vacíos no se aplicarán. Puedes combinar tantos como necesites.
+            </p>
+
+        </section>
+
+
+        <section class="panel-reporte">
+
+            <div class="panel-titulo">
+                <div class="panel-icono">
+                    <i class="fa-solid fa-table-columns"></i>
+                </div>
+                <div>
+                    <h2>3. Personaliza las columnas</h2>
+                    <p>Selecciona los campos que deseas incluir en tu reporte.</p>
+                </div>
+            </div>
+
+            <div class="columnas-acciones">
+                <button type="button" onclick="marcarColumnas(true)">
+                    Seleccionar todas
+                </button>
+
+                <button type="button" onclick="marcarColumnas(false)">
+                    Desmarcar todas
+                </button>
+            </div>
+
+            <div class="columnas-grid">
+
+                {% for columna in columnas %}
+
+                <label class="columna-opcion">
+                    <input
+                        type="checkbox"
+                        name="columnas"
+                        value="{{ columna.nombre }}"
+                        {% if columna.seleccionada %}checked{% endif %}
+                    >
+                    <span>{{ columna.nombre|capfirst }}</span>
+                </label>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="ordenamiento">
+
+                <div class="campo-principal">
+                    <label>Ordenar por</label>
+
+                    <select name="ordenar">
+                        {% for columna in columnas %}
+                        <option value="{{ columna.nombre }}"
+                            {% if columna.nombre == ordenar %}selected{% endif %}>
+                            {{ columna.nombre|capfirst }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-principal">
+                    <label>Dirección</label>
+
+                    <select name="direccion">
+                        <option value="DESC"
+                            {% if direccion == "DESC" %}selected{% endif %}>
+                            Descendente
+                        </option>
+
+                        <option value="ASC"
+                            {% if direccion == "ASC" %}selected{% endif %}>
+                            Ascendente
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="acciones-generacion">
+
+            <button type="submit" class="btn-generar">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                Generar vista previa
+            </button>
+
+            <button
+                type="submit"
+                name="formato"
+                value="excel"
+                class="btn-excel"
+                formtarget="_blank">
+                <i class="fa-solid fa-file-excel"></i>
+                Exportar a Excel
+            </button>
+
+            <button
+                type="submit"
+                name="formato"
+                value="pdf"
+                class="btn-pdf"
+                formtarget="_blank">
+                <i class="fa-solid fa-file-pdf"></i>
+                Generar PDF
+            </button>
+
+            <a href="{% url 'gestion_reportes' %}" class="btn-limpiar">
+                <i class="fa-solid fa-rotate-left"></i>
+                Limpiar filtros
+            </a>
+
+        </div>
+
+    </form>
+
+
+    {% if generado %}
+
+    <section class="panel-resultados">
+
+        <div class="resultado-header">
+
+            <div>
+                <span class="resultado-etiqueta">RESULTADO DE LA CONSULTA</span>
+                <h2>{{ titulo_tabla }}</h2>
+                <p>Información obtenida según los criterios seleccionados.</p>
+            </div>
+
+            <div class="contador-resultados">
+                <strong>{{ total }}</strong>
+                <span>Registros encontrados</span>
+            </div>
+
+        </div>
+
+
+        {% if filtros_aplicados %}
+        <div class="filtros-resumen">
+            <strong><i class="fa-solid fa-filter"></i> Filtros aplicados:</strong>
+
+            {% for filtro in filtros_aplicados %}
+            <span>
+                {{ filtro.columna }} {{ filtro.operador }} {{ filtro.valor }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        {% if filas %}
+
+        <div class="tabla-contenedor">
+            <table class="tabla-resultados">
+
+                <thead>
+                    <tr>
+                        {% for encabezado in encabezados %}
+                        <th>{{ encabezado|capfirst }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for fila in filas %}
+                    <tr>
+                        {% for valor in fila %}
+                        <td>{{ valor|default_if_none:"—" }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="sin-resultados">
+            <i class="fa-solid fa-folder-open"></i>
+            <h3>No se encontraron resultados</h3>
+            <p>Prueba cambiando o quitando algunos filtros.</p>
+        </div>
+
+        {% endif %}
+
+        <div class="nota-limite">
+            <i class="fa-solid fa-circle-info"></i>
+            La vista previa y las exportaciones están limitadas a 10.000 registros por consulta.
+        </div>
+
+    </section>
+
+    {% endif %}
+
+</div>
+
+
+<style>
+.reportes-container {
+    padding: 28px;
+    color: #51434d;
+}
+
+.reportes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(120deg, #f8eaf1, #f4edf8);
+    border-radius: 22px;
+    padding: 30px;
+    margin-bottom: 25px;
+}
+
+.reportes-etiqueta,
+.resultado-etiqueta {
+    color: #a47791;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.reportes-header h1 {
+    color: #76566b;
+    margin: 10px 0;
+    font-size: 28px;
+}
+
+.reportes-header p {
+    color: #8b7885;
+    margin: 0;
+}
+
+.header-icon {
+    width: 75px;
+    height: 75px;
+    border-radius: 22px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #bd8ba7;
+    font-size: 32px;
+}
+
+.panel-reporte,
+.panel-resultados {
+    background: white;
+    padding: 26px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 5px 22px rgba(103, 69, 91, .06);
+    border: 1px solid #f0e7ed;
+}
+
+.panel-titulo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.panel-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: #f8edf3;
+    color: #ad7896;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.panel-titulo h2 {
+    margin: 0 0 5px;
+    font-size: 18px;
+    color: #76566b;
+}
+
+.panel-titulo p {
+    margin: 0;
+    font-size: 13px;
+    color: #9b8994;
+}
+
+.campo-principal {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.campo-principal label,
+.filtro-campo label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #745a6b;
+}
+
+.campo-principal input,
+.campo-principal select,
+.filtro-controles input,
+.filtro-controles select {
+    width: 100%;
+    min-width: 0;
+    height: 43px;
+    border: 1px solid #eadde5;
+    border-radius: 10px;
+    padding: 0 12px;
+    outline: none;
+    background: #fff;
+    color: #594956;
+    box-sizing: border-box;
+}
+
+.campo-principal input:focus,
+.campo-principal select:focus,
+.filtro-controles input:focus,
+.filtro-controles select:focus {
+    border-color: #bd8ba7;
+    box-shadow: 0 0 0 3px rgba(189, 139, 167, .12);
+}
+
+.campo-principal + .campo-principal {
+    margin-top: 20px;
+}
+
+.input-icono {
+    position: relative;
+}
+
+.input-icono i {
+    position: absolute;
+    top: 14px;
+    left: 13px;
+    color: #b58ca5;
+}
+
+.input-icono input {
+    padding-left: 40px;
+}
+
+.subtitulo-filtros {
+    font-size: 14px;
+    font-weight: 800;
+    color: #8f6981;
+    margin: 22px 0 15px;
+}
+
+.subtitulo-filtros i {
+    margin-right: 7px;
+}
+
+.filtros-fecha,
+.ordenamiento {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.filtro-campo {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro-controles {
+    display: grid;
+    grid-template-columns: minmax(105px, .85fr) minmax(0, 1.15fr);
+    gap: 7px;
+}
+
+.filtro-controles select,
+.filtro-controles input {
+    font-size: 12px;
+}
+
+.ayuda-filtros {
+    color: #9b8994;
+    font-size: 12px;
+    margin-top: 18px;
+}
+
+.ayuda-filtros i {
+    color: #b58ca5;
+    margin-right: 5px;
+}
+
+.columnas-acciones {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.columnas-acciones button {
+    border: none;
+    background: #f8edf3;
+    color: #956d85;
+    border-radius: 8px;
+    padding: 9px 13px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.columnas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.columna-opcion {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #fcf8fa;
+    border: 1px solid #f0e5ec;
+    border-radius: 9px;
+    padding: 11px;
+    color: #735e6b;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.columna-opcion input {
+    accent-color: #b77e9d;
+    width: 15px;
+    height: 15px;
+}
+
+.ordenamiento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 22px;
+}
+
+.acciones-generacion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.acciones-generacion button,
+.btn-limpiar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: none;
+    border-radius: 11px;
+    padding: 13px 18px;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-generar {
+    background: #a87996;
+}
+
+.btn-excel {
+    background: #62977d;
+}
+
+.btn-pdf {
+    background: #bd777e;
+}
+
+.btn-limpiar {
+    background: #eee7ec;
+    color: #806b79;
+}
+
+.acciones-generacion button:hover,
+.btn-limpiar:hover {
+    filter: brightness(.96);
+    transform: translateY(-1px);
+}
+
+.resultado-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.resultado-header h2 {
+    margin: 7px 0;
+    color: #76566b;
+}
+
+.resultado-header p {
+    color: #9b8994;
+    font-size: 13px;
+    margin: 0;
+}
+
+.contador-resultados {
+    background: #f8edf3;
+    padding: 14px 20px;
+    border-radius: 13px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: #946c84;
+}
+
+.contador-resultados strong {
+    font-size: 25px;
+}
+
+.contador-resultados span {
+    font-size: 11px;
+}
+
+.filtros-resumen {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 18px;
+    font-size: 12px;
+}
+
+.filtros-resumen span {
+    background: #f7edf3;
+    color: #936d84;
+    border-radius: 20px;
+    padding: 7px 11px;
+}
+
+.tabla-contenedor {
+    overflow-x: auto;
+}
+
+.tabla-resultados {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.tabla-resultados th {
+    background: #a87996;
+    color: white;
+    padding: 13px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.tabla-resultados td {
+    padding: 12px;
+    border-bottom: 1px solid #f0e8ed;
+    color: #665662;
+    max-width: 260px;
+    overflow-wrap: anywhere;
+}
+
+.tabla-resultados tbody tr:nth-child(even) {
+    background: #fcf8fa;
+}
+
+.sin-resultados {
+    text-align: center;
+    padding: 45px 15px;
+    color: #a28b9a;
+}
+
+.sin-resultados i {
+    font-size: 35px;
+    margin-bottom: 12px;
+}
+
+.sin-resultados h3 {
+    color: #795e70;
+}
+
+.nota-limite {
+    color: #9b8994;
+    font-size: 11px;
+    margin-top: 18px;
+}
+
+.nota-limite i {
+    color: #b58ca5;
+}
+
+.alerta-error {
+    background: #fff0f0;
+    color: #a64e58;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 850px) {
+    .filtros-fecha,
+    .columnas-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .reportes-container {
+        padding: 12px;
+    }
+
+    .reportes-header {
+        padding: 20px;
+    }
+
+    .header-icon {
+        display: none;
+    }
+
+    .filtros-grid,
+    .filtros-fecha,
+    .columnas-grid,
+    .ordenamiento {
+        grid-template-columns: 1fr;
+    }
+
+    .resultado-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .acciones-generacion {
+        flex-direction: column;
+    }
+
+    .acciones-generacion button,
+    .btn-limpiar {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+@media print {
+
+    body {
+        background: white !important;
+    }
+
+    .sidebar,
+    .topbar,
+    .main-footer,
+    .reportes-header,
+    #formReporte,
+    .nota-limite {
+        display: none !important;
+    }
+
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .reportes-container {
+        padding: 0;
+    }
+
+    .panel-resultados {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+    }
+
+    .tabla-resultados {
+        font-size: 9px;
+    }
+
+    .tabla-resultados th {
+        background: #a87996 !important;
+        color: white !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .tabla-resultados tr {
+        page-break-inside: avoid;
+    }
+
+    @page {
+        size: landscape;
+        margin: 12mm;
+    }
+}
+</style>
+
+
+<script>
+function cambiarTabla() {
+    const formulario = document.getElementById("formReporte");
+
+    formulario.querySelectorAll(
+        'input[name^="filtro_"], input[name^="operador_"]'
+    ).forEach(campo => campo.disabled = true);
+
+    formulario.querySelectorAll(
+        'input[name="columnas"]'
+    ).forEach(campo => campo.disabled = true);
+
+    formulario.querySelectorAll(
+        'input[name="buscar"], input[name="fecha_desde"], input[name="fecha_hasta"], select[name="fecha_columna"], select[name="ordenar"], select[name="direccion"]'
+    ).forEach(campo => campo.disabled = true);
+
+    formulario.submit();
+}
+
+function marcarColumnas(estado) {
+    document.querySelectorAll(
+        'input[name="columnas"]'
+    ).forEach(campo => {
+        campo.checked = estado;
+    });
+}
+
+{% if es_pdf %}
+window.addEventListener("load", function() {
+    window.print();
+});
+{% endif %}
+</script>
+
+{% endblock %}
