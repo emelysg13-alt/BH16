@@ -1,25 +1,23 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="BackHome ayuda a conectar mascotas perdidas con sus familias y ofrece seguimiento, consejos y refugios.">
+    <meta name="description" content="BackHome: una comunidad que protege y ayuda a los animales.">
     <title>BackHome | Cada huellita importa</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Playwrite+NZ+Basic:wght@100..400&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
-
 <body>
 
 <header class="site-header">
     <div class="container nav-wrap">
-
         <a class="brand" href="#inicio">
             <span class="brand-mark"><i class="fa-solid fa-paw"></i></span>
             <span>Back<span>Home</span><small>Cada huellita importa</small></span>
@@ -29,85 +27,73 @@
             <i class="fa-solid fa-bars"></i>
         </button>
 
-        <nav class="main-nav" aria-label="Navegación principal">
-            <a class="nav-active" href="#inicio">Inicio</a>
+        <nav class="main-nav">
+            <a href="#inicio">Inicio</a>
             <a href="#seguimientos">Seguimientos</a>
-            <a href="#consejos">Consejos</a>
             <a href="#refugios">Refugios</a>
             <a href="#nosotros">Nosotros</a>
+            <a href="#consejos" class="nav-advice-button">
+                <i class="fa-solid fa-lightbulb"></i> Consejos
+            </a>
         </nav>
 
-        <a class="header-action" href="#iniciar-sesion">
-            Iniciar sesión <i class="fa-solid fa-user"></i>
-        </a>
-
+        <div class="header-actions">
+            <a class="donate-button" href="#donaciones">
+                <i class="fa-solid fa-heart"></i> Donar
+            </a>
+            <a class="login-button" href="#iniciar-sesion">
+                Iniciar sesión <i class="fa-solid fa-user"></i>
+            </a>
+        </div>
     </div>
 </header>
 
 <main>
-
-    <!-- HERO -->
+    <!-- PRESENTACIÓN PRINCIPAL -->
     <section class="hero" id="inicio">
-
         <div class="hero-shape shape-one"></div>
         <div class="hero-shape shape-two"></div>
 
         <div class="container hero-grid">
-
             <div class="hero-copy">
-
                 <span class="eyebrow">
                     <i class="fa-solid fa-heart"></i>
                     Juntos podemos hacer la diferencia
                 </span>
 
-                <h1>
-                    Cada huellita merece encontrar <em>su hogar.</em>
-                </h1>
+                <h1>Cada huellita merece encontrar <em>su hogar.</em></h1>
 
                 <p class="hero-lead">
-                    En BackHome conectamos personas, ayudamos a encontrar mascotas
-                    perdidas y brindamos herramientas para proteger a quienes
-                    hacen nuestra vida más especial.
+                    En BackHome conectamos personas, ayudamos a encontrar
+                    mascotas perdidas y compartimos información para
+                    proteger a nuestros animales.
                 </p>
 
                 <div class="hero-buttons">
                     <a class="btn btn-primary" href="#seguimientos">
                         Conoce BackHome <i class="fa-solid fa-arrow-right"></i>
                     </a>
-
-                    <a class="btn btn-light" href="#refugios">
-                        Explorar refugios
-                    </a>
+                    <a class="btn btn-light" href="#refugios">Explorar refugios</a>
                 </div>
 
                 <div class="hero-note">
                     <span class="avatar-stack">
-                        <b>🐶</b>
-                        <b>🐱</b>
-                        <b>🐾</b>
+                        <b>🐶</b><b>🐱</b><b>🐾</b>
                     </span>
-
                     <span>
                         <strong>Una comunidad que sí se mueve</strong>
                         <small>Pequeñas acciones, grandes resultados.</small>
                     </span>
                 </div>
-
             </div>
 
             <div class="hero-visual">
-
                 <div class="photo-frame">
-                    <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=1100&q=85"
-                         alt="Perro acompañado de su familia">
+                    <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=1100&q=85" alt="Perro acompañado de su familia">
                 </div>
 
                 <div class="floating-card reunion">
-                    <span class="float-icon">
-                        <i class="fa-solid fa-house-heart"></i>
-                    </span>
-
+                    <i class="fa-solid fa-house-heart"></i>
                     <span>
                         <strong>Un reencuentro</strong>
                         <small>puede empezar contigo</small>
@@ -116,96 +102,181 @@
 
                 <div class="floating-card paw-note">
                     <i class="fa-solid fa-paw"></i>
-                    <span>Cada huellita importa</span>
+                    Cada huellita importa
                 </div>
-
-                <span class="sparkle sparkle-a">✦</span>
-                <span class="sparkle sparkle-b">✳</span>
-
             </div>
-
         </div>
     </section>
-
 
     <!-- ACCESOS PRINCIPALES -->
     <section class="quick-section">
         <div class="container quick-grid">
-
             <a class="quick-card pink" href="#seguimientos">
-                <span class="quick-icon">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </span>
-
-                <span>
-                    <strong>Seguimientos</strong>
-                    <small>Consulta el estado de los reportes.</small>
-                </span>
-
-                <i class="fa-solid fa-arrow-up-right-from-square quick-arrow"></i>
+                <span class="quick-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <span><strong>Seguimientos</strong><small>Consulta los reportes.</small></span>
+                <i class="fa-solid fa-arrow-right quick-arrow"></i>
             </a>
 
-            <a class="quick-card peach" href="#consejos">
-                <span class="quick-icon">
-                    <i class="fa-solid fa-lightbulb"></i>
-                </span>
-
-                <span>
-                    <strong>Consejos</strong>
-                    <small>Aprende sobre el cuidado animal.</small>
-                </span>
-
-                <i class="fa-solid fa-arrow-up-right-from-square quick-arrow"></i>
+            <a class="quick-card peach" href="#refugios">
+                <span class="quick-icon"><i class="fa-solid fa-house-chimney-heart"></i></span>
+                <span><strong>Refugios</strong><small>Conoce nuestra comunidad.</small></span>
+                <i class="fa-solid fa-arrow-right quick-arrow"></i>
             </a>
 
-            <a class="quick-card lilac" href="#refugios">
-                <span class="quick-icon">
-                    <i class="fa-solid fa-house-chimney-heart"></i>
-                </span>
-
-                <span>
-                    <strong>Refugios</strong>
-                    <small>Conoce organizaciones y refugios.</small>
-                </span>
-
-                <i class="fa-solid fa-arrow-up-right-from-square quick-arrow"></i>
+            <a class="quick-card lilac" href="#nosotros">
+                <span class="quick-icon"><i class="fa-solid fa-heart"></i></span>
+                <span><strong>Nosotros</strong><small>Conoce nuestra labor.</small></span>
+                <i class="fa-solid fa-arrow-right quick-arrow"></i>
             </a>
-
         </div>
     </section>
 
+    <!-- SEGUIMIENTOS -->
+    <section class="section how-section" id="seguimientos">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Siempre cerca de cada historia</span>
+                <h2>Seguimientos para no perder <em>la esperanza.</em></h2>
+                <p>
+                    En BackHome puedes conocer el proceso de los reportes
+                    y estar al tanto de cada avance.
+                </p>
+            </div>
+
+            <div class="steps-grid">
+                <article class="step-card">
+                    <span class="step-number">01</span>
+                    <div class="step-icon rose"><i class="fa-solid fa-file-circle-check"></i></div>
+                    <h3>Consulta los reportes</h3>
+                    <p>Encuentra información relacionada con los casos registrados.</p>
+                </article>
+
+                <article class="step-card">
+                    <span class="step-number">02</span>
+                    <div class="step-icon yellow"><i class="fa-solid fa-list-check"></i></div>
+                    <h3>Revisa los avances</h3>
+                    <p>Mantente al tanto de las novedades de cada caso.</p>
+                </article>
+
+                <article class="step-card">
+                    <span class="step-number">03</span>
+                    <div class="step-icon green"><i class="fa-solid fa-heart-circle-check"></i></div>
+                    <h3>Acompaña cada historia</h3>
+                    <p>Cada actualización puede acercarnos a un reencuentro.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- REFUGIOS -->
+    <section class="section live-section shelter-section" id="refugios">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Red de protección animal</span>
+                <h2>Conoce nuestros <em>refugios.</em></h2>
+                <p>Encuentra organizaciones dedicadas a proteger y cuidar a nuestros animales.</p>
+            </div>
+
+            <form method="get" class="public-search">
+                <label for="buscar_refugio">Buscar un refugio</label>
+                <div>
+                    <input
+                        id="buscar_refugio"
+                        type="search"
+                        name="buscar_refugio"
+                        value="{{ buscar_refugio }}"
+                        placeholder="Nombre, dirección o localidad">
+                    <button type="submit">
+                        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                    </button>
+                </div>
+            </form>
+
+            <div class="public-cards">
+                {% for refugio in refugios %}
+                    <article class="public-card refuge-card">
+                        <div class="refuge-card-top">
+                            <div class="public-card-icon">
+                                <i class="fa-solid fa-house-chimney-heart"></i>
+                            </div>
+                            <span class="status-pill">
+                                <i class="fa-solid fa-circle"></i> Activo
+                            </span>
+                        </div>
+
+                        <span class="public-kicker">REFUGIO REGISTRADO</span>
+                        <h3>{{ refugio.nombre }}</h3>
+
+                        <p>
+                            {{ refugio.descripcion|default:"Organización dedicada a la protección y el bienestar animal."|linebreaksbr }}
+                        </p>
+
+                        <ul class="refuge-details">
+                            <li>
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>
+                                    {{ refugio.direccion }}
+                                    {% if refugio.localidad %}, {{ refugio.localidad }}{% endif %}
+                                </span>
+                            </li>
+
+                            {% if refugio.telefono %}
+                                <li>
+                                    <i class="fa-solid fa-phone"></i>
+                                    <a href="tel:{{ refugio.telefono }}">{{ refugio.telefono }}</a>
+                                </li>
+                            {% endif %}
+
+                            {% if refugio.email %}
+                                <li>
+                                    <i class="fa-solid fa-envelope"></i>
+                                    <a href="mailto:{{ refugio.email }}">{{ refugio.email }}</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+
+                        <a class="map-link" target="_blank" rel="noopener"
+                           href="https://www.google.com/maps/search/?api=1&query={{ refugio.direccion|urlencode }}%20{{ refugio.localidad|urlencode }}">
+                            Ver ubicación <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+
+                        <a class="btn btn-primary refuge-donate" href="#donaciones">
+                            Apoyar a este refugio
+                        </a>
+                    </article>
+                {% empty %}
+                    <div class="public-empty">
+                        <i class="fa-solid fa-house-chimney"></i>
+                        <h3>No hay refugios activos</h3>
+                        <p>Los refugios activos registrados en BackHome aparecerán aquí.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
 
     <!-- NOSOTROS -->
     <section class="section about-section" id="nosotros">
-
         <div class="container about-grid">
-
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1000&q=85"
-                     alt="Dos perros disfrutando juntos">
-
+                <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1000&q=85" alt="Dos perros juntos" loading="lazy">
                 <span class="image-sticker">
-                    <i class="fa-solid fa-heart"></i>
-                    Amor que transforma
+                    <i class="fa-solid fa-heart"></i> Amor que transforma
                 </span>
             </div>
 
             <div class="section-copy">
-
                 <span class="eyebrow">¿Qué es BackHome?</span>
-
-                <h2>
-                    Un espacio creado para proteger y ayudar a nuestros <em>animales.</em>
-                </h2>
+                <h2>Un espacio creado para proteger y ayudar a nuestros <em>animales.</em></h2>
 
                 <p>
-                    BackHome es una plataforma que busca facilitar la conexión
-                    entre personas, promover el bienestar animal y ayudar en
-                    los procesos relacionados con mascotas perdidas.
+                    BackHome conecta personas, promueve el bienestar animal
+                    y ayuda en los procesos relacionados con mascotas perdidas.
+                    Creemos que cada animal merece cuidado, protección y una
+                    oportunidad de volver a casa.
                 </p>
 
                 <div class="value-list">
-
                     <div>
                         <i class="fa-solid fa-check"></i>
                         <span>
@@ -217,289 +288,209 @@
                     <div>
                         <i class="fa-solid fa-check"></i>
                         <span>
-                            <strong>Orientación y consejos</strong>
-                            <small>Información útil para el cuidado animal.</small>
+                            <strong>Apoyo a refugios</strong>
+                            <small>Conoce organizaciones y aporta a su labor.</small>
                         </span>
                     </div>
 
                     <div>
                         <i class="fa-solid fa-check"></i>
                         <span>
-                            <strong>Conexión con refugios</strong>
-                            <small>Conoce organizaciones dedicadas a proteger animales.</small>
+                            <strong>Orientación y consejos</strong>
+                            <small>Información útil para el cuidado animal.</small>
                         </span>
                     </div>
-
                 </div>
-
-            </div>
-
-        </div>
-    </section>
-
-
-    <!-- SEGUIMIENTOS -->
-    <section class="section how-section" id="seguimientos">
-
-        <div class="container">
-
-            <div class="section-heading">
-
-                <span class="eyebrow">Siempre cerca de cada historia</span>
-
-                <h2>
-                    Seguimientos para no perder <em>la esperanza.</em>
-                </h2>
-
-                <p>
-                    Acompaña los reportes y consulta la información relacionada
-                    con los casos de mascotas.
-                </p>
-
-            </div>
-
-            <div class="steps-grid">
-
-                <article class="step-card">
-
-                    <span class="step-number">01</span>
-
-                    <div class="step-icon rose">
-                        <i class="fa-solid fa-file-circle-check"></i>
-                    </div>
-
-                    <h3>Consulta los reportes</h3>
-
-                    <p>
-                        Encuentra información relacionada con los reportes
-                        registrados en BackHome.
-                    </p>
-
-                </article>
-
-                <article class="step-card">
-
-                    <span class="step-number">02</span>
-
-                    <div class="step-icon yellow">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-
-                    <h3>Revisa los avances</h3>
-
-                    <p>
-                        Mantente al tanto de las novedades y actualizaciones
-                        de cada caso.
-                    </p>
-
-                </article>
-
-                <article class="step-card">
-
-                    <span class="step-number">03</span>
-
-                    <div class="step-icon green">
-                        <i class="fa-solid fa-heart-circle-check"></i>
-                    </div>
-
-                    <h3>Acompaña cada historia</h3>
-
-                    <p>
-                        Cada actualización puede acercarnos a un nuevo
-                        reencuentro.
-                    </p>
-
-                </article>
-
             </div>
         </div>
     </section>
-
 
     <!-- CONSEJOS -->
-    <section class="adoption-section" id="consejos">
-
-        <div class="container adoption-grid">
-
-            <div>
-
-                <span class="eyebrow light-eyebrow">
-                    Cuidarlos también es quererlos
-                </span>
-
-                <h2>
-                    Pequeños consejos para un <em>gran bienestar.</em>
-                </h2>
-
-                <p>
-                    El cuidado responsable comienza con información.
-                    Conoce recomendaciones para proteger, alimentar y
-                    acompañar a tus mascotas en cada etapa de su vida.
-                </p>
-
-                <a class="btn btn-white" href="#contacto">
-                    Descubre BackHome
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-
+    <section class="section advice-section" id="consejos">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Cuidado y bienestar animal</span>
+                <h2>Aprende a cuidar mejor a nuestras <em>huellitas.</em></h2>
+                <p>Recomendaciones y contenido publicado para acompañarte en el cuidado de tus mascotas.</p>
             </div>
 
-            <div class="adoption-photo">
+            <form method="get" class="public-search">
+                <label for="buscar_consejo">Buscar un consejo</label>
+                <div>
+                    <input
+                        id="buscar_consejo"
+                        type="search"
+                        name="buscar_consejo"
+                        value="{{ buscar_consejo }}"
+                        placeholder="Alimentación, vacunas, hidratación...">
+                    <button type="submit">
+                        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                    </button>
+                </div>
+            </form>
 
-                <img src="https://images.unsplash.com/photo-1551717743-49959800b1f6?auto=format&fit=crop&w=1000&q=85"
-                     alt="Perro disfrutando de los cuidados de su familia">
-
-                <span>
-                    Cuidar también es una forma de amar.
-                    <i class="fa-solid fa-heart"></i>
-                </span>
-
+            <div class="public-cards">
+                {% for consejo in consejos %}
+                    <article class="public-card advice-card">
+                        <div class="public-card-icon">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <span class="public-kicker">CONSEJO BACKHOME</span>
+                        <h3>{{ consejo.titulo }}</h3>
+                        <p>{{ consejo.descripcion|linebreaksbr }}</p>
+                        <small>Publicado: {{ consejo.created_at|date:"d/m/Y" }}</small>
+                    </article>
+                {% empty %}
+                    <div class="public-empty">
+                        <i class="fa-regular fa-lightbulb"></i>
+                        <h3>Aún no hay consejos publicados</h3>
+                        <p>Próximamente encontrarás nuevas recomendaciones para el bienestar de tus mascotas.</p>
+                    </div>
+                {% endfor %}
             </div>
-
         </div>
     </section>
 
+    <!-- DONACIONES -->
+    <section class="section donation-section" id="donaciones">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Un gesto que puede cambiar vidas</span>
+                <h2>Tu ayuda deja <em>huellitas.</em></h2>
+                <p>Cada aporte representa una oportunidad para brindar cuidado, alimento y protección a los animales.</p>
+            </div>
 
-    <!-- REFUGIOS -->
-    <section class="section help-section" id="refugios">
+            <div class="donation-layout">
+                <div class="donation-info">
+                    <div class="donation-heart">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
 
+                    <span class="eyebrow">Ayúdanos a ayudar</span>
+                    <h3>Un pequeño aporte puede hacer una gran diferencia.</h3>
+
+                    <p>
+                        Tu generosidad contribuye a fortalecer la labor
+                        de los refugios y el bienestar de los animales
+                        que necesitan apoyo.
+                    </p>
+
+                    <ul>
+                        <li><i class="fa-solid fa-check-circle"></i> Apoya a los refugios de nuestra comunidad.</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Contribuye al bienestar animal.</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Haz parte de una comunidad solidaria.</li>
+                    </ul>
+                </div>
+
+                <div class="donation-form-card">
+                    <h3>Realiza tu aporte</h3>
+                    <p>Completa los datos para registrar tu donación.</p>
+
+                    {% if mensaje_donacion %}
+                        <div class="form-message {{ tipo_mensaje }}">
+                            {{ mensaje_donacion }}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="#donaciones">
+                        {% csrf_token %}
+
+                        <label for="correo">Correo electrónico</label>
+                        <input type="email" id="correo" name="correo" maxlength="150" placeholder="Tu correo registrado" required>
+
+                        <label for="monto">Valor de tu aporte</label>
+                        <div class="money-input">
+                            <span>$</span>
+                            <input type="number" id="monto" name="monto" min="1" max="99999999.99" step="0.01" placeholder="20.000" required>
+                        </div>
+                        <small class="currency-note">Pesos colombianos (COP)</small>
+
+                        <label for="refugio_id">Selecciona un refugio</label>
+                        <select id="refugio_id" name="refugio_id">
+                            <option value="">Apoyo general a BackHome</option>
+                            {% for refugio in refugios %}
+                                <option value="{{ refugio.id_refugio }}">{{ refugio.nombre }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="mensaje">Mensaje para acompañar tu aporte</label>
+                        <textarea id="mensaje" name="mensaje" maxlength="255" rows="3" placeholder="Escribe un mensaje de apoyo..."></textarea>
+
+                        <button class="btn btn-primary donation-submit" type="submit">
+                            <i class="fa-solid fa-heart"></i> Registrar mi donación
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CIERRE -->
+    <section class="help-section">
         <div class="container help-inner">
-
-            <div class="help-icon">
-                <i class="fa-solid fa-house-chimney-heart"></i>
-            </div>
+            <div class="help-icon"><i class="fa-solid fa-paw"></i></div>
 
             <div>
-
-                <span class="eyebrow">Organizaciones que hacen la diferencia</span>
-
-                <h2>
-                    Los refugios también son <em>esperanza.</em>
-                </h2>
-
-                <p>
-                    Conoce los refugios y organizaciones que trabajan
-                    diariamente por el bienestar y la protección animal.
-                </p>
-
+                <span class="eyebrow">Una comunidad con corazón</span>
+                <h2>Juntos podemos dejar <em>huellitas.</em></h2>
+                <p>Gracias por ser parte de BackHome y ayudar a construir un mundo mejor para nuestros animales.</p>
             </div>
 
-            <a class="btn btn-primary" href="#contacto">
-                Conocer más
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-
+            <a class="btn btn-primary" href="#inicio">Volver al inicio</a>
         </div>
     </section>
-
 </main>
 
-
-<!-- FOOTER -->
-<footer class="site-footer" id="contacto">
-
+<footer class="site-footer">
     <div class="container footer-grid">
-
         <div class="footer-brand">
-
             <a class="brand brand-footer" href="#inicio">
-
-                <span class="brand-mark">
-                    <i class="fa-solid fa-paw"></i>
-                </span>
-
-                <span>
-                    Back<span>Home</span>
-                    <small>Cada huellita importa</small>
-                </span>
-
+                <span class="brand-mark"><i class="fa-solid fa-paw"></i></span>
+                <span>Back<span>Home</span><small>Cada huellita importa</small></span>
             </a>
-
-            <p>
-                Conectamos historias, promovemos el cuidado y trabajamos
-                por un futuro más amable para los animales.
-            </p>
-
+            <p>Conectamos historias y trabajamos por un futuro más amable para los animales.</p>
         </div>
 
         <div>
-
             <h3>Explora</h3>
-
             <a href="#seguimientos">Seguimientos</a>
-            <a href="#consejos">Consejos</a>
             <a href="#refugios">Refugios</a>
-
+            <a href="#consejos">Consejos</a>
         </div>
 
         <div>
-
-            <h3>BackHome</h3>
-
+            <h3>Conócenos</h3>
             <a href="#nosotros">Sobre nosotros</a>
-            <a href="#inicio">Página principal</a>
-            <a href="#iniciar-sesion">Iniciar sesión</a>
-
+            <a href="#donaciones">Apoyar a BackHome</a>
         </div>
 
-        <div class="footer-contact">
-
+        <div>
             <h3>Una comunidad con corazón</h3>
-
-            <p>
-                Gracias por ser parte de una comunidad que cuida,
-                protege y acompaña.
-            </p>
-
-            <a class="admin-link" href="{% url 'dashboard' %}">
-                <i class="fa-solid fa-lock"></i>
-                Acceso administrativo
-            </a>
-
+            <p>Gracias por ayudar a quienes más lo necesitan.</p>
         </div>
-
     </div>
 
     <div class="container footer-bottom">
-
-        <span>
-            © {% now "Y" %} BackHome. Todos los derechos reservados.
-        </span>
-
-        <span>
-            Hecho con <i class="fa-solid fa-heart"></i> por los que no tienen voz.
-        </span>
-
+        <span>© {% now "Y" %} BackHome. Todos los derechos reservados.</span>
+        <span>Hecho con <i class="fa-solid fa-heart"></i> por los que no tienen voz.</span>
     </div>
-
 </footer>
 
-
 <script>
-
     const toggle = document.querySelector('.menu-toggle');
     const nav = document.querySelector('.main-nav');
 
     toggle.addEventListener('click', () => {
-
-        const open = nav.classList.toggle('is-open');
-
-        toggle.setAttribute('aria-expanded', String(open));
-
+        const abierto = nav.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(abierto));
     });
 
     nav.querySelectorAll('a').forEach(link => {
-
         link.addEventListener('click', () => {
-
             nav.classList.remove('is-open');
-
             toggle.setAttribute('aria-expanded', 'false');
-
         });
-
     });
-
 </script>
 
 </body>
