@@ -1,8 +1,8 @@
-
-from django.urls import path
+from django.urls import path, include
 from . import views
-from . import reportes
-from .consejos_soporte import gestion_consejos, gestion_soporte
+
+from usuarios.views import gestion_usuarios
+
 
 
 urlpatterns = [
@@ -15,51 +15,21 @@ urlpatterns = [
     ),
 
     # USUARIOS
-    path(
-        'usuarios/',
-        views.gestion_usuarios,
-        name='gestion_usuarios'
-    ),
+    path('usuarios/', gestion_usuarios, name='gestion_usuarios'),
 
     # REFUGIOS
-    path(
-        'refugios/',
-        views.gestion_refugios,
-        name='gestion_refugios'
-    ),
-
-    path(
-        'refugios/eliminar/<int:id_refugio>/',
-        views.eliminar_refugio,
-        name='eliminar_refugio'
-    ),
+    path('refugios/', include('refugios.urls')),
 
     # DONACIONES
-    path(
-        'donaciones/',
-        views.gestion_donaciones,
-        name='gestion_donaciones'
-    ),
+    path('donaciones/', include('donaciones.urls')),
 
     # CONSEJOS
-    path(
-        'consejos/',
-        gestion_consejos,
-        name='gestion_consejos'
-    ),
+    path('consejos/', include('consejos.urls')),
 
     # SOPORTE
-    path(
-        'soporte/',
-        gestion_soporte,
-        name='gestion_soporte'
-    ),
+    path('soporte/', include('soporte.urls')),
 
     # REPORTES
-    path(
-        'reportes/',
-        reportes.gestion_reportes,
-        name='gestion_reportes'
-    ),
+    path('reportes/', include('reportes.urls')),
 
 ]

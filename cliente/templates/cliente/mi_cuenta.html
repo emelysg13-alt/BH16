@@ -93,7 +93,7 @@
             tus solicitudes y consultar la información de tus mascotas.
         </p>
 
-        <form method="post" action="{% url 'inicio:cerrar_sesion' %}">
+        <form method="post" action="{% url 'cerrar_sesion' %}">
             {% csrf_token %}
 
             <button type="submit">

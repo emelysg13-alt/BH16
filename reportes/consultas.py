@@ -1,18 +1,9 @@
 
-import csv
-import re
-from datetime import datetime
-from io import StringIO
-
 from django.db import connection
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.views.decorators.http import require_GET
 
 
 # ==========================================================
 # TABLAS DISPONIBLES PARA GENERAR REPORTES
-# Los nombres corresponden al SQL real de BackHome.
 # ==========================================================
 
 TABLAS_REPORTES = {
@@ -125,10 +116,7 @@ def construir_consulta(request, tabla, configuracion):
     consulta = f"SELECT {nombres_sql} FROM `{tabla}` WHERE 1=1"
     parametros = []
 
-    # ------------------------------------------------------
     # BÚSQUEDA GENERAL
-    # ------------------------------------------------------
-
     buscar = request.GET.get("buscar", "").strip()
 
     if buscar:
@@ -140,10 +128,7 @@ def construir_consulta(request, tabla, configuracion):
 
         consulta += " AND (" + " OR ".join(condiciones) + ")"
 
-    # ------------------------------------------------------
     # FILTRO DE FECHAS
-    # ------------------------------------------------------
-
     fecha_columna = request.GET.get("fecha_columna", "")
 
     if fecha_columna in configuracion["fechas"]:
@@ -159,10 +144,7 @@ def construir_consulta(request, tabla, configuracion):
             consulta += f" AND DATE(`{fecha_columna}`) <= %s"
             parametros.append(fecha_hasta)
 
-    # ------------------------------------------------------
     # FILTROS POR COLUMNA
-    # ------------------------------------------------------
-
     filtros_aplicados = []
 
     for columna in columnas_validas:
@@ -213,10 +195,7 @@ def construir_consulta(request, tabla, configuracion):
             "valor": valor,
         })
 
-    # ------------------------------------------------------
     # ORDENAMIENTO
-    # ------------------------------------------------------
-
     ordenar = request.GET.get("ordenar", "")
 
     if ordenar not in columnas_validas:
@@ -247,133 +226,3 @@ def construir_consulta(request, tabla, configuracion):
         "ordenar": ordenar,
         "direccion": direccion,
     }
-
-
-# ==========================================================
-# VISTA PRINCIPAL
-# ==========================================================
-
-@require_GET
-def gestion_reportes(request):
-
-    tabla = request.GET.get("tabla", "seguimiento")
-
-    if tabla not in TABLAS_REPORTES:
-        tabla = "seguimiento"
-
-    try:
-        configuracion = obtener_configuracion(tabla)
-
-        resultado = construir_consulta(
-            request,
-            tabla,
-            configuracion
-        )
-
-        generar = request.GET.get("generar") == "1"
-        formato = request.GET.get("formato", "")
-
-        etiquetas = {
-            "columnas": [
-                {
-                    "nombre": columna["nombre"],
-                    "seleccionada": (
-                        columna["nombre"] in resultado["seleccionadas"]
-                    ),
-                    "es_fecha": columna["es_fecha"],
-                    "es_numerico": columna["es_numerico"],
-                }
-                for columna in configuracion["columnas"]
-            ],
-            "fechas": configuracion["fechas"],
-            "numericas": configuracion["numericas"],
-        }
-
-        encabezados = resultado["seleccionadas"]
-
-        if formato == "excel":
-
-            salida = StringIO()
-            escritor = csv.writer(salida, delimiter=";")
-
-            escritor.writerow(["BACKHOME - " + TABLAS_REPORTES[tabla]])
-            escritor.writerow([
-                "Generado el",
-                datetime.now().strftime("%d/%m/%Y %H:%M")
-            ])
-            escritor.writerow([])
-            escritor.writerow(encabezados)
-
-            for fila in resultado["filas"]:
-                escritor.writerow([
-                    valor.isoformat(sep=" ")
-                    if hasattr(valor, "isoformat")
-                    else valor
-                    for valor in fila
-                ])
-
-            respuesta = HttpResponse(
-                "\ufeff" + salida.getvalue(),
-                content_type="text/csv; charset=utf-8"
-            )
-
-            respuesta["Content-Disposition"] = (
-                f'attachment; filename="BackHome_{tabla}.csv"'
-            )
-
-            return respuesta
-
-        contexto = {
-            "tablas": [
-                {"nombre": nombre, "titulo": titulo}
-                for nombre, titulo in TABLAS_REPORTES.items()
-            ],
-            "tabla_actual": tabla,
-            "titulo_tabla": TABLAS_REPORTES[tabla],
-            "columnas": etiquetas["columnas"],
-            "fechas": etiquetas["fechas"],
-            "numericas": etiquetas["numericas"],
-            "encabezados": encabezados,
-            "filas": resultado["filas"] if generar else [],
-            "total": len(resultado["filas"]) if generar else 0,
-            "generado": generar,
-            "buscar": resultado["buscar"],
-            "fecha_columna": resultado["fecha_columna"],
-            "fecha_desde": resultado["fecha_desde"],
-            "fecha_hasta": resultado["fecha_hasta"],
-            "ordenar": resultado["ordenar"],
-            "direccion": resultado["direccion"],
-            "filtros_aplicados": resultado["filtros_aplicados"],
-            "error": None,
-            "es_pdf": formato == "pdf",
-        }
-
-        return render(
-            request,
-            "panel_admin/gestion_reportes.html",
-            contexto
-        )
-
-    except Exception as error:
-
-        return render(
-            request,
-            "panel_admin/gestion_reportes.html",
-            {
-                "tablas": [
-                    {"nombre": nombre, "titulo": titulo}
-                    for nombre, titulo in TABLAS_REPORTES.items()
-                ],
-                "tabla_actual": tabla,
-                "titulo_tabla": TABLAS_REPORTES[tabla],
-                "columnas": [],
-                "fechas": [],
-                "numericas": [],
-                "encabezados": [],
-                "filas": [],
-                "total": 0,
-                "generado": False,
-                "error": str(error),
-                "es_pdf": False,
-            }
-        )

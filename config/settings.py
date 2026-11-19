@@ -39,8 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'panel_admin',
+        
     'inicio',
+    'usuarios',
+    'cliente',
+    'reportes',
+    'seguimientos',
+    'refugios',
+    'donaciones',
+    'consejos',
+    'soporte',
+    'panel_admin',
 ]
 
 MIDDLEWARE = [
@@ -117,9 +126,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'es'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
