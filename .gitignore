@@ -1,4 +1,4 @@
-# Archivos generados por Python
+# Python
 __pycache__/
 *.py[cod]
 
@@ -6,5 +6,12 @@ __pycache__/
 venv/
 .venv/
 
-# Configuración local
+# Variables de entorno
 .env
+
+# Archivos locales
+*.sqlite3
+
+# Archivos temporales
+*.log
+.DS_Store
