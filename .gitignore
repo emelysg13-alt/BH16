@@ -1,8 +1,10 @@
-# Archivos temporales de Python
+# Archivos generados por Python
 __pycache__/
 *.py[cod]
-*$py.class
 
 # Entornos virtuales
 venv/
 .venv/
+
+# Configuración local
+.env
