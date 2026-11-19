@@ -13,13 +13,61 @@
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- ESTILOS DEL BOTÓN CERRAR SESIÓN -->
+    <style>
+        .menu .logout-button {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            width: 100%;
+            min-height: 46px;
+            padding: 12px 14px;
+            border: 0;
+            border-radius: 13px;
+            background: transparent;
+            color: #8c7784;
+            font-size: 13px;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .menu .logout-button i {
+            width: 19px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .menu .logout-button:hover,
+        .menu .logout-button:focus-visible {
+            background: var(--pink-soft);
+            color: var(--pink-dark);
+            transform: translateX(3px);
+        }
+
+        @media (max-width: 600px) {
+            .menu .logout-button {
+                justify-content: center;
+                padding: 14px 5px;
+            }
+
+            .menu .logout-button span {
+                display: none;
+            }
+
+            .menu .logout-button i {
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
     <!-- MENÚ LATERAL -->
     <aside class="sidebar">
-
         <div class="logo">
             <span class="logo-icon">
                 <i class="fa-solid fa-paw"></i>
@@ -83,6 +131,15 @@
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Reportes</span>
             </a>
+
+            <!-- NUEVO: CERRAR SESIÓN -->
+            <form method="post" action="{% url 'inicio:cerrar_sesion' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </form>
 
         </nav>
 
