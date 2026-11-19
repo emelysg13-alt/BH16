@@ -7,4 +7,5 @@ urlpatterns = [
     path('', include('cliente.urls')),
     path('admin/', admin.site.urls),
     path('panel/', include('panel_admin.urls')),
+    path('', include('donaciones.public_urls')),
 ]

@@ -1,8 +1,6 @@
 from django.urls import path, include
 from . import views
 
-from usuarios.views import gestion_usuarios
-
 
 
 urlpatterns = [
@@ -15,7 +13,7 @@ urlpatterns = [
     ),
 
     # USUARIOS
-    path('usuarios/', gestion_usuarios, name='gestion_usuarios'),
+    path('usuarios/', include('usuarios.urls')),
 
     # REFUGIOS
     path('refugios/', include('refugios.urls')),

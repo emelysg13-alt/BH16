@@ -3,6 +3,115 @@ from django.db import connection
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 
+from decimal import Decimal, InvalidOperation
+
+from django.shortcuts import redirect
+from django.db import connection, DatabaseError, transaction
+
+
+def registrar_donacion(request):
+    if request.method != "POST":
+        return redirect("pagina_principal")
+
+    correo = request.POST.get("correo", "").strip()
+    monto_texto = request.POST.get("monto", "").strip()
+    mensaje = request.POST.get("mensaje", "").strip()
+    refugio_id = request.POST.get("refugio_id", "").strip()
+
+    try:
+        monto = Decimal(monto_texto)
+
+        if (
+            not monto.is_finite()
+            or monto <= 0
+            or monto > Decimal("99999999.99")
+        ):
+            raise ValueError
+
+        if len(mensaje) > 255:
+            raise ValueError
+
+        with transaction.atomic():
+            with connection.cursor() as cursor:
+
+                cursor.execute("""
+                    SELECT c.id_cliente
+                    FROM cliente c
+                    INNER JOIN personas p
+                        ON p.id_persona = c.persona_id
+                    WHERE LOWER(p.email) = LOWER(%s)
+                      AND p.estado = 'activo'
+                    LIMIT 1
+                """, [correo])
+
+                cliente = cursor.fetchone()
+
+                if not cliente:
+                    raise LookupError(
+                        "No encontramos una cuenta de cliente activa "
+                        "con ese correo."
+                    )
+
+                cliente_id = cliente[0]
+
+                if refugio_id:
+                    cursor.execute("""
+                        SELECT id_refugio
+                        FROM refugios
+                        WHERE id_refugio = %s
+                          AND estado = 'activo'
+                    """, [refugio_id])
+
+                    if not cursor.fetchone():
+                        raise LookupError(
+                            "El refugio seleccionado no está disponible."
+                        )
+                else:
+                    refugio_id = None
+
+                cursor.execute("""
+                    INSERT INTO donaciones
+                        (cliente_id, refugio_id, monto, mensaje, estado)
+                    VALUES (%s, %s, %s, %s, 'pendiente')
+                """, [
+                    cliente_id,
+                    refugio_id,
+                    monto,
+                    mensaje or None
+                ])
+
+                numero_donacion = cursor.lastrowid
+
+        request.session["mensaje_donacion"] = (
+            f"¡Muchas gracias por tu aporte! "
+            f"Tu donación quedó registrada con el número "
+            f"#{numero_donacion} y está pendiente de confirmación."
+        )
+        request.session["tipo_mensaje"] = "exito"
+
+    except (InvalidOperation, ValueError):
+        request.session["mensaje_donacion"] = (
+            "Por favor, ingresa un monto válido y un mensaje "
+            "de máximo 255 caracteres."
+        )
+        request.session["tipo_mensaje"] = "error"
+
+    except LookupError as error:
+        request.session["mensaje_donacion"] = str(error)
+        request.session["tipo_mensaje"] = "error"
+
+    except DatabaseError:
+        request.session["mensaje_donacion"] = (
+            "No fue posible registrar tu donación. "
+            "Por favor, inténtalo nuevamente."
+        )
+        request.session["tipo_mensaje"] = "error"
+
+    return redirect("/#donaciones")
+
+
+"""Gestion"""
+
 @require_http_methods(["GET", "POST"])
 def gestion_donaciones(request):
 

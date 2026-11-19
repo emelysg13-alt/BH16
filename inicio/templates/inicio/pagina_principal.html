@@ -392,7 +392,7 @@
                         </div>
                     {% endif %}
 
-                    <form method="post" action="#donaciones">
+                    <form method="post" action="{% url 'registrar_donacion' %}">
                         {% csrf_token %}
 
                         <label for="correo">Correo electrónico</label>

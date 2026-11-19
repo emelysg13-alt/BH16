@@ -133,7 +133,7 @@
             </a>
 
             <!-- NUEVO: CERRAR SESIÓN -->
-            <form method="post" action="{% url 'inicio:cerrar_sesion' %}">
+            <form method="post" action="{% url 'cerrar_sesion' %}">
                 {% csrf_token %}
                 <button type="submit" class="logout-button">
                     <i class="fa-solid fa-right-from-bracket"></i>
