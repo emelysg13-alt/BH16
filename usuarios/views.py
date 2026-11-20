@@ -9,10 +9,8 @@ from django.db import transaction, IntegrityError
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-
 def _destino_por_rol(rol):
-    return "/panel/" if rol == "administrador" else "/mi-cuenta/"
-
+    return "/panel/" if rol == "administrador" else "/"
 
 @require_http_methods(["GET", "POST"])
 def iniciar_sesion(request):

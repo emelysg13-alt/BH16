@@ -10,6 +10,13 @@ from django.db import connection, DatabaseError, transaction
 
 
 def registrar_donacion(request):
+    
+    if request.session.get("backhome_rol") != "cliente":
+        if request.session.get("backhome_user_id"):
+            return redirect("pagina_principal")
+
+        return redirect("registrar_cliente")
+    
     if request.method != "POST":
         return redirect("pagina_principal")
 
@@ -35,14 +42,18 @@ def registrar_donacion(request):
             with connection.cursor() as cursor:
 
                 cursor.execute("""
-                    SELECT c.id_cliente
-                    FROM cliente c
-                    INNER JOIN personas p
-                        ON p.id_persona = c.persona_id
-                    WHERE LOWER(p.email) = LOWER(%s)
-                      AND p.estado = 'activo'
-                    LIMIT 1
-                """, [correo])
+    SELECT c.id_cliente
+    FROM cliente c
+    INNER JOIN personas p
+        ON p.id_persona = c.persona_id
+    WHERE LOWER(p.email) = LOWER(%s)
+      AND p.id_persona = %s
+      AND p.estado = 'activo'
+    LIMIT 1
+""", [
+    correo,
+    request.session.get("backhome_user_id")
+])
 
                 cliente = cursor.fetchone()
 
