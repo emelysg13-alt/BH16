@@ -260,14 +260,22 @@
                                 <form method="post" class="donaciones-update">
                                     {% csrf_token %}
 
+                                    <!-- CAMBIO: ahora se envía la acción que espera la vista -->
+                                    <input
+                                        type="hidden"
+                                        name="accion"
+                                        value="estado"
+                                    >
+
                                     <input
                                         type="hidden"
                                         name="id_donacion"
                                         value="{{ d.id_donacion }}"
                                     >
 
+                                    <!-- CAMBIO: el nombre ahora coincide con nuevo_estado -->
                                     <select
-                                        name="estado"
+                                        name="nuevo_estado"
                                         aria-label="Nuevo estado para donación {{ d.id_donacion }}"
                                     >
                                         <option value="pendiente" {% if d.estado == 'pendiente' %}selected{% endif %}>
