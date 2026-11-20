@@ -13,7 +13,7 @@ urlpatterns = [
     ),
 
     # USUARIOS
-    path('usuarios/', include('usuarios.urls')),
+    path('usuarios/', include('usuarios.admin_urls')),
 
     # REFUGIOS
     path('refugios/', include('refugios.urls')),

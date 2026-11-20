@@ -1,0 +1,240 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f8f0f2, #eee2e7);
+    color: #35232b;
+}
+
+.register-page {
+    min-height: 100vh;
+    padding: 35px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.back-home {
+    align-self: flex-start;
+    margin-bottom: 25px;
+    color: #742b48;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.back-home:hover {
+    color: #a34b6b;
+}
+
+.back-home i {
+    margin-right: 7px;
+}
+
+.register-card {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    padding: 40px 45px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 12px 40px rgba(76, 35, 53, 0.10);
+}
+
+.register-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #742b48;
+    font-family: 'Playwrite NZ Basic', cursive;
+    font-size: 23px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.register-brand > span:last-child > span {
+    color: #b66b86;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6e8ed;
+    border-radius: 13px;
+    color: #8b3c5b;
+}
+
+.register-heading {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.register-eyebrow {
+    color: #a45b77;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.register-heading h1 {
+    margin: 10px 0;
+    color: #492536;
+    font-size: 29px;
+}
+
+.register-heading p {
+    max-width: 490px;
+    margin: auto;
+    color: #8a7b81;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.register-form h2 {
+    margin: 27px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0e5e9;
+    color: #742b48;
+    font-size: 15px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #59434d;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    height: 45px;
+    padding: 0 13px;
+    border: 1px solid #e8dce1;
+    border-radius: 9px;
+    outline: none;
+    background: #fdfbfc;
+    color: #49343e;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #a45b77;
+    box-shadow: 0 0 0 3px rgba(164, 91, 119, 0.12);
+}
+
+.form-group input::placeholder {
+    color: #b6a9af;
+}
+
+.register-submit {
+    width: 100%;
+    height: 49px;
+    margin-top: 32px;
+    border: none;
+    border-radius: 10px;
+    background: #742b48;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.register-submit:hover {
+    background: #8e3a5c;
+    transform: translateY(-2px);
+}
+
+.register-submit i {
+    margin-left: 8px;
+}
+
+.register-error {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #f0c9cf;
+    border-radius: 9px;
+    background: #fff2f3;
+    color: #a12e43;
+    font-size: 13px;
+}
+
+.register-error i {
+    margin-top: 2px;
+}
+
+.register-error ul {
+    padding-left: 15px;
+    line-height: 1.7;
+}
+
+.register-login {
+    margin-top: 25px;
+    text-align: center;
+    color: #897981;
+    font-size: 13px;
+}
+
+.register-login a {
+    color: #8b3c5b;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.register-login a:hover {
+    text-decoration: underline;
+}
+
+.register-footer {
+    margin-top: 25px;
+    color: #9a828d;
+    font-size: 12px;
+}
+
+.register-footer i {
+    margin-left: 5px;
+    color: #a45b77;
+}
+
+@media (max-width: 600px) {
+    .register-page {
+        padding: 22px 13px;
+    }
+
+    .register-card {
+        padding: 30px 22px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .register-heading h1 {
+        font-size: 25px;
+    }
+}

@@ -157,6 +157,161 @@ def cerrar_sesion(request):
     return redirect("/")
 
 
+
+@require_http_methods(["GET", "POST"])
+def registrar_cliente(request):
+    """Registra una nueva cuenta de cliente."""
+
+    errores = []
+    datos = {}
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_t_doc, n_doc
+                FROM tipo_documento
+                ORDER BY n_doc
+            """)
+            tipos_documento = cursor.fetchall()
+
+        if request.method == "POST":
+            tipo_documento = request.POST.get(
+                "tipo_documento", ""
+            ).strip()
+            documento = request.POST.get("documento", "").strip()
+            primer_nombre = request.POST.get(
+                "primer_nombre", ""
+            ).strip()
+            segundo_nombre = request.POST.get(
+                "segundo_nombre", ""
+            ).strip()
+            primer_apellido = request.POST.get(
+                "primer_apellido", ""
+            ).strip()
+            segundo_apellido = request.POST.get(
+                "segundo_apellido", ""
+            ).strip()
+            email = request.POST.get("email", "").strip().lower()
+            telefono = request.POST.get("telefono", "").strip()
+            password = request.POST.get("password", "")
+            confirmar_password = request.POST.get(
+                "confirmar_password", ""
+            )
+
+            datos = request.POST.dict()
+
+            # Validar campos obligatorios.
+            if not all([
+                tipo_documento, documento, primer_nombre,
+                primer_apellido, email, telefono,
+                password, confirmar_password
+            ]):
+                errores.append("Completa todos los campos obligatorios.")
+
+            # Validar tipo y número de documento.
+            if tipo_documento and not any(
+                tipo[0] == tipo_documento
+                for tipo in tipos_documento
+            ):
+                errores.append("Selecciona un tipo de documento válido.")
+
+            if documento and len(documento) > 20:
+                errores.append("El documento no puede superar 20 caracteres.")
+
+            # Validar correo.
+            try:
+                validate_email(email)
+            except ValidationError:
+                errores.append("Ingresa un correo electrónico válido.")
+
+            if len(email) > 150:
+                errores.append("El correo no puede superar 150 caracteres.")
+
+            # Validar contraseña.
+            if len(password) < 8:
+                errores.append("La contraseña debe tener mínimo 8 caracteres.")
+
+            if password != confirmar_password:
+                errores.append("Las contraseñas no coinciden.")
+
+            if not errores:
+                with transaction.atomic():
+                    with connection.cursor() as cursor:
+
+                        # Comprobar documento o correo existente.
+                        cursor.execute("""
+                            SELECT id_persona
+                            FROM personas
+                            WHERE n_documento = %s
+                               OR LOWER(email) = LOWER(%s)
+                            LIMIT 1
+                        """, [documento, email])
+
+                        if cursor.fetchone():
+                            errores.append(
+                                "El documento o correo ya están registrados."
+                            )
+                        else:
+                            cursor.execute("""
+                                INSERT INTO personas (
+                                    t_documento_id,
+                                    n_documento,
+                                    primer_nombre,
+                                    segundo_nombre,
+                                    primer_apellido,
+                                    segundo_apellido,
+                                    email,
+                                    numero_tel,
+                                    password,
+                                    estado
+                                )
+                                VALUES (
+                                    %s, %s, %s, %s, %s, %s,
+                                    %s, %s, %s, 'activo'
+                                )
+                            """, [
+                                tipo_documento,
+                                documento,
+                                primer_nombre,
+                                segundo_nombre or None,
+                                primer_apellido,
+                                segundo_apellido or None,
+                                email,
+                                telefono,
+                                make_password(password)
+                            ])
+
+                            id_persona = cursor.lastrowid
+
+                            cursor.execute("""
+                                INSERT INTO cliente (persona_id)
+                                VALUES (%s)
+                            """, [id_persona])
+
+                if not errores:
+                    messages.success(
+                        request,
+                        "Tu cuenta fue creada correctamente. Ya puedes iniciar sesión."
+                    )
+                    return redirect("iniciar_sesion")
+
+    except IntegrityError:
+        errores.append(
+            "El documento o correo ya están registrados."
+        )
+    except DatabaseError:
+        errores.append(
+            "No fue posible completar el registro. Inténtalo nuevamente."
+        )
+
+    return render(request, "usuarios/registrar_cliente.html", {
+        "tipos_documento": tipos_documento,
+        "errores": errores,
+        "datos": datos,
+    })
+
+
+
 @require_http_methods(["GET", "POST"])
 def gestion_usuarios(request):
 

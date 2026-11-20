@@ -178,6 +178,28 @@ button, input, textarea, select {
     cursor: pointer;
 }
 
+
+.register-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 17px;
+    border: 1px solid #742b48;
+    border-radius: 8px;
+    color: #742b48;
+    background: transparent;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.register-button:hover {
+    background: #742b48;
+    color: #fff;
+}
+
 /* PORTADA */
 
 .hero {
