@@ -1,4 +1,3 @@
-
 {% extends 'panel_admin/dashboard.html' %}
 
 {% block content %}
@@ -147,7 +146,7 @@
     <section class="donaciones-total-box">
         <div>
             <span>Total de dinero confirmado</span>
-            <strong>${{ estadisticas.monto_confirmado|floatformat:2 }}</strong>
+            <strong>${{ estadisticas.dinero_confirmado|floatformat:2 }}</strong>
         </div>
         <div class="donaciones-total-icon">
             <i class="fa-solid fa-sack-dollar"></i>
