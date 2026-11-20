@@ -132,7 +132,7 @@
                 <span>Reportes</span>
             </a>
 
-            <!-- NUEVO: CERRAR SESIÓN -->
+            <!-- CERRAR SESIÓN -->
             <form method="post" action="{% url 'cerrar_sesion' %}">
                 {% csrf_token %}
                 <button type="submit" class="logout-button">
@@ -266,7 +266,7 @@
                     </div>
 
                     <p>Usuarios registrados</p>
-                    <h3>0</h3>
+                    <h3>{{ total_usuarios }}</h3>
 
                     <span class="stat-description">
                         Total de usuarios
@@ -286,7 +286,7 @@
                     </div>
 
                     <p>Refugios registrados</p>
-                    <h3>0</h3>
+                    <h3>{{ total_refugios }}</h3>
 
                     <span class="stat-description">
                         Refugios en BackHome
@@ -306,7 +306,7 @@
                     </div>
 
                     <p>Donaciones</p>
-                    <h3>0</h3>
+                    <h3>{{ total_donaciones }}</h3>
 
                     <span class="stat-description">
                         Donaciones registradas
@@ -326,7 +326,7 @@
                     </div>
 
                     <p>Soportes pendientes</p>
-                    <h3>0</h3>
+                    <h3>{{ total_soporte }}</h3>
 
                     <span class="stat-description">
                         Solicitudes por atender

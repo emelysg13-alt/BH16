@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect
 from django.db import connection, transaction, IntegrityError
 from django.contrib import messages
@@ -17,67 +18,149 @@ def gestion_refugios(request):
         email = request.POST.get("email", "").strip()
         localidad_id = request.POST.get("localidad_id", "").strip()
 
+        # ==========================================
+        # CREAR REFUGIO
+        # ==========================================
         if accion == "crear":
+
             if not all([nombre, direccion, localidad_id]):
-                messages.error(request, "Completa los campos obligatorios.")
+                messages.error(
+                    request,
+                    "Completa los campos obligatorios."
+                )
                 return redirect("gestion_refugios")
 
             try:
                 with connection.cursor() as cursor:
                     cursor.execute("""
                         INSERT INTO refugios
-                        (nombre, descripcion, direccion, telefono, email,
-                         localidad_id, estado)
+                        (
+                            nombre,
+                            descripcion,
+                            direccion,
+                            telefono,
+                            email,
+                            localidad_id,
+                            estado
+                        )
                         VALUES (%s, %s, %s, %s, %s, %s, 'activo')
                     """, [
-                        nombre, descripcion or None, direccion,
-                        telefono or None, email or None, localidad_id
+                        nombre,
+                        descripcion or None,
+                        direccion,
+                        telefono or None,
+                        email or None,
+                        localidad_id
                     ])
 
-                messages.success(request, "Refugio registrado correctamente.")
+                messages.success(
+                    request,
+                    "Refugio registrado correctamente."
+                )
 
             except Exception as error:
-                messages.error(request, f"No se pudo registrar el refugio: {error}")
+                messages.error(
+                    request,
+                    f"No se pudo registrar el refugio: {error}"
+                )
 
             return redirect("gestion_refugios")
 
+        # ==========================================
+        # EDITAR REFUGIO
+        # ==========================================
         if accion == "editar":
-            id_refugio = request.POST.get("id_refugio")
 
-            if not all([id_refugio, nombre, direccion, localidad_id]):
-                messages.error(request, "Completa los campos obligatorios.")
+            id_refugio = request.POST.get("id_refugio")
+            nuevo_estado = request.POST.get("estado", "").strip()
+
+            if not all([
+                id_refugio,
+                nombre,
+                direccion,
+                localidad_id
+            ]):
+                messages.error(
+                    request,
+                    "Completa los campos obligatorios."
+                )
+                return redirect("gestion_refugios")
+
+            if nuevo_estado not in ["activo", "inactivo"]:
+                messages.error(
+                    request,
+                    "El estado seleccionado no es válido."
+                )
                 return redirect("gestion_refugios")
 
             try:
                 with connection.cursor() as cursor:
                     cursor.execute("""
                         UPDATE refugios
-                        SET nombre = %s,
+                        SET
+                            nombre = %s,
                             descripcion = %s,
                             direccion = %s,
                             telefono = %s,
                             email = %s,
-                            localidad_id = %s
+                            localidad_id = %s,
+                            estado = %s
                         WHERE id_refugio = %s
                     """, [
-                        nombre, descripcion or None, direccion,
-                        telefono or None, email or None,
-                        localidad_id, id_refugio
+                        nombre,
+                        descripcion or None,
+                        direccion,
+                        telefono or None,
+                        email or None,
+                        localidad_id,
+                        nuevo_estado,
+                        id_refugio
                     ])
 
-                messages.success(request, "Refugio actualizado correctamente.")
+                    if cursor.rowcount == 0:
+                        messages.error(
+                            request,
+                            "No se encontró el refugio que deseas actualizar."
+                        )
+                    else:
+                        messages.success(
+                            request,
+                            "Refugio actualizado correctamente."
+                        )
 
             except Exception as error:
-                messages.error(request, f"No se pudo actualizar: {error}")
+                messages.error(
+                    request,
+                    f"No se pudo actualizar el refugio: {error}"
+                )
 
             return redirect("gestion_refugios")
 
+        # ==========================================
+        # ACTIVAR / DESACTIVAR REFUGIO
+        # ==========================================
         if accion == "estado":
+
             id_refugio = request.POST.get("id_refugio")
-            nuevo_estado = request.POST.get("nuevo_estado")
+
+            # Acepta ambos nombres de campo
+            nuevo_estado = (
+                request.POST.get("nuevo_estado")
+                or request.POST.get("estado")
+            )
+
+            if not id_refugio:
+                messages.error(
+                    request,
+                    "No se recibió el ID del refugio."
+                )
+                return redirect("gestion_refugios")
 
             if nuevo_estado not in ["activo", "inactivo"]:
-                messages.error(request, "Estado no válido.")
+                messages.error(
+                    request,
+                    "Estado no válido."
+                )
                 return redirect("gestion_refugios")
 
             try:
@@ -86,14 +169,43 @@ def gestion_refugios(request):
                         UPDATE refugios
                         SET estado = %s
                         WHERE id_refugio = %s
-                    """, [nuevo_estado, id_refugio])
+                    """, [
+                        nuevo_estado,
+                        id_refugio
+                    ])
 
-                messages.success(request, "Estado del refugio actualizado.")
+                    if cursor.rowcount == 0:
+                        messages.error(
+                            request,
+                            "No se encontró el refugio."
+                        )
+                    else:
+                        messages.success(
+                            request,
+                            f"El refugio ahora está {nuevo_estado}."
+                        )
 
             except Exception as error:
-                messages.error(request, f"No se pudo cambiar el estado: {error}")
+                messages.error(
+                    request,
+                    f"No se pudo cambiar el estado: {error}"
+                )
 
             return redirect("gestion_refugios")
+
+        # ==========================================
+        # ACCIÓN NO RECONOCIDA
+        # ==========================================
+        messages.error(
+            request,
+            "La acción solicitada no es válida."
+        )
+
+        return redirect("gestion_refugios")
+
+    # ==========================================
+    # CONSULTAR REFUGIOS
+    # ==========================================
 
     buscar = request.GET.get("buscar", "").strip()
     filtro_estado = request.GET.get("estado", "").strip()
@@ -118,6 +230,7 @@ def gestion_refugios(request):
 
     parametros = []
 
+    # BUSCADOR
     if buscar:
         consulta += """
             AND (
@@ -127,9 +240,11 @@ def gestion_refugios(request):
                 OR l.n_localidad LIKE %s
             )
         """
+
         valor = f"%{buscar}%"
         parametros.extend([valor] * 4)
 
+    # FILTRO POR ESTADO
     if filtro_estado in ["activo", "inactivo"]:
         consulta += " AND r.estado = %s"
         parametros.append(filtro_estado)
@@ -137,20 +252,31 @@ def gestion_refugios(request):
     consulta += " ORDER BY r.id_refugio DESC"
 
     with connection.cursor() as cursor:
+
+        # LISTADO DE REFUGIOS
         cursor.execute(consulta, parametros)
-        columnas = [col[0] for col in cursor.description]
+
+        columnas = [
+            col[0] for col in cursor.description
+        ]
+
         refugios = [
             dict(zip(columnas, fila))
             for fila in cursor.fetchall()
         ]
 
+        # LOCALIDADES PARA LOS FORMULARIOS
         cursor.execute("""
-            SELECT id_localidad, n_localidad
+            SELECT
+                id_localidad,
+                n_localidad
             FROM localidades
             ORDER BY n_localidad
         """)
+
         localidades = cursor.fetchall()
 
+        # ESTADÍSTICAS DE REFUGIOS
         cursor.execute("""
             SELECT
                 COUNT(*),
@@ -158,13 +284,19 @@ def gestion_refugios(request):
                 COALESCE(SUM(estado = 'inactivo'), 0)
             FROM refugios
         """)
+
         estadisticas = cursor.fetchone()
+
+    # ==========================================
+    # CONTEXTO
+    # ==========================================
 
     contexto = {
         "refugios": refugios,
         "localidades": localidades,
         "buscar": buscar,
         "filtro_estado": filtro_estado,
+
         "estadisticas": {
             "total": estadisticas[0] or 0,
             "activos": estadisticas[1] or 0,
@@ -179,11 +311,16 @@ def gestion_refugios(request):
     )
 
 
+# ==========================================
+# ELIMINAR REFUGIO
+# ==========================================
+
 @require_http_methods(["POST"])
 def eliminar_refugio(request, id_refugio):
 
     try:
         with transaction.atomic():
+
             with connection.cursor() as cursor:
 
                 cursor.execute("""
@@ -192,10 +329,16 @@ def eliminar_refugio(request, id_refugio):
                 """, [id_refugio])
 
                 if cursor.rowcount == 0:
-                    messages.error(request, "El refugio no existe.")
+                    messages.error(
+                        request,
+                        "El refugio no existe."
+                    )
                     return redirect("gestion_refugios")
 
-        messages.success(request, "Refugio eliminado correctamente.")
+        messages.success(
+            request,
+            "Refugio eliminado correctamente."
+        )
 
     except IntegrityError:
         messages.error(
@@ -204,6 +347,9 @@ def eliminar_refugio(request, id_refugio):
         )
 
     except Exception as error:
-        messages.error(request, f"No se pudo eliminar: {error}")
+        messages.error(
+            request,
+            f"No se pudo eliminar: {error}"
+        )
 
     return redirect("gestion_refugios")

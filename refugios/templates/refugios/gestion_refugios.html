@@ -118,29 +118,49 @@
 </style>
 
 <div class="refugios-page">
+
+    <!-- ENCABEZADO -->
     <header class="refugios-heading">
         <div>
-            <span class="refugios-eyebrow"><i class="fa-solid fa-paw"></i> BackHome / Administración</span>
+            <span class="refugios-eyebrow">
+                <i class="fa-solid fa-paw"></i>
+                BackHome / Administración
+            </span>
+
             <h1>Gestión de refugios</h1>
-            <p>Organiza y supervisa los refugios que hacen parte de nuestra comunidad.</p>
+
+            <p>
+                Organiza y supervisa los refugios que hacen parte de nuestra comunidad.
+            </p>
         </div>
 
-        <button class="refugios-primary" type="button" onclick="document.getElementById('modalNuevoRefugio').showModal()">
-            <i class="fa-solid fa-plus"></i> Nuevo refugio
+        <button class="refugios-primary"
+                type="button"
+                onclick="document.getElementById('modalNuevoRefugio').showModal()">
+
+            <i class="fa-solid fa-plus"></i>
+            Nuevo refugio
         </button>
     </header>
 
+    <!-- MENSAJES -->
     {% if messages %}
         {% for message in messages %}
-            <div class="refugios-message {% if message.tags != 'success' %}error{% endif %}">{{ message }}</div>
+            <div class="refugios-message {% if message.tags != 'success' %}error{% endif %}">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endif %}
 
+    <!-- ESTADÍSTICAS -->
     <section class="refugios-stats">
+
         <article class="refugios-stat">
             <div class="refugios-stat-top">
                 <span>Total de refugios</span>
-                <div class="refugios-stat-icon"><i class="fa-solid fa-house-chimney"></i></div>
+                <div class="refugios-stat-icon">
+                    <i class="fa-solid fa-house-chimney"></i>
+                </div>
             </div>
             <strong>{{ estadisticas.total }}</strong>
         </article>
@@ -148,7 +168,9 @@
         <article class="refugios-stat">
             <div class="refugios-stat-top">
                 <span>Refugios activos</span>
-                <div class="refugios-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="refugios-stat-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
             </div>
             <strong>{{ estadisticas.activos }}</strong>
         </article>
@@ -156,13 +178,18 @@
         <article class="refugios-stat">
             <div class="refugios-stat-top">
                 <span>Refugios inactivos</span>
-                <div class="refugios-stat-icon"><i class="fa-solid fa-house-circle-xmark"></i></div>
+                <div class="refugios-stat-icon">
+                    <i class="fa-solid fa-house-circle-xmark"></i>
+                </div>
             </div>
             <strong>{{ estadisticas.inactivos }}</strong>
         </article>
+
     </section>
 
+    <!-- DIRECTORIO -->
     <section class="refugios-panel">
+
         <div class="refugios-panel-head">
             <div>
                 <h2>Directorio de refugios</h2>
@@ -170,26 +197,47 @@
             </div>
         </div>
 
+        <!-- BUSCADOR Y FILTROS -->
         <form method="get" class="refugios-filter">
-            <input class="refugios-input refugios-search" name="buscar" value="{{ buscar }}" placeholder="Buscar por nombre, dirección o localidad">
+
+            <input
+                class="refugios-input refugios-search"
+                name="buscar"
+                value="{{ buscar }}"
+                placeholder="Buscar por nombre, dirección o localidad"
+            >
 
             <select class="refugios-input" name="estado">
                 <option value="">Todos los estados</option>
-                <option value="activo" {% if filtro_estado == 'activo' %}selected{% endif %}>Activos</option>
-                <option value="inactivo" {% if filtro_estado == 'inactivo' %}selected{% endif %}>Inactivos</option>
+
+                <option value="activo"
+                    {% if filtro_estado == 'activo' %}selected{% endif %}>
+                    Activos
+                </option>
+
+                <option value="inactivo"
+                    {% if filtro_estado == 'inactivo' %}selected{% endif %}>
+                    Inactivos
+                </option>
             </select>
 
             <button class="refugios-filter-btn" type="submit">
-                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Buscar
             </button>
 
             <a class="refugios-clear" href="{% url 'gestion_refugios' %}">
-                <i class="fa-solid fa-rotate-left"></i> Limpiar
+                <i class="fa-solid fa-rotate-left"></i>
+                Limpiar
             </a>
+
         </form>
 
+        <!-- TABLA -->
         <div class="refugios-table-wrap">
+
             <table class="refugios-table">
+
                 <thead>
                     <tr>
                         <th>Refugio</th>
@@ -202,205 +250,469 @@
                 </thead>
 
                 <tbody>
+
                 {% for r in refugios %}
+
                     <tr>
+
+                        <!-- NOMBRE -->
                         <td>
                             <div class="refugios-name">
-                                <div class="refugios-avatar"><i class="fa-solid fa-house-chimney"></i></div>
+
+                                <div class="refugios-avatar">
+                                    <i class="fa-solid fa-house-chimney"></i>
+                                </div>
+
                                 <div>
                                     <strong>{{ r.nombre }}</strong>
                                     <small>Registro #{{ r.id_refugio }}</small>
                                 </div>
+
                             </div>
                         </td>
 
+                        <!-- UBICACIÓN -->
                         <td>
                             {{ r.direccion }}
-                            <span class="refugios-cell-muted">{{ r.n_localidad }}</span>
-                        </td>
 
-                        <td class="refugios-contact">
-                            {{ r.telefono|default:"Sin teléfono" }}
-                            <span class="refugios-cell-muted">{{ r.email|default:"Sin correo" }}</span>
-                        </td>
-
-                        <td><strong>{{ r.total_donaciones }}</strong></td>
-
-                        <td>
-                            <span class="refugios-badge {% if r.estado == 'activo' %}active{% else %}inactive{% endif %}">
-                                {{ r.estado|capfirst }}
+                            <span class="refugios-cell-muted">
+                                {{ r.localidad }}
                             </span>
                         </td>
 
+                        <!-- CONTACTO -->
+                        <td class="refugios-contact">
+
+                            {{ r.telefono|default:"Sin teléfono" }}
+
+                            <span class="refugios-cell-muted">
+                                {{ r.email|default:"Sin correo" }}
+                            </span>
+
+                        </td>
+
+                        <!-- DONACIONES -->
                         <td>
+                            <strong>{{ r.total_donaciones|default:"0" }}</strong>
+                        </td>
+
+                        <!-- ESTADO -->
+                        <td>
+
+                            <span class="refugios-badge {% if r.estado == 'activo' %}active{% else %}inactive{% endif %}">
+                                {{ r.estado|capfirst }}
+                            </span>
+
+                        </td>
+
+                        <!-- ACCIONES -->
+                        <td>
+
                             <div class="refugios-actions">
+
+                                <!-- EDITAR -->
                                 <details>
+
                                     <summary class="refugios-action edit">
-                                        <i class="fa-solid fa-pen"></i> Editar
+                                        <i class="fa-solid fa-pen"></i>
+                                        Editar
                                     </summary>
 
                                     <div class="refugios-edit-box">
-                                        <h3>Editar refugio #{{ r.id_refugio }}</h3>
+
+                                        <h3>
+                                            Editar refugio #{{ r.id_refugio }}
+                                        </h3>
 
                                         <form method="post">
                                             {% csrf_token %}
-                                            <input type="hidden" name="accion" value="editar">
-                                            <input type="hidden" name="id_refugio" value="{{ r.id_refugio }}">
 
-                                            <input name="nombre" value="{{ r.nombre }}" placeholder="Nombre" required>
-                                            <input name="direccion" value="{{ r.direccion }}" placeholder="Dirección" required>
+                                            <input type="hidden"
+                                                   name="accion"
+                                                   value="editar">
+
+                                            <input type="hidden"
+                                                   name="id_refugio"
+                                                   value="{{ r.id_refugio }}">
+
+                                            <input
+                                                name="nombre"
+                                                value="{{ r.nombre }}"
+                                                placeholder="Nombre"
+                                                required
+                                            >
+
+                                            <input
+                                                name="direccion"
+                                                value="{{ r.direccion }}"
+                                                placeholder="Dirección"
+                                                required
+                                            >
 
                                             <select name="localidad_id" required>
+
                                                 {% for id,nombre in localidades %}
-                                                    <option value="{{ id }}" {% if id == r.localidad_id %}selected{% endif %}>{{ nombre }}</option>
+
+                                                    <option
+                                                        value="{{ id }}"
+                                                        {% if id == r.localidad_id %}selected{% endif %}
+                                                    >
+                                                        {{ nombre }}
+                                                    </option>
+
                                                 {% endfor %}
+
                                             </select>
 
-                                            <input name="telefono" value="{{ r.telefono|default:'' }}" placeholder="Teléfono">
-                                            <input type="email" name="email" value="{{ r.email|default:'' }}" placeholder="Correo electrónico">
-                                            <textarea name="descripcion" rows="2" placeholder="Descripción">{{ r.descripcion }}</textarea>
+                                            <input
+                                                name="telefono"
+                                                value="{{ r.telefono|default:'' }}"
+                                                placeholder="Teléfono"
+                                            >
 
-                                            <select name="estado">
-                                                <option value="activo" {% if r.estado == 'activo' %}selected{% endif %}>Activo</option>
-                                                <option value="inactivo" {% if r.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                value="{{ r.email|default:'' }}"
+                                                placeholder="Correo electrónico"
+                                            >
+
+                                            <textarea
+                                                name="descripcion"
+                                                rows="2"
+                                                placeholder="Descripción"
+                                            >{{ r.descripcion }}</textarea>
+
+                                            <!-- ESTADO EN EDICIÓN -->
+                                            <select name="estado" required>
+
+                                                <option
+                                                    value="activo"
+                                                    {% if r.estado == 'activo' %}selected{% endif %}
+                                                >
+                                                    Activo
+                                                </option>
+
+                                                <option
+                                                    value="inactivo"
+                                                    {% if r.estado == 'inactivo' %}selected{% endif %}
+                                                >
+                                                    Inactivo
+                                                </option>
+
                                             </select>
 
                                             <button class="refugios-action edit" type="submit">
-                                                <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+                                                <i class="fa-solid fa-floppy-disk"></i>
+                                                Guardar cambios
                                             </button>
+
                                         </form>
+
                                     </div>
+
                                 </details>
 
+                                <!-- ACTIVAR / DESACTIVAR -->
                                 <form method="post">
+
                                     {% csrf_token %}
-                                    <input type="hidden" name="accion" value="estado">
-                                    <input type="hidden" name="id_refugio" value="{{ r.id_refugio }}">
-                                    <input type="hidden" name="estado" value="{% if r.estado == 'activo' %}inactivo{% else %}activo{% endif %}">
+
+                                    <input
+                                        type="hidden"
+                                        name="accion"
+                                        value="estado"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="id_refugio"
+                                        value="{{ r.id_refugio }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="nuevo_estado"
+                                        value="{% if r.estado == 'activo' %}inactivo{% else %}activo{% endif %}"
+                                    >
 
                                     <button class="refugios-action toggle" type="submit">
+
                                         {% if r.estado == 'activo' %}
-                                            <i class="fa-solid fa-pause"></i> Desactivar
+
+                                            <i class="fa-solid fa-pause"></i>
+                                            Desactivar
+
                                         {% else %}
-                                            <i class="fa-solid fa-play"></i> Activar
+
+                                            <i class="fa-solid fa-play"></i>
+                                            Activar
+
                                         {% endif %}
+
                                     </button>
+
                                 </form>
 
-                                <form method="post" onsubmit="return confirm('¿Eliminar este refugio? Las donaciones asociadas conservarán su registro.');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="accion" value="eliminar">
-                                    <input type="hidden" name="id_refugio" value="{{ r.id_refugio }}">
+                                <!-- ELIMINAR -->
+                                <form
+                                    method="post"
+                                    action="{% url 'eliminar_refugio' r.id_refugio %}"
+                                    onsubmit="return confirm('¿Eliminar este refugio? Las donaciones asociadas conservarán su registro.');"
+                                >
 
-                                    <button class="refugios-action delete" type="submit" title="Eliminar">
+                                    {% csrf_token %}
+
+                                    <button
+                                        class="refugios-action delete"
+                                        type="submit"
+                                        title="Eliminar"
+                                    >
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
+
                                 </form>
+
                             </div>
+
                         </td>
+
                     </tr>
 
                 {% empty %}
+
                     <tr>
                         <td colspan="6" class="refugios-empty">
+
                             <i class="fa-solid fa-house-circle-exclamation"></i>
+
                             No hay refugios que coincidan con la búsqueda.
+
                         </td>
                     </tr>
+
                 {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
+
     </section>
+
 </div>
 
-<!-- VENTANA PARA REGISTRAR UN NUEVO REFUGIO -->
+
+<!-- ==========================================
+     MODAL NUEVO REFUGIO
+========================================== -->
+
 <dialog class="refugios-dialog" id="modalNuevoRefugio">
+
     <div class="refugios-dialog-head">
+
         <div>
-            <h2><i class="fa-solid fa-house-chimney" style="color:#d85f91"></i> Registrar nuevo refugio</h2>
-            <p>Completa los datos para agregarlo al directorio.</p>
+            <h2>
+                <i class="fa-solid fa-house-chimney" style="color:#d85f91"></i>
+                Registrar nuevo refugio
+            </h2>
+
+            <p>
+                Completa los datos para agregarlo al directorio.
+            </p>
         </div>
 
-        <button class="refugios-close" type="button" aria-label="Cerrar" onclick="document.getElementById('modalNuevoRefugio').close()">
+        <button
+            class="refugios-close"
+            type="button"
+            aria-label="Cerrar"
+            onclick="document.getElementById('modalNuevoRefugio').close()"
+        >
             <i class="fa-solid fa-xmark"></i>
         </button>
+
     </div>
 
     <div class="refugios-dialog-body">
+
         <form method="post">
+
             {% csrf_token %}
+
             <input type="hidden" name="accion" value="crear">
 
             <div class="refugios-form-grid">
+
                 <div class="refugios-field">
-                    <label for="nuevo_nombre">Nombre del refugio *</label>
-                    <input id="nuevo_nombre" name="nombre" required maxlength="150" placeholder="Ej. Huellitas felices">
+
+                    <label for="nuevo_nombre">
+                        Nombre del refugio *
+                    </label>
+
+                    <input
+                        id="nuevo_nombre"
+                        name="nombre"
+                        required
+                        maxlength="150"
+                        placeholder="Ej. Huellitas felices"
+                    >
+
                 </div>
 
                 <div class="refugios-field">
-                    <label for="nuevo_direccion">Dirección *</label>
-                    <input id="nuevo_direccion" name="direccion" required maxlength="255" placeholder="Dirección del refugio">
+
+                    <label for="nuevo_direccion">
+                        Dirección *
+                    </label>
+
+                    <input
+                        id="nuevo_direccion"
+                        name="direccion"
+                        required
+                        maxlength="255"
+                        placeholder="Dirección del refugio"
+                    >
+
                 </div>
 
                 <div class="refugios-field">
-                    <label for="nuevo_localidad">Localidad *</label>
+
+                    <label for="nuevo_localidad">
+                        Localidad *
+                    </label>
+
                     <select id="nuevo_localidad" name="localidad_id" required>
-                        <option value="">Selecciona una localidad</option>
+
+                        <option value="">
+                            Selecciona una localidad
+                        </option>
+
                         {% for id,nombre in localidades %}
-                            <option value="{{ id }}">{{ nombre }}</option>
+
+                            <option value="{{ id }}">
+                                {{ nombre }}
+                            </option>
+
                         {% endfor %}
+
                     </select>
+
                 </div>
 
                 <div class="refugios-field">
-                    <label for="nuevo_telefono">Teléfono</label>
-                    <input id="nuevo_telefono" name="telefono" maxlength="20" placeholder="Número de contacto">
+
+                    <label for="nuevo_telefono">
+                        Teléfono
+                    </label>
+
+                    <input
+                        id="nuevo_telefono"
+                        name="telefono"
+                        maxlength="20"
+                        placeholder="Número de contacto"
+                    >
+
                 </div>
 
                 <div class="refugios-field">
-                    <label for="nuevo_email">Correo electrónico</label>
-                    <input id="nuevo_email" type="email" name="email" maxlength="150" placeholder="correo@ejemplo.com">
+
+                    <label for="nuevo_email">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        id="nuevo_email"
+                        type="email"
+                        name="email"
+                        maxlength="150"
+                        placeholder="correo@ejemplo.com"
+                    >
+
                 </div>
 
                 <div class="refugios-field">
-                    <label for="nuevo_estado">Estado inicial</label>
+
+                    <label for="nuevo_estado">
+                        Estado inicial
+                    </label>
+
                     <select id="nuevo_estado" name="estado">
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
+
+                        <option value="activo">
+                            Activo
+                        </option>
+
+                        <option value="inactivo">
+                            Inactivo
+                        </option>
+
                     </select>
+
                 </div>
 
                 <div class="refugios-field full">
-                    <label for="nuevo_descripcion">Descripción</label>
-                    <textarea id="nuevo_descripcion" name="descripcion" rows="3" placeholder="Cuéntanos brevemente sobre el refugio..."></textarea>
+
+                    <label for="nuevo_descripcion">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        id="nuevo_descripcion"
+                        name="descripcion"
+                        rows="3"
+                        placeholder="Cuéntanos brevemente sobre el refugio..."
+                    ></textarea>
+
                 </div>
+
             </div>
 
             <div class="refugios-form-actions">
-                <button class="refugios-cancel" type="button" onclick="document.getElementById('modalNuevoRefugio').close()">
+
+                <button
+                    class="refugios-cancel"
+                    type="button"
+                    onclick="document.getElementById('modalNuevoRefugio').close()"
+                >
                     Cancelar
                 </button>
 
                 <button class="refugios-primary" type="submit">
-                    <i class="fa-solid fa-floppy-disk"></i> Guardar refugio
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Guardar refugio
+
                 </button>
+
             </div>
+
         </form>
+
     </div>
+
 </dialog>
+
+
+<!-- ==========================================
+     JAVASCRIPT DEL MODAL
+========================================== -->
 
 <script>
 (function(){
+
     const modal = document.getElementById('modalNuevoRefugio');
 
     if (!modal) return;
 
     modal.addEventListener('click', function(event){
+
         if (event.target === modal) {
             modal.close();
         }
+
     });
+
 })();
 </script>
 
