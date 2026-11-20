@@ -139,6 +139,10 @@ button, input, textarea, select {
     gap: 10px;
 }
 
+.header-actions form {
+    margin: 0;
+}
+
 .donate-button,
 .login-button {
     display: inline-flex;
@@ -166,6 +170,12 @@ button, input, textarea, select {
 .login-button {
     background: var(--pink-light);
     color: var(--pink-dark);
+}
+
+.login-button:hover {
+    background: var(--pink);
+    color: white;
+    transform: translateY(-2px);
 }
 
 .menu-toggle {

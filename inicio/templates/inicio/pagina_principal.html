@@ -39,17 +39,36 @@
 
         
 <div class="header-actions">
+    {% if request.session.backhome_user_id and request.session.backhome_rol == 'cliente' %}
     <a class="donate-button" href="#donaciones">
         <i class="fa-solid fa-heart"></i> Donar
     </a>
-
-    <a class="register-button" href="{% url 'registrar_cliente' %}">
-        Crear cuenta <i class="fa-solid fa-user-plus"></i>
+{% else %}
+    <a class="donate-button" href="{% url 'registrar_cliente' %}">
+        <i class="fa-solid fa-heart"></i> Donar
     </a>
+{% endif %}
 
-    <a class="login-button" href="{% url 'iniciar_sesion' %}">
-        Iniciar sesión <i class="fa-solid fa-user"></i>
-    </a>
+    {% if request.session.backhome_user_id %}
+        <a class="register-button" href="{% url 'mi_cuenta' %}">
+            Mi perfil <i class="fa-solid fa-user"></i>
+        </a>
+
+        <form method="post" action="{% url 'cerrar_sesion' %}">
+            {% csrf_token %}
+            <button type="submit" class="login-button">
+                Cerrar sesión <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
+    {% else %}
+        <a class="register-button" href="{% url 'registrar_cliente' %}">
+            Crear cuenta <i class="fa-solid fa-user-plus"></i>
+        </a>
+
+        <a class="login-button" href="{% url 'iniciar_sesion' %}">
+            Iniciar sesión <i class="fa-solid fa-user"></i>
+        </a>
+    {% endif %}
 </div>
 
     </div>
