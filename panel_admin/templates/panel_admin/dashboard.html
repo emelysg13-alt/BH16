@@ -2,462 +2,419 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>BackHome | Panel Administrativo</title>
 
     <link rel="stylesheet" href="{% static 'panel_admin/css/dashboard.css' %}">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <!-- ESTILOS DEL BOTÓN CERRAR SESIÓN -->
-    <style>
-        .menu .logout-button {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            width: 100%;
-            min-height: 46px;
-            padding: 12px 14px;
-            border: 0;
-            border-radius: 13px;
-            background: transparent;
-            color: #8c7784;
-            font-size: 13px;
-            font-weight: 800;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .menu .logout-button i {
-            width: 19px;
-            text-align: center;
-            font-size: 15px;
-        }
-
-        .menu .logout-button:hover,
-        .menu .logout-button:focus-visible {
-            background: var(--pink-soft);
-            color: var(--pink-dark);
-            transform: translateX(3px);
-        }
-
-        @media (max-width: 600px) {
-            .menu .logout-button {
-                justify-content: center;
-                padding: 14px 5px;
-            }
-
-            .menu .logout-button span {
-                display: none;
-            }
-
-            .menu .logout-button i {
-                font-size: 18px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
 
-    <!-- MENÚ LATERAL -->
-    <aside class="sidebar">
-        <div class="logo">
-            <span class="logo-icon">
+<aside class="sidebar">
+    <div class="logo">
+        <span class="logo-icon"><i class="fa-solid fa-paw"></i></span>
+        <h2>BackHome</h2>
+    </div>
+
+    <div class="menu-title">MENÚ PRINCIPAL</div>
+
+    <nav class="menu">
+        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i><span>Dashboard</span>
+        </a>
+        <a href="{% url 'gestion_usuarios' %}">
+            <i class="fa-solid fa-users"></i><span>Usuarios</span>
+        </a>
+        <a href="{% url 'gestion_refugios' %}">
+            <i class="fa-solid fa-house-chimney"></i><span>Refugios</span>
+        </a>
+        <a href="{% url 'gestion_donaciones' %}">
+            <i class="fa-solid fa-heart"></i><span>Donaciones</span>
+        </a>
+        <a href="{% url 'gestion_consejos' %}">
+            <i class="fa-solid fa-lightbulb"></i><span>Consejos</span>
+        </a>
+        <a href="{% url 'gestion_soporte' %}">
+            <i class="fa-solid fa-headset"></i><span>Soporte</span>
+        </a>
+        <a href="#"><i class="fa-solid fa-route"></i><span>Seguimientos</span></a>
+        <a href="{% url 'gestion_reportes' %}">
+            <i class="fa-solid fa-chart-pie"></i><span>Reportes</span>
+        </a>
+
+        <form method="post" action="{% url 'cerrar_sesion' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Cerrar sesión</span>
+            </button>
+        </form>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-decoration">
+            <i class="fa-solid fa-heart"></i>
+            <p>Un hogar para cada huellita</p>
+            <span>Gracias por ayudar 🐾</span>
+        </div>
+        <div class="sidebar-footer">
+            <i class="fa-solid fa-shield-heart"></i>
+            Panel de administración
+        </div>
+    </div>
+</aside>
+
+<main class="main-content">
+
+    <header class="topbar">
+        <div>
+            <span class="topbar-label">BACKHOME / ADMINISTRACIÓN</span>
+            <h2>Panel de Administrador</h2>
+        </div>
+
+        <div class="topbar-right">
+            <button class="icon-button" type="button" aria-label="Notificaciones">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-dot"></span>
+            </button>
+
+            <div class="profile">
+                <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="profile-info">
+                    <strong>Administradora</strong>
+                    <span>Superadministrador</span>
+                </div>
+                <i class="fa-solid fa-chevron-down profile-arrow"></i>
+            </div>
+        </div>
+    </header>
+
+    {% block content %}
+
+    <section class="welcome">
+        <div class="welcome-content">
+            <span class="welcome-tag"><i class="fa-solid fa-heart"></i> BIENVENIDA</span>
+            <h1>¡Hola, Administradora! 🌸</h1>
+            <p>Bienvenida a BackHome. Aquí cuidamos, conectamos y damos segundas oportunidades.</p>
+            <div class="welcome-message">
                 <i class="fa-solid fa-paw"></i>
+                Cada huellita merece un hogar lleno de amor.
+            </div>
+        </div>
+
+        <div class="welcome-decoration">
+            <i class="fa-solid fa-paw paw-one"></i>
+            <i class="fa-solid fa-heart heart-one"></i>
+            <i class="fa-solid fa-paw paw-two"></i>
+            <i class="fa-solid fa-heart heart-two"></i>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <span class="section-subtitle">RESUMEN DE BACKHOME</span>
+                <h2>Tu plataforma en números</h2>
+            </div>
+            <span class="date-label">
+                <i class="fa-regular fa-calendar"></i>
+                Resumen general
             </span>
-            <h2>BackHome</h2>
         </div>
 
-        <div class="menu-title">
-            MENÚ PRINCIPAL
-        </div>
-
-        <nav class="menu">
-
-            <a href="{% url 'dashboard' %}"
-               class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                <i class="fa-solid fa-house"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="{% url 'gestion_usuarios' %}"
-               class="{% if request.resolver_match.url_name == 'gestion_usuarios' %}active{% endif %}">
-                <i class="fa-solid fa-users"></i>
-                <span>Usuarios</span>
-            </a>
-
-            <a href="{% url 'gestion_refugios' %}"
-               class="{% if request.resolver_match.url_name == 'gestion_refugios' %}active{% endif %}">
-                <i class="fa-solid fa-house-chimney"></i>
-                <span>Refugios</span>
-            </a>
-
-            <a href="{% url 'gestion_donaciones' %}"
-               class="{% if request.resolver_match.url_name == 'gestion_donaciones' %}active{% endif %}">
-                <i class="fa-solid fa-heart"></i>
-                <span>Donaciones</span>
-            </a>
-
-            <!-- GESTIÓN DE CONSEJOS -->
-            <a href="{% url 'gestion_consejos' %}"
-               class="{% if request.resolver_match.url_name == 'gestion_consejos' %}active{% endif %}">
-                <i class="fa-solid fa-lightbulb"></i>
-                <span>Consejos</span>
-            </a>
-
-            <!-- GESTIÓN DE SOPORTE -->
-            <a href="{% url 'gestion_soporte' %}"
-               class="{% if request.resolver_match.url_name == 'gestion_soporte' %}active{% endif %}">
-                <i class="fa-solid fa-headset"></i>
-                <span>Soporte</span>
-            </a>
-
-            <!-- GESTIÓN DE SEGUIMIENTOS -->
-            <a href="#">
-                <i class="fa-solid fa-route"></i>
-                <span>Seguimientos</span>
-            </a>
-
-            <!-- GESTIÓN DE REPORTES -->
-            <a href="{% url 'gestion_reportes' %}"
-               class="{% if request.resolver_match.url_name == 'gestion_reportes' %}active{% endif %}">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Reportes</span>
-            </a>
-
-            <!-- CERRAR SESIÓN -->
-            <form method="post" action="{% url 'cerrar_sesion' %}">
-                {% csrf_token %}
-                <button type="submit" class="logout-button">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Cerrar sesión</span>
-                </button>
-            </form>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="sidebar-decoration">
-                <i class="fa-solid fa-heart"></i>
-                <p>Un hogar para cada huellita</p>
-                <span>Gracias por ayudar 🐾</span>
-            </div>
-
-            <div class="sidebar-footer">
-                <i class="fa-solid fa-shield-heart"></i>
-                Panel de administración
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="main-content">
-
-        <!-- ENCABEZADO -->
-        <header class="topbar">
-
-            <div class="topbar-left">
-                <span class="topbar-label">BACKHOME / ADMINISTRACIÓN</span>
-                <h2>Panel de Administrador</h2>
-            </div>
-
-            <div class="topbar-right">
-
-                <button class="icon-button" type="button" aria-label="Notificaciones">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="notification-dot"></span>
-                </button>
-
-                <div class="profile">
-
-                    <div class="profile-avatar">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-
-                    <div class="profile-info">
-                        <strong>Administradora</strong>
-                        <span>Superadministrador</span>
-                    </div>
-
-                    <i class="fa-solid fa-chevron-down profile-arrow"></i>
-
+        <div class="stats">
+            <article class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon pink"><i class="fa-solid fa-users"></i></div>
+                    <span class="stat-number">01</span>
                 </div>
+                <p>Usuarios registrados</p>
+                <h3>{{ total_usuarios }}</h3>
+                <span class="stat-description">Total de usuarios</span>
+            </article>
 
-            </div>
-
-        </header>
-
-
-        <!-- CONTENIDO DINÁMICO -->
-        {% block content %}
-
-        <!-- BIENVENIDA -->
-        <section class="welcome">
-
-            <div class="welcome-content">
-
-                <span class="welcome-tag">
-                    <i class="fa-solid fa-heart"></i>
-                    BIENVENIDA
-                </span>
-
-                <h1>¡Hola, Administradora! 🌸</h1>
-
-                <p>
-                    Bienvenida a BackHome. Aquí cuidamos, conectamos
-                    y damos segundas oportunidades.
-                </p>
-
-                <div class="welcome-message">
-                    <i class="fa-solid fa-paw"></i>
-                    Cada huellita merece un hogar lleno de amor.
+            <article class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon purple"><i class="fa-solid fa-house-chimney"></i></div>
+                    <span class="stat-number">02</span>
                 </div>
+                <p>Refugios registrados</p>
+                <h3>{{ total_refugios }}</h3>
+                <span class="stat-description">Refugios en BackHome</span>
+            </article>
 
-            </div>
+            <article class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon peach"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                    <span class="stat-number">03</span>
+                </div>
+                <p>Donaciones</p>
+                <h3>{{ total_donaciones }}</h3>
+                <span class="stat-description">Donaciones registradas</span>
+            </article>
 
-            <div class="welcome-decoration">
-                <i class="fa-solid fa-paw paw-one"></i>
-                <i class="fa-solid fa-heart heart-one"></i>
-                <i class="fa-solid fa-paw paw-two"></i>
-                <i class="fa-solid fa-heart heart-two"></i>
-            </div>
+            <article class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon blue"><i class="fa-solid fa-headset"></i></div>
+                    <span class="stat-number">04</span>
+                </div>
+                <p>Soportes pendientes</p>
+                <h3>{{ total_soporte }}</h3>
+                <span class="stat-description">Solicitudes por atender</span>
+            </article>
+        </div>
+    </section>
 
-        </section>
+    <section class="bottom-grid">
 
-
-        <!-- ESTADÍSTICAS -->
-        <section class="section">
-
-            <div class="section-heading">
-
+        <div class="content-card activity-card">
+            <div class="card-heading">
                 <div>
-                    <span class="section-subtitle">RESUMEN DE BACKHOME</span>
-                    <h2>Tu plataforma en números</h2>
+                    <span class="section-subtitle">ACTIVIDAD</span>
+                    <h2>Resumen general</h2>
                 </div>
-
-                <span class="date-label">
-                    <i class="fa-regular fa-calendar"></i>
-                    Resumen general
-                </span>
-
+                <div class="heading-icon"><i class="fa-solid fa-chart-line"></i></div>
             </div>
 
-            <div class="stats">
-
-                <!-- USUARIOS -->
-                <article class="stat-card">
-
-                    <div class="stat-top">
-                        <div class="stat-icon pink">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <span class="stat-number">01</span>
-                    </div>
-
-                    <p>Usuarios registrados</p>
-                    <h3>{{ total_usuarios }}</h3>
-
-                    <span class="stat-description">
-                        Total de usuarios
-                    </span>
-
-                </article>
-
-
-                <!-- REFUGIOS -->
-                <article class="stat-card">
-
-                    <div class="stat-top">
-                        <div class="stat-icon purple">
-                            <i class="fa-solid fa-house-chimney"></i>
-                        </div>
-                        <span class="stat-number">02</span>
-                    </div>
-
-                    <p>Refugios registrados</p>
-                    <h3>{{ total_refugios }}</h3>
-
-                    <span class="stat-description">
-                        Refugios en BackHome
-                    </span>
-
-                </article>
-
-
-                <!-- DONACIONES -->
-                <article class="stat-card">
-
-                    <div class="stat-top">
-                        <div class="stat-icon peach">
-                            <i class="fa-solid fa-hand-holding-heart"></i>
-                        </div>
-                        <span class="stat-number">03</span>
-                    </div>
-
-                    <p>Donaciones</p>
-                    <h3>{{ total_donaciones }}</h3>
-
-                    <span class="stat-description">
-                        Donaciones registradas
-                    </span>
-
-                </article>
-
-
-                <!-- SOPORTE -->
-                <article class="stat-card">
-
-                    <div class="stat-top">
-                        <div class="stat-icon blue">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <span class="stat-number">04</span>
-                    </div>
-
-                    <p>Soportes pendientes</p>
-                    <h3>{{ total_soporte }}</h3>
-
-                    <span class="stat-description">
-                        Solicitudes por atender
-                    </span>
-
-                </article>
-
-            </div>
-
-        </section>
-
-
-        <!-- RESUMEN GENERAL -->
-        <section class="bottom-grid">
-
-            <div class="content-card activity-card">
-
-                <div class="card-heading">
-
-                    <div>
-                        <span class="section-subtitle">ACTIVIDAD</span>
-                        <h2>Resumen general</h2>
-                    </div>
-
-                    <div class="heading-icon">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-
-                </div>
-
-                <p>
-                    Desde este espacio podrás visualizar la actividad
-                    de BackHome y supervisar sus diferentes módulos.
-                </p>
-
-                <div class="empty-state">
-                    <i class="fa-solid fa-paw"></i>
-                    <span>¡Pronto verás aquí toda la actividad de BackHome!</span>
-                </div>
-
-            </div>
-
-
-            <!-- ACCESOS RÁPIDOS -->
-            <div class="content-card quick-card">
-
-                <div class="card-heading">
-
-                    <div>
-                        <span class="section-subtitle">ACCESOS DIRECTOS</span>
-                        <h2>Gestión rápida</h2>
-                    </div>
-
-                    <div class="heading-icon">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
-
-                </div>
-
-                <a href="{% url 'gestion_usuarios' %}" class="quick-link">
-
-                    <span class="quick-icon">
-                        <i class="fa-solid fa-users"></i>
-                    </span>
-
-                    <span>Gestionar usuarios</span>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-
-                </a>
-
-
-                <a href="{% url 'gestion_refugios' %}" class="quick-link">
-
-                    <span class="quick-icon">
-                        <i class="fa-solid fa-house"></i>
-                    </span>
-
-                    <span>Gestionar refugios</span>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-
-                </a>
-
-
-                <a href="{% url 'gestion_soporte' %}" class="quick-link">
-
-                    <span class="quick-icon">
-                        <i class="fa-solid fa-headset"></i>
-                    </span>
-
-                    <span>Revisar soporte</span>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-
-                </a>
-
-
-                <a href="{% url 'gestion_consejos' %}" class="quick-link">
-
-                    <span class="quick-icon">
-                        <i class="fa-solid fa-lightbulb"></i>
-                    </span>
-
-                    <span>Gestionar consejos</span>
-
-                    <i class="fa-solid fa-chevron-right"></i>
-
-                </a>
-
-            </div>
-
-        </section>
-
-        {% endblock %}
-
-
-        <!-- PIE DE PÁGINA -->
-        <footer class="main-footer">
-
-            <p>
-                Hecho con
-                <i class="fa-solid fa-heart"></i>
-                para proteger cada huellita.
+            <p class="activity-description">
+                Desde este espacio podrás visualizar la actividad de BackHome
+                y supervisar sus diferentes módulos.
             </p>
 
-            <span>BackHome © 2026</span>
+            <div class="activity-chart-grid">
+                <div class="activity-chart-panel activity-trend-panel">
+                    <div class="activity-chart-heading">
+                        <div>
+                            <h3>Movimiento de la plataforma</h3>
+                            <span>Registros de los últimos 6 meses</span>
+                        </div>
+                        <span class="chart-live-label">
+                            <i class="fa-solid fa-circle"></i> Datos reales
+                        </span>
+                    </div>
+                    <div class="activity-canvas-wrap">
+                        <canvas id="activityTrendChart" role="img"
+                            aria-label="Gráfica de actividad mensual de BackHome"></canvas>
+                    </div>
+                </div>
 
-        </footer>
+                <div class="activity-chart-panel activity-distribution-panel">
+                    <div class="activity-chart-heading">
+                        <div>
+                            <h3>Distribución actual</h3>
+                            <span>Registros por módulo</span>
+                        </div>
+                    </div>
+                    <div class="activity-doughnut-wrap">
+                        <canvas id="activityDistributionChart" role="img"
+                            aria-label="Distribución de registros por módulo"></canvas>
+                    </div>
+                    <div class="activity-chart-footnote">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Los valores se consultan directamente en la base de datos.
+                    </div>
+                </div>
+            </div>
 
-    </main>
+            {{ actividad_labels|json_script:"actividad-labels-data" }}
+            {{ actividad_usuarios|json_script:"actividad-usuarios-data" }}
+            {{ actividad_refugios|json_script:"actividad-refugios-data" }}
+            {{ actividad_donaciones|json_script:"actividad-donaciones-data" }}
+            {{ actividad_soporte|json_script:"actividad-soporte-data" }}
+            {{ distribucion_modulos|json_script:"distribucion-modulos-data" }}
+        </div>
+
+        <div class="content-card quick-card">
+            <div class="card-heading">
+                <div>
+                    <span class="section-subtitle">ACCESOS DIRECTOS</span>
+                    <h2>Gestión rápida</h2>
+                </div>
+                <div class="heading-icon"><i class="fa-solid fa-bolt"></i></div>
+            </div>
+
+            <a href="{% url 'gestion_usuarios' %}" class="quick-link">
+                <span class="quick-icon"><i class="fa-solid fa-users"></i></span>
+                <span>Gestionar usuarios</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a href="{% url 'gestion_refugios' %}" class="quick-link">
+                <span class="quick-icon"><i class="fa-solid fa-house"></i></span>
+                <span>Gestionar refugios</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a href="{% url 'gestion_soporte' %}" class="quick-link">
+                <span class="quick-icon"><i class="fa-solid fa-headset"></i></span>
+                <span>Revisar soporte</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a href="{% url 'gestion_consejos' %}" class="quick-link">
+                <span class="quick-icon"><i class="fa-solid fa-lightbulb"></i></span>
+                <span>Gestionar consejos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </section>
+
+    {% endblock %}
+
+    <footer class="main-footer">
+        <p>Hecho con <i class="fa-solid fa-heart"></i> para proteger cada huellita.</p>
+        <span>BackHome © 2026</span>
+    </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const readJson = (id) => {
+        const element = document.getElementById(id);
+        return element ? JSON.parse(element.textContent) : [];
+    };
+
+    const labels = readJson("actividad-labels-data");
+    const usuarios = readJson("actividad-usuarios-data");
+    const refugios = readJson("actividad-refugios-data");
+    const donaciones = readJson("actividad-donaciones-data");
+    const soporte = readJson("actividad-soporte-data");
+    const distribucion = readJson("distribucion-modulos-data");
+
+    const trendCanvas = document.getElementById("activityTrendChart");
+
+    if (trendCanvas && window.Chart) {
+        new Chart(trendCanvas, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Usuarios",
+                        data: usuarios,
+                        borderColor: "#e879a5",
+                        backgroundColor: "rgba(232, 121, 165, 0.12)",
+                        tension: 0.38,
+                        fill: true,
+                        borderWidth: 2.5,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: "Refugios",
+                        data: refugios,
+                        borderColor: "#b28bd8",
+                        backgroundColor: "rgba(178, 139, 216, 0.08)",
+                        tension: 0.38,
+                        fill: false,
+                        borderWidth: 2.5,
+                        pointRadius: 3
+                    },
+                    {
+                        label: "Donaciones",
+                        data: donaciones,
+                        borderColor: "#efa184",
+                        backgroundColor: "rgba(239, 161, 132, 0.08)",
+                        tension: 0.38,
+                        fill: false,
+                        borderWidth: 2.5,
+                        pointRadius: 3
+                    },
+                    {
+                        label: "Soporte",
+                        data: soporte,
+                        borderColor: "#83b9df",
+                        backgroundColor: "rgba(131, 185, 223, 0.08)",
+                        tension: 0.38,
+                        fill: false,
+                        borderWidth: 2.5,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: "index" },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            boxWidth: 7,
+                            padding: 15,
+                            color: "#927b89",
+                            font: { family: "Nunito", size: 10, weight: "700" }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "#604b57",
+                        padding: 11
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "#a18d99" },
+                        border: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, color: "#a18d99" },
+                        grid: { color: "#f5edf1" },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    const distributionCanvas = document.getElementById("activityDistributionChart");
+
+    if (distributionCanvas && window.Chart) {
+        new Chart(distributionCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Usuarios", "Refugios", "Donaciones", "Soporte"],
+                datasets: [{
+                    data: distribucion,
+                    backgroundColor: ["#e879a5", "#b28bd8", "#efa184", "#83b9df"],
+                    borderColor: "#ffffff",
+                    borderWidth: 4,
+                    hoverOffset: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "69%",
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: "circle",
+                            boxWidth: 7,
+                            padding: 13,
+                            color: "#927b89",
+                            font: { family: "Nunito", size: 10, weight: "700" }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "#604b57",
+                        padding: 11
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 
 </body>
 </html>
