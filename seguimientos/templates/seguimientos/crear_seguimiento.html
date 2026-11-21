@@ -1,0 +1,815 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registrar seguimiento | BackHome</title>
+
+    <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
+    <link rel="stylesheet" href="{% static 'seguimientos/css/seguimientos.css' %}">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container nav-wrap">
+
+            <a class="brand" href="{% url 'pagina_principal' %}">
+                <span class="brand-mark">
+                    <i class="fa-solid fa-paw"></i>
+                </span>
+
+                <span>
+                    Back<span>Home</span>
+                    <small>Cada huellita importa</small>
+                </span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="{% url 'pagina_principal' %}">Inicio</a>
+                <a href="{% url 'lista_seguimientos' %}">Seguimientos</a>
+                <a href="{% url 'mis_seguimientos' %}">Mis seguimientos</a>
+            </nav>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="section">
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <span class="eyebrow">Cada historia merece una oportunidad</span>
+
+                    <h1>
+                        Registrar un <em>seguimiento.</em>
+                    </h1>
+
+                    <p>
+                        Comparte la información del animal y ayúdanos
+                        a mantener su historia y sus avances.
+                    </p>
+
+                </div>
+
+                <form method="POST" enctype="multipart/form-data"
+      class="form-seguimiento" id="formSeguimiento" novalidate>
+
+    {% csrf_token %}
+
+    <!-- INDICADOR DE PROGRESO -->
+    <div class="progreso-formulario">
+
+        <div class="progreso-pasos">
+
+            <span class="paso-activo" id="numeroPaso">
+                Paso 1 de 4
+            </span>
+
+            <span id="nombrePaso">
+                Tipo de caso
+            </span>
+
+        </div>
+
+        <div class="progreso-barra">
+            <div id="progresoBarra"></div>
+        </div>
+
+    </div>
+
+    <!-- CONTENIDO DE LOS PASOS -->
+    <div id="contenidoPasos">
+
+    <!-- PASO 1: TIPO DE CASO -->
+    <section class="form-paso activo" data-paso="1">
+
+        <div class="form-paso-encabezado">
+
+            <span class="eyebrow">Comencemos con lo básico</span>
+
+            <h2>¿Qué situación deseas reportar?</h2>
+
+            <p>
+                Selecciona el tipo de caso que deseas registrar.
+            </p>
+
+        </div>
+
+        <div class="opciones-tipo-caso">
+
+            <label class="opcion-caso">
+
+                <input
+                    type="radio"
+                    name="tipo_caso"
+                    value="perdido"
+                    required
+                >
+
+                <div class="opcion-caso-contenido">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <h3>Animal perdido</h3>
+
+                    <p>
+                        Un animal que se ha extraviado y necesita
+                        ser localizado.
+                    </p>
+
+                </div>
+
+            </label>
+
+            <label class="opcion-caso">
+
+                <input
+                    type="radio"
+                    name="tipo_caso"
+                    value="encontrado"
+                    required
+                >
+
+                <div class="opcion-caso-contenido">
+
+                    <i class="fa-solid fa-heart"></i>
+
+                    <h3>Animal encontrado</h3>
+
+                    <p>
+                        Un animal que ha sido encontrado y necesita
+                        ayuda para regresar a su hogar.
+                    </p>
+
+                </div>
+
+            </label>
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="titulo">
+                Título del caso
+            </label>
+
+            <input
+                type="text"
+                id="titulo"
+                name="titulo"
+                maxlength="150"
+                placeholder="Ej. Perrito perdido en Chapinero"
+                required
+            >
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="descripcion">
+                Descripción del caso
+            </label>
+
+            <textarea
+                id="descripcion"
+                name="descripcion"
+                rows="4"
+                placeholder="Cuéntanos qué ocurrió y proporciona detalles importantes..."
+                required
+            ></textarea>
+
+        </div>
+
+    </section>
+
+
+<!-- PASO 2: INFORMACIÓN DEL ANIMAL -->
+<section class="form-paso" data-paso="2">
+
+    <div class="form-paso-encabezado">
+
+        <span class="eyebrow">Conozcamos al protagonista</span>
+
+        <h2>Información del animal</h2>
+
+        <p>
+            Cuéntanos cómo es el animal para facilitar su identificación.
+        </p>
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="nombre_animal">Nombre del animal</label>
+
+        <input
+            type="text"
+            id="nombre_animal"
+            name="nombre_animal"
+            maxlength="100"
+            placeholder="Nombre del animal (si lo conoces)"
+        >
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="tipo_animal">Tipo de animal</label>
+
+        <select id="tipo_animal" name="tipo_animal" required>
+            <option value="">Selecciona una opción</option>
+            <option value="domestico">Animal doméstico</option>
+            <option value="exotico">Animal exótico</option>
+        </select>
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="especie">Especie</label>
+
+        <input
+            type="text"
+            id="especie"
+            name="especie"
+            maxlength="100"
+            placeholder="Ej. Perro, gato, conejo..."
+            required
+        >
+
+    </div>
+
+    <div class="campo-formulario" id="campoRaza">
+
+        <label for="raza">Raza</label>
+
+        <input
+            type="text"
+            id="raza"
+            name="raza"
+            maxlength="100"
+            placeholder="Ej. Criollo, labrador, persa..."
+        >
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="sexo">Sexo</label>
+
+        <select id="sexo" name="sexo" required>
+            <option value="">Selecciona una opción</option>
+            <option value="macho">Macho</option>
+            <option value="hembra">Hembra</option>
+            <option value="desconocido">Desconocido</option>
+        </select>
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="color">Color</label>
+
+        <input
+            type="text"
+            id="color"
+            name="color"
+            maxlength="50"
+            placeholder="Ej. Blanco con manchas negras"
+            required
+        >
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="tamano">Tamaño</label>
+
+        <select id="tamano" name="tamano">
+            <option value="">Selecciona una opción</option>
+            <option value="pequeño">Pequeño</option>
+            <option value="mediano">Mediano</option>
+            <option value="grande">Grande</option>
+        </select>
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="descripcion_animal">
+            Características físicas del animal
+        </label>
+
+        <textarea
+            id="descripcion_animal"
+            name="descripcion_animal"
+            rows="4"
+            placeholder="Describe características como manchas, marcas, apariencia, collar u otros detalles..."
+            required
+        ></textarea>
+
+    </div>
+
+</section>
+
+
+<!-- PASO 3: UBICACIÓN Y SITUACIÓN -->
+<section class="form-paso" data-paso="3">
+
+    <div class="form-paso-encabezado">
+
+        <span class="eyebrow">Cada detalle importa</span>
+
+        <h2>Ubicación y situación del caso</h2>
+
+        <p>
+            Indica dónde ocurrió el caso y proporciona información
+            sobre las circunstancias.
+        </p>
+
+    </div>
+
+    <!-- UBICACIÓN GENERAL -->
+    <div class="campo-formulario">
+
+        <label for="localidad_id">Localidad</label>
+
+        <select id="localidad_id" name="localidad_id" required>
+
+            <option value="">Selecciona una localidad</option>
+
+            {% for localidad in localidades %}
+                <option value="{{ localidad.0 }}">
+                    {{ localidad.1 }}
+                </option>
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="direccion">Dirección del caso</label>
+
+        <input
+            type="text"
+            id="direccion"
+            name="direccion"
+            maxlength="255"
+            placeholder="Ej. Calle 45 #20-15"
+            required
+        >
+
+        <div class="campo-formulario">
+    <label for="prioridad_id">Prioridad del caso</label>
+
+    <select id="prioridad_id" name="prioridad_id" required>
+        <option value="">Selecciona una prioridad</option>
+
+        {% for prioridad in prioridades %}
+            <option value="{{ prioridad.0 }}">
+                {{ prioridad.1 }} — {{ prioridad.2 }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <small>
+        Selecciona el nivel que mejor represente las condiciones
+        y necesidades actuales del animal.
+    </small>
+</div>
+
+    </div>
+
+    <!-- INFORMACIÓN DE ANIMAL PERDIDO -->
+    <div class="grupo-situacion" id="datosPerdido">
+
+        <div class="form-paso-encabezado">
+
+            <h3>Información de la pérdida</h3>
+
+            <p>
+                Indica cuándo se perdió el animal y dónde fue visto
+                por última vez.
+            </p>
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="fecha_perdida">Fecha y hora de pérdida</label>
+
+            <input
+                type="datetime-local"
+                id="fecha_perdida"
+                name="fecha_perdida"
+            >
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="ultima_fecha_visto">
+                Fecha y hora de la última vez que fue visto
+            </label>
+
+            <input
+                type="datetime-local"
+                id="ultima_fecha_visto"
+                name="ultima_fecha_visto"
+            >
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="descripcion_ultima_ubicacion">
+                Descripción de la última ubicación
+            </label>
+
+            <textarea
+                id="descripcion_ultima_ubicacion"
+                name="descripcion_ultima_ubicacion"
+                rows="3"
+                placeholder="Describe el lugar o las circunstancias en las que fue visto por última vez..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+    <!-- INFORMACIÓN DE ANIMAL ENCONTRADO -->
+    <div class="grupo-situacion" id="datosEncontrado">
+
+        <div class="form-paso-encabezado">
+
+            <h3>Información del hallazgo</h3>
+
+            <p>
+                Indica cuándo y dónde encontraste al animal.
+            </p>
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="fecha_encontrado">Fecha y hora del hallazgo</label>
+
+            <input
+                type="datetime-local"
+                id="fecha_encontrado"
+                name="fecha_encontrado"
+            >
+
+        </div>
+
+        <div class="campo-formulario">
+
+            <label for="descripcion_lugar_encontrado">
+                Descripción del lugar donde fue encontrado
+            </label>
+
+            <textarea
+                id="descripcion_lugar_encontrado"
+                name="descripcion_lugar_encontrado"
+                rows="3"
+                placeholder="Describe las circunstancias del hallazgo..."
+            ></textarea>
+
+        </div>
+
+        <!-- REFUGIO -->
+        <div class="campo-formulario">
+
+            <label for="necesita_refugio">
+                ¿El animal necesita ingresar a un refugio?
+            </label>
+
+            <select
+                id="necesita_refugio"
+                name="necesita_refugio"
+            >
+                <option value="0">No</option>
+                <option value="1">Sí</option>
+            </select>
+
+        </div>
+
+        <div class="campo-formulario" id="campoRefugio">
+
+            <label for="refugio_id">Selecciona un refugio</label>
+
+            <select id="refugio_id" name="refugio_id">
+
+                <option value="">Selecciona un refugio</option>
+
+                {% for refugio in refugios %}
+                    <option
+                        value="{{ refugio.0 }}"
+                        data-localidad="{{ refugio.3 }}"
+                    >
+                        {{ refugio.1 }} — {{ refugio.2 }}
+                    </option>
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- PASO 4: FOTOGRAFÍAS Y CONFIRMACIÓN -->
+<section class="form-paso" data-paso="4">
+
+    <div class="form-paso-encabezado">
+
+        <span class="eyebrow">Una imagen puede marcar la diferencia</span>
+
+        <h2>Fotografías del animal</h2>
+
+        <p>
+            Añade fotografías que permitan identificar al animal
+            y faciliten su búsqueda.
+        </p>
+
+    </div>
+
+    <div class="campo-formulario">
+
+        <label for="fotografias">
+            Seleccionar fotografías
+        </label>
+
+        <input
+            type="file"
+            id="fotografias"
+            name="fotografias"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            required
+        >
+
+        <small>
+            Puedes seleccionar varias fotografías. La primera será
+            utilizada como imagen principal.
+        </small>
+
+    </div>
+
+    <div id="vistaPreviaImagenes" class="vista-previa-imagenes">
+
+        <!-- Aquí mostraremos las fotografías seleccionadas -->
+
+    </div>
+
+    <div class="confirmacion-registro">
+
+        <label class="checkbox-confirmacion">
+
+            <input
+                type="checkbox"
+                id="confirmarInformacion"
+                name="confirmar_informacion"
+                value="1"
+                required
+            >
+
+            <span>
+                Confirmo que la información proporcionada es correcta
+                y autorizo su revisión por parte de BackHome.
+            </span>
+
+        </label>
+
+    </div>
+
+    <div class="nota-moderacion">
+
+        <i class="fa-solid fa-circle-info"></i>
+
+        <p>
+            Al enviar el formulario, el seguimiento quedará pendiente
+            de revisión. Solo se publicará después de completar
+            las verificaciones correspondientes.
+        </p>
+
+    </div>
+
+</section>
+
+
+</div>
+
+    <!-- NAVEGACIÓN -->
+    <div class="navegacion-formulario">
+
+        <button type="button" id="btnAnterior" disabled>
+            <i class="fa-solid fa-arrow-left"></i>
+            Anterior
+        </button>
+
+        <button type="button" id="btnSiguiente">
+            Siguiente
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+    </div>
+
+</form>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const pasos = document.querySelectorAll('.form-paso');
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    const numeroPaso = document.getElementById('numeroPaso');
+    const nombrePaso = document.getElementById('nombrePaso');
+    const progresoBarra = document.getElementById('progresoBarra');
+
+    const nombresPasos = [
+        'Tipo de caso',
+        'Información del animal',
+        'Ubicación y situación',
+        'Fotografías y confirmación'
+    ];
+
+    let pasoActual = 1;
+
+    // Elementos del formulario
+const tipoAnimal = document.getElementById('tipo_animal');
+const campoRaza = document.getElementById('campoRaza');
+const raza = document.getElementById('raza');
+
+const tipoCaso = document.querySelectorAll(
+    'input[name="tipo_caso"]'
+);
+
+const datosPerdido = document.getElementById('datosPerdido');
+const datosEncontrado = document.getElementById('datosEncontrado');
+
+const necesitaRefugio = document.getElementById('necesita_refugio');
+const campoRefugio = document.getElementById('campoRefugio');
+const refugio = document.getElementById('refugio_id');
+
+// Mostrar raza solo para animales domésticos
+function actualizarTipoAnimal() {
+
+    const esDomestico = tipoAnimal.value === 'domestico';
+
+    campoRaza.style.display = esDomestico ? 'flex' : 'none';
+    raza.disabled = !esDomestico;
+    raza.required = esDomestico;
+
+    if (!esDomestico) {
+        raza.value = '';
+    }
+}
+
+// Mostrar información según el tipo de caso
+function actualizarTipoCaso() {
+
+    const seleccionado = document.querySelector(
+        'input[name="tipo_caso"]:checked'
+    );
+
+    const tipo = seleccionado ? seleccionado.value : '';
+
+    datosPerdido.style.display = tipo === 'perdido' ? 'block' : 'none';
+    datosEncontrado.style.display = tipo === 'encontrado' ? 'block' : 'none';
+
+    // Desactivar campos del tipo de caso que no se seleccionó
+    datosPerdido.querySelectorAll('input, select, textarea')
+        .forEach(campo => {
+            campo.disabled = tipo !== 'perdido';
+        });
+
+    datosEncontrado.querySelectorAll('input, select, textarea')
+        .forEach(campo => {
+            campo.disabled = tipo !== 'encontrado';
+        });
+
+    actualizarRefugio();
+}
+
+// Mostrar refugio solo cuando sea necesario
+function actualizarRefugio() {
+
+    const mostrar = necesitaRefugio.value === '1';
+
+    campoRefugio.style.display = mostrar ? 'flex' : 'none';
+    refugio.disabled = !mostrar;
+    refugio.required = mostrar;
+
+    if (!mostrar) {
+        refugio.value = '';
+    }
+}
+
+// Escuchar cambios
+tipoAnimal.addEventListener('change', actualizarTipoAnimal);
+
+tipoCaso.forEach(opcion => {
+    opcion.addEventListener('change', actualizarTipoCaso);
+});
+
+necesitaRefugio.addEventListener('change', actualizarRefugio);
+
+// Estado inicial
+actualizarTipoAnimal();
+actualizarTipoCaso();
+
+    function mostrarPaso(numero) {
+
+        pasos.forEach(function (paso) {
+            paso.classList.remove('activo');
+        });
+
+        document.querySelector(
+            `.form-paso[data-paso="${numero}"]`
+        ).classList.add('activo');
+
+        numeroPaso.textContent = `Paso ${numero} de 4`;
+        nombrePaso.textContent = nombresPasos[numero - 1];
+
+        progresoBarra.style.width = `${numero * 25}%`;
+
+        btnAnterior.disabled = numero === 1;
+
+        btnSiguiente.innerHTML = numero === 4
+            ? 'Enviar seguimiento <i class="fa-solid fa-paper-plane"></i>'
+            : 'Siguiente <i class="fa-solid fa-arrow-right"></i>';
+
+        pasoActual = numero;
+    }
+
+    function validarPaso() {
+
+        const paso = document.querySelector(
+            `.form-paso[data-paso="${pasoActual}"]`
+        );
+
+        const campos = paso.querySelectorAll(
+            'input, select, textarea'
+        );
+
+        for (const campo of campos) {
+
+            if (campo.disabled || campo.type === 'file' && !campo.required) {
+                continue;
+            }
+
+            if (!campo.checkValidity()) {
+                campo.reportValidity();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    btnSiguiente.addEventListener('click', function () {
+
+    if (!validarPaso()) {
+        return;
+    }
+
+    if (pasoActual < 4) {
+        mostrarPaso(pasoActual + 1);
+    } else {
+        document.getElementById('formSeguimiento').requestSubmit();
+    }
+
+});
+
+    btnAnterior.addEventListener('click', function () {
+
+        if (pasoActual > 1) {
+            mostrarPaso(pasoActual - 1);
+        }
+    });
+
+    mostrarPaso(1);
+});
+</script>
+
+</body>
+</html>

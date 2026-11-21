@@ -70,6 +70,15 @@
 
                             <article class="seguimiento-card">
 
+                                {% if seguimiento.fotografia %}
+    <div class="seguimiento-imagen">
+        <img
+            src="/media/{{ seguimiento.fotografia }}"
+            alt="Fotografía de {{ seguimiento.animal_nombre|default:'animal reportado' }}"
+        >
+    </div>
+{% endif %}
+
                                 <div class="seguimiento-info">
 
                                     <h2>{{ seguimiento.titulo }}</h2>

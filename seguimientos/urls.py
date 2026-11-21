@@ -15,4 +15,10 @@ urlpatterns = [
         views.detalle_seguimiento,
         name='detalle_seguimiento'
     ),
+
+    path(
+    'crear/',
+    views.crear_seguimiento,
+    name='crear_seguimiento'
+    ),
 ]

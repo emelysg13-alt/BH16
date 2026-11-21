@@ -1,6 +1,16 @@
 from django.shortcuts import render, redirect
-from django.db import connection
+from django.db import connection, transaction
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
+from django.utils.text import get_valid_filename
+from pathlib import Path
+import uuid
+from PIL import Image
+from django.utils.dateparse import parse_datetime
 
+MAX_FOTOGRAFIAS = 5
+MAX_TAMANO_IMAGEN = 5 * 1024 * 1024  # 5 MB
 
 def lista_seguimientos(request):
 
@@ -250,6 +260,7 @@ def detalle_seguimiento(request, id_seguimiento):
     from django.shortcuts import redirect
 
 
+
 def mis_seguimientos(request):
 
     # Verificar que el usuario haya iniciado sesión
@@ -275,7 +286,15 @@ def mis_seguimientos(request):
 
             COALESCE(ad.especie, ae.especie) AS especie,
 
-            loc.n_localidad AS localidad
+            loc.n_localidad AS localidad,
+
+            (
+                SELECT i.ruta_imagen
+                FROM imagenes_seguimiento i
+                WHERE i.seguimiento_id = s.id_seguimiento
+                ORDER BY i.imagen_principal DESC, i.id_imagen ASC
+                LIMIT 1
+            ) AS fotografia
 
         FROM seguimiento s
 
@@ -306,6 +325,7 @@ def mis_seguimientos(request):
     """
 
     with connection.cursor() as cursor:
+
         cursor.execute(consulta, [persona_id])
 
         columnas = [
@@ -324,3 +344,561 @@ def mis_seguimientos(request):
             'seguimientos': seguimientos
         }
     )
+
+
+
+def obtener_cliente_id(persona_id):
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_cliente
+            FROM cliente
+            WHERE persona_id = %s
+        """, [persona_id])
+
+        resultado = cursor.fetchone()
+
+    if resultado:
+        return resultado[0]
+
+    return None
+
+
+def validar_fotografia(imagen):
+
+    formatos_permitidos = {
+        'JPEG': '.jpg',
+        'PNG': '.png',
+        'WEBP': '.webp'
+    }
+
+    try:
+        imagen.seek(0)
+
+        archivo = Image.open(imagen)
+        formato = archivo.format
+
+        if formato not in formatos_permitidos:
+            return None
+
+        archivo.verify()
+
+        imagen.seek(0)
+
+        return formatos_permitidos[formato]
+
+    except (Image.UnidentifiedImageError, OSError, Image.DecompressionBombError):
+        return None
+
+
+def crear_seguimiento(request):
+
+    # Verificar sesión
+    persona_id = request.session.get('backhome_user_id')
+    rol = request.session.get('backhome_rol')
+
+    if not persona_id:
+        return redirect('iniciar_sesion')
+
+    if rol != 'cliente':
+        return redirect('pagina_principal')
+
+    # Obtener cliente autenticado
+    cliente_id = obtener_cliente_id(persona_id)
+
+    if cliente_id is None:
+        return redirect('pagina_principal')
+
+    # Consultar datos para los select del formulario
+    with connection.cursor() as cursor:
+
+        cursor.execute("""
+            SELECT id_localidad, n_localidad
+            FROM localidades
+            ORDER BY n_localidad
+        """)
+        localidades = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT id_refugio, nombre, direccion, localidad_id
+            FROM refugios
+            WHERE estado = 'activo'
+            ORDER BY nombre
+        """)
+        refugios = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT id_prioridad, nombre, descripcion
+            FROM prioridades
+            WHERE estado = 'activo'
+            ORDER BY nivel
+        """)
+        prioridades = cursor.fetchall()
+
+    contexto = {
+        'localidades': localidades,
+        'refugios': refugios,
+        'prioridades': prioridades
+    }
+
+    # Mostrar formulario mediante GET
+    if request.method == 'GET':
+        return render(
+            request,
+            'seguimientos/crear_seguimiento.html',
+            contexto
+        )
+
+    # Obtener fotografías
+    fotografias = request.FILES.getlist('fotografias')
+
+    def error_formulario(mensaje):
+        contexto['error'] = mensaje
+        return render(
+            request,
+            'seguimientos/crear_seguimiento.html',
+            contexto
+        )
+
+    # Validar cantidad de fotografías
+    if not fotografias:
+        return error_formulario(
+            'Debes cargar al menos una fotografía del animal.'
+        )
+
+    if len(fotografias) > MAX_FOTOGRAFIAS:
+        return error_formulario(
+            'Puedes cargar máximo 5 fotografías.'
+        )
+
+    # Validar tamaño y formato
+    extensiones = []
+
+    for imagen in fotografias:
+
+        if imagen.size > MAX_TAMANO_IMAGEN:
+            return error_formulario(
+                'Cada fotografía debe pesar máximo 5 MB.'
+            )
+
+        extension = validar_fotografia(imagen)
+
+        if extension is None:
+            return error_formulario(
+                'Una o más fotografías no tienen un formato válido. Usa JPG, PNG o WEBP.'
+            )
+
+        extensiones.append(extension)
+
+    # Obtener datos generales
+    tipo_caso = request.POST.get('tipo_caso')
+    titulo = request.POST.get('titulo', '').strip()
+    descripcion = request.POST.get('descripcion', '').strip()
+    prioridad_id = request.POST.get('prioridad_id')
+
+    # Obtener ubicación
+    localidad_id = request.POST.get('localidad_id')
+    direccion = request.POST.get('direccion', '').strip()
+
+    # Obtener información del animal
+    nombre_animal = request.POST.get('nombre_animal', '').strip()
+    tipo_animal = request.POST.get('tipo_animal')
+    especie = request.POST.get('especie', '').strip()
+    raza = request.POST.get('raza', '').strip()
+    sexo = request.POST.get('sexo')
+    color = request.POST.get('color', '').strip()
+    tamano = request.POST.get('tamano') or None
+    descripcion_animal = request.POST.get(
+        'descripcion_animal', ''
+    ).strip()
+
+    # Obtener datos de animal perdido
+    fecha_perdida = request.POST.get('fecha_perdida')
+    ultima_fecha_visto = request.POST.get('ultima_fecha_visto')
+    descripcion_ultima_ubicacion = request.POST.get(
+        'descripcion_ultima_ubicacion', ''
+    ).strip()
+
+    # Obtener datos de animal encontrado
+    fecha_encontrado = request.POST.get('fecha_encontrado')
+    descripcion_lugar_encontrado = request.POST.get(
+        'descripcion_lugar_encontrado', ''
+    ).strip()
+
+    necesita_refugio = request.POST.get('necesita_refugio', '0')
+    refugio_id = request.POST.get('refugio_id')
+
+    # Validar confirmación
+    if not request.POST.get('confirmar_informacion'):
+        return error_formulario(
+            'Debes confirmar que la información proporcionada es correcta.'
+        )
+
+    # Validar datos generales
+    if not all([
+        tipo_caso,
+        titulo,
+        descripcion,
+        prioridad_id,
+        localidad_id,
+        direccion
+    ]):
+        return error_formulario(
+            'Completa todos los campos obligatorios.'
+        )
+
+    if len(titulo) > 150:
+        return error_formulario(
+            'El título no puede superar los 150 caracteres.'
+        )
+
+    # Validar tipo de caso
+    if tipo_caso not in ['perdido', 'encontrado']:
+        return error_formulario(
+            'El tipo de caso seleccionado no es válido.'
+        )
+
+    # Validar datos del animal
+    if not all([
+        tipo_animal,
+        especie,
+        sexo,
+        color,
+        descripcion_animal
+    ]):
+        return error_formulario(
+            'Completa la información obligatoria del animal.'
+        )
+
+    if tipo_animal not in ['domestico', 'exotico']:
+        return error_formulario(
+            'El tipo de animal seleccionado no es válido.'
+        )
+
+    if sexo not in ['macho', 'hembra', 'desconocido']:
+        return error_formulario(
+            'El sexo seleccionado no es válido.'
+        )
+
+    if tamano and tamano not in ['pequeño', 'mediano', 'grande']:
+        return error_formulario(
+            'El tamaño seleccionado no es válido.'
+        )
+
+    if tipo_animal == 'domestico' and not raza:
+        return error_formulario(
+            'Debes indicar la raza del animal doméstico.'
+        )
+
+    if tipo_animal == 'domestico' and len(raza) > 100:
+        return error_formulario(
+            'La raza no puede superar los 100 caracteres.'
+        )
+
+    if len(especie) > 100 or len(color) > 50:
+        return error_formulario(
+            'La especie o el color superan la longitud permitida.'
+        )
+
+    # Convertir identificadores a enteros
+    try:
+        prioridad_id = int(prioridad_id)
+        localidad_id = int(localidad_id)
+
+        if necesita_refugio == '1' and refugio_id:
+            refugio_id = int(refugio_id)
+
+    except (ValueError, TypeError):
+        return error_formulario(
+            'Uno de los identificadores seleccionados no es válido.'
+        )
+
+    # Validar prioridad y localidad
+    with connection.cursor() as cursor:
+
+        cursor.execute("""
+            SELECT id_prioridad
+            FROM prioridades
+            WHERE id_prioridad = %s
+            AND estado = 'activo'
+        """, [prioridad_id])
+
+        prioridad_valida = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT id_localidad
+            FROM localidades
+            WHERE id_localidad = %s
+        """, [localidad_id])
+
+        localidad_valida = cursor.fetchone()
+
+    if not prioridad_valida or not localidad_valida:
+        return error_formulario(
+            'La prioridad o localidad seleccionada no es válida.'
+        )
+
+    # Validar fechas
+    if tipo_caso == 'perdido':
+
+        fecha_perdida_dt = parse_datetime(fecha_perdida or '')
+
+        if not fecha_perdida_dt:
+            return error_formulario(
+                'Debes indicar una fecha válida de pérdida.'
+            )
+
+        ultima_fecha_visto_dt = None
+
+        if ultima_fecha_visto:
+            ultima_fecha_visto_dt = parse_datetime(
+                ultima_fecha_visto
+            )
+
+            if not ultima_fecha_visto_dt:
+                return error_formulario(
+                    'La última fecha en que se vio al animal no es válida.'
+                )
+
+    else:
+
+        fecha_encontrado_dt = parse_datetime(
+            fecha_encontrado or ''
+        )
+
+        if not fecha_encontrado_dt:
+            return error_formulario(
+                'Debes indicar una fecha válida de encuentro.'
+            )
+
+    # Validar necesidad de refugio
+    if tipo_caso == 'encontrado':
+
+        if necesita_refugio not in ['0', '1']:
+            return error_formulario(
+                'La selección de refugio no es válida.'
+            )
+
+        if necesita_refugio == '1' and not refugio_id:
+            return error_formulario(
+                'Debes seleccionar un refugio.'
+            )
+
+    # Validar refugio activo
+    if tipo_caso == 'encontrado' and necesita_refugio == '1':
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_refugio
+                FROM refugios
+                WHERE id_refugio = %s
+                AND estado = 'activo'
+            """, [refugio_id])
+
+            refugio_valido = cursor.fetchone()
+
+        if not refugio_valido:
+            return error_formulario(
+                'El refugio seleccionado no existe o no está activo.'
+            )
+
+    # Preparar control de archivos
+    archivos_guardados = []
+
+    try:
+
+        # Iniciar transacción
+        with transaction.atomic():
+
+            with connection.cursor() as cursor:
+
+                # Registrar información general del animal
+                cursor.execute("""
+                    INSERT INTO animal (
+                        nombre,
+                        sexo,
+                        color,
+                        tamano,
+                        descripcion
+                    )
+                    VALUES (%s, %s, %s, %s, %s)
+                """, [
+                    nombre_animal or None,
+                    sexo,
+                    color,
+                    tamano,
+                    descripcion_animal
+                ])
+
+                animal_id = cursor.lastrowid
+
+                # Registrar clasificación del animal
+                if tipo_animal == 'domestico':
+
+                    cursor.execute("""
+                        INSERT INTO animal_domestico (
+                            animal_id,
+                            especie,
+                            raza
+                        )
+                        VALUES (%s, %s, %s)
+                    """, [
+                        animal_id,
+                        especie,
+                        raza
+                    ])
+
+                else:
+
+                    cursor.execute("""
+                        INSERT INTO animal_exotico (
+                            animal_id,
+                            especie
+                        )
+                        VALUES (%s, %s)
+                    """, [
+                        animal_id,
+                        especie
+                    ])
+
+                # Registrar ubicación
+                cursor.execute("""
+                    INSERT INTO lugares (
+                        direccion,
+                        localidad_id
+                    )
+                    VALUES (%s, %s)
+                """, [
+                    direccion,
+                    localidad_id
+                ])
+
+                lugar_id = cursor.lastrowid
+
+                # Registrar seguimiento principal
+                cursor.execute("""
+                    INSERT INTO seguimiento (
+                        titulo,
+                        descripcion,
+                        estado_seguimiento,
+                        estado_moderacion,
+                        animal_id,
+                        lugar_id,
+                        cliente_id,
+                        prioridad_id
+                    )
+                    VALUES (%s, %s, %s, 'pendiente', %s, %s, %s, %s)
+                """, [
+                    titulo,
+                    descripcion,
+                    tipo_caso,
+                    animal_id,
+                    lugar_id,
+                    cliente_id,
+                    prioridad_id
+                ])
+
+                seguimiento_id = cursor.lastrowid
+
+                # Registrar caso perdido
+                if tipo_caso == 'perdido':
+
+                    cursor.execute("""
+                        INSERT INTO seguimiento_perdido (
+                            seguimiento_id,
+                            fecha_perdida,
+                            ultima_fecha_visto,
+                            descripcion_ultima_ubicacion
+                        )
+                        VALUES (%s, %s, %s, %s)
+                    """, [
+                        seguimiento_id,
+                        fecha_perdida_dt,
+                        ultima_fecha_visto_dt,
+                        descripcion_ultima_ubicacion or None
+                    ])
+
+                # Registrar caso encontrado
+                else:
+
+                    cursor.execute("""
+                        INSERT INTO seguimiento_encontrado (
+                            seguimiento_id,
+                            fecha_encontrado,
+                            descripcion_lugar_encontrado,
+                            necesita_refugio,
+                            refugio_id
+                        )
+                        VALUES (%s, %s, %s, %s, %s)
+                    """, [
+                        seguimiento_id,
+                        fecha_encontrado_dt,
+                        descripcion_lugar_encontrado or None,
+                        int(necesita_refugio),
+                        refugio_id if necesita_refugio == '1' else None
+                    ])
+
+                # Registrar solicitud de ingreso al refugio
+                if tipo_caso == 'encontrado' and necesita_refugio == '1':
+
+                    cursor.execute("""
+                        INSERT INTO ingresos_refugio (
+                            refugio_id,
+                            animal_id,
+                            seguimiento_id,
+                            observacion,
+                            estado
+                        )
+                        VALUES (%s, %s, %s, %s, 'pendiente')
+                    """, [
+                        refugio_id,
+                        animal_id,
+                        seguimiento_id,
+                        descripcion_lugar_encontrado or None
+                    ])
+
+                # Guardar fotografías
+                for indice, (imagen, extension) in enumerate(
+                    zip(fotografias, extensiones)
+                ):
+
+                    nombre_archivo = (
+                        f"seguimientos/{uuid.uuid4().hex}{extension}"
+                    )
+
+                    imagen.seek(0)
+
+                    ruta_guardada = default_storage.save(
+                        nombre_archivo,
+                        ContentFile(imagen.read())
+                    )
+
+                    archivos_guardados.append(ruta_guardada)
+
+                    # Registrar fotografía en MariaDB
+                    cursor.execute("""
+                        INSERT INTO imagenes_seguimiento (
+                            seguimiento_id,
+                            ruta_imagen,
+                            imagen_principal
+                        )
+                        VALUES (%s, %s, %s)
+                    """, [
+                        seguimiento_id,
+                        ruta_guardada,
+                        1 if indice == 0 else 0
+                    ])
+
+    except Exception:
+        # Eliminar archivos si el registro falla
+        for ruta in archivos_guardados:
+            default_storage.delete(ruta)
+
+        return error_formulario(
+            'No fue posible registrar el seguimiento. '
+            'Verifica la información e inténtalo nuevamente.'
+        )
+
+    # Registro completado
+    return redirect('mis_seguimientos')
+
