@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Consulta los seguimientos publicados en BackHome.">
+
+    <title>Seguimientos | BackHome</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Playwrite+NZ+Basic:wght@100..400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
+    <link rel="stylesheet" href="{% static 'seguimientos/css/seguimientos.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container nav-wrap">
+
+        <a class="brand" href="{% url 'pagina_principal' %}">
+            <span class="brand-mark">
+                <i class="fa-solid fa-paw"></i>
+            </span>
+
+            <span>
+                Back<span>Home</span>
+                <small>Cada huellita importa</small>
+            </span>
+        </a>
+
+        <button class="menu-toggle" type="button"
+                aria-label="Abrir menú" aria-expanded="false">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <nav class="main-nav">
+            <a href="{% url 'pagina_principal' %}">Inicio</a>
+
+            <a href="{% url 'lista_seguimientos' %}">
+                Seguimientos
+            </a>
+
+            <a href="{% url 'pagina_principal' %}#refugios">
+                Refugios
+            </a>
+
+            <a href="{% url 'pagina_principal' %}#nosotros">
+                Nosotros
+            </a>
+
+            <a class="nav-advice-button"
+               href="{% url 'pagina_principal' %}#consejos">
+                <i class="fa-solid fa-lightbulb"></i>
+                Consejos
+            </a>
+        </nav>
+
+        <div class="header-actions">
+
+            {% if request.session.backhome_user_id %}
+
+                <a class="register-button" href="{% url 'mi_cuenta' %}">
+                    Mi perfil <i class="fa-solid fa-user"></i>
+                </a>
+
+                <form method="post" action="{% url 'cerrar_sesion' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="login-button">
+                        Cerrar sesión
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a class="register-button" href="{% url 'registrar_cliente' %}">
+                    Crear cuenta
+                    <i class="fa-solid fa-user-plus"></i>
+                </a>
+
+                <a class="login-button" href="{% url 'iniciar_sesion' %}">
+                    Iniciar sesión
+                    <i class="fa-solid fa-user"></i>
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</header>
+    <section class="section how-section">
+    <div class="container">
+
+        <div class="section-heading">
+            <span class="eyebrow">Cada historia merece ser contada</span>
+
+            <h1>
+                Seguimientos para mantener
+                <em>la esperanza.</em>
+            </h1>
+
+            <p>
+                Conoce los casos publicados y descubre los avances
+                de los animales que están buscando a su familia
+                o un nuevo hogar.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+    <main>
+
+        {% if seguimientos %}
+
+            <section class="seguimientos-grid">
+
+                {% for seguimiento in seguimientos %}
+
+                    <article class="seguimiento-card">
+
+    {% if seguimiento.imagen_principal %}
+        <img
+            src="/media/{{ seguimiento.imagen_principal }}"
+            alt="Fotografía de {{ seguimiento.animal_nombre|default:'un animal' }}"
+        >
+    {% endif %}
+
+    <div class="seguimiento-info">
+
+        <h2>{{ seguimiento.titulo }}</h2>
+
+        <p>
+            <strong>Animal:</strong>
+            {{ seguimiento.animal_nombre|default:"Sin nombre" }}
+            · {{ seguimiento.especie|default:"No especificada" }}
+        </p>
+
+        <p>
+            <strong>Ubicación:</strong>
+            {{ seguimiento.localidad }}
+        </p>
+
+        <p>
+            <strong>Estado:</strong>
+            {{ seguimiento.estado_seguimiento|capfirst }}
+        </p>
+
+        <p>
+            <strong>Publicado:</strong>
+            {{ seguimiento.fecha_publicacion|date:"d/m/Y" }}
+        </p>
+
+        <span class="verificacion">
+            <i class="fa-solid fa-circle-check"></i>
+            Verificado por BackHome
+        </span>
+
+        {% if seguimiento.ultima_actualizacion %}
+            <p>
+                <strong>Último avance:</strong>
+                {{ seguimiento.ultima_actualizacion|truncatewords:15 }}
+            </p>
+        {% endif %}
+
+        <a
+            href="{% url 'detalle_seguimiento' seguimiento.id_seguimiento %}"
+            class="btn-detalles"
+        >
+            Ver detalles
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+    </div>
+
+</article>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <section class="sin-seguimientos">
+                <h2>Aún no hay seguimientos publicados</h2>
+
+                <p>
+                    Cuando existan casos aprobados y verificados,
+                    podrás consultarlos aquí.
+                </p>
+            </section>
+
+        {% endif %}
+
+    </main>
+
+</body>
+</html>
