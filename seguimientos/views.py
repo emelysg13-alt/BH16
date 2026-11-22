@@ -8,6 +8,7 @@ from pathlib import Path
 import uuid
 from PIL import Image
 from django.utils.dateparse import parse_datetime
+from django.contrib import messages
 
 MAX_FOTOGRAFIAS = 5
 MAX_TAMANO_IMAGEN = 5 * 1024 * 1024  # 5 MB
@@ -257,9 +258,6 @@ def detalle_seguimiento(request, id_seguimiento):
     )
 
 
-    from django.shortcuts import redirect
-
-
 
 def mis_seguimientos(request):
 
@@ -281,6 +279,14 @@ def mis_seguimientos(request):
             s.fecha_publicacion,
             s.estado_seguimiento,
             s.estado_moderacion,
+            (
+    SELECT ir.estado
+    FROM ingresos_refugio ir
+    WHERE ir.seguimiento_id = s.id_seguimiento
+    ORDER BY ir.id_ingreso DESC
+    LIMIT 1
+) AS estado_ingreso,
+
 
             a.nombre AS animal_nombre,
 
@@ -323,6 +329,7 @@ def mis_seguimientos(request):
 
         ORDER BY s.fecha_publicacion DESC
     """
+    
 
     with connection.cursor() as cursor:
 
@@ -337,6 +344,28 @@ def mis_seguimientos(request):
             for fila in cursor.fetchall()
         ]
 
+    for seguimiento in seguimientos:
+        seguimiento['estado_seguimiento'] = (
+            seguimiento['estado_seguimiento']
+        .replace('_', ' ')
+        .capitalize()
+    )
+
+    if seguimiento['estado_moderacion']:
+        seguimiento['estado_moderacion'] = (
+            seguimiento['estado_moderacion']
+            .replace('_', ' ')
+            .capitalize()
+        )
+
+    if seguimiento['estado_ingreso']:
+        seguimiento['estado_ingreso'] = (
+            seguimiento['estado_ingreso']
+            .replace('_', ' ')
+            .capitalize()
+        )
+
+
     return render(
         request,
         'seguimientos/mis_seguimientos.html',
@@ -344,6 +373,259 @@ def mis_seguimientos(request):
             'seguimientos': seguimientos
         }
     )
+
+
+
+
+
+def detalle_mi_seguimiento(request, id_seguimiento):
+
+    # Verificar sesión
+    persona_id = request.session.get('backhome_user_id')
+    rol = request.session.get('backhome_rol')
+
+    if not persona_id:
+        return redirect('iniciar_sesion')
+
+    if rol != 'cliente':
+        return redirect('pagina_principal')
+
+    # Consultar el seguimiento y verificar que pertenezca al cliente
+    consulta = """
+        SELECT
+            s.id_seguimiento,
+            s.titulo,
+            s.descripcion,
+            s.fecha_publicacion,
+            s.estado_seguimiento,
+            s.estado_moderacion,
+
+            a.nombre AS animal_nombre,
+            a.sexo,
+            a.color,
+            a.tamano,
+            a.descripcion AS descripcion_animal,
+
+            COALESCE(ad.especie, ae.especie) AS especie,
+            ad.raza,
+
+            l.direccion,
+            loc.n_localidad AS localidad,
+
+            sp.fecha_perdida,
+            sp.ultima_fecha_visto,
+            sp.descripcion_ultima_ubicacion,
+
+            se.fecha_encontrado,
+            se.descripcion_lugar_encontrado,
+            se.necesita_refugio,
+
+            r.nombre AS refugio_nombre,
+            r.direccion AS refugio_direccion
+
+        FROM seguimiento s
+
+        INNER JOIN cliente c
+            ON c.id_cliente = s.cliente_id
+
+        INNER JOIN animal a
+            ON a.id_animal = s.animal_id
+
+        LEFT JOIN animal_domestico ad
+            ON ad.animal_id = a.id_animal
+
+        LEFT JOIN animal_exotico ae
+            ON ae.animal_id = a.id_animal
+
+        INNER JOIN lugares l
+            ON l.id_lugar = s.lugar_id
+
+        INNER JOIN localidades loc
+            ON loc.id_localidad = l.localidad_id
+
+        LEFT JOIN seguimiento_perdido sp
+            ON sp.seguimiento_id = s.id_seguimiento
+
+        LEFT JOIN seguimiento_encontrado se
+            ON se.seguimiento_id = s.id_seguimiento
+
+        LEFT JOIN refugios r
+            ON r.id_refugio = se.refugio_id
+
+        WHERE s.id_seguimiento = %s
+        AND c.persona_id = %s
+
+        LIMIT 1
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(consulta, [id_seguimiento, persona_id])
+
+        columnas = [columna[0] for columna in cursor.description]
+        fila = cursor.fetchone()
+
+    if not fila:
+        from django.http import Http404
+        raise Http404("Seguimiento no encontrado")
+
+    seguimiento = dict(zip(columnas, fila))
+
+    # Consultar fotografías
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_imagen, ruta_imagen, imagen_principal
+            FROM imagenes_seguimiento
+            WHERE seguimiento_id = %s
+            ORDER BY imagen_principal DESC, id_imagen ASC
+        """, [id_seguimiento])
+
+        columnas_imagenes = [
+            columna[0] for columna in cursor.description
+        ]
+
+        imagenes = [
+            dict(zip(columnas_imagenes, imagen))
+            for imagen in cursor.fetchall()
+        ]
+
+    # Consultar historial de actualizaciones
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT mensaje, created_at
+            FROM actualizaciones_seguimiento
+            WHERE seguimiento_id = %s
+            ORDER BY created_at DESC, id_actualizacion DESC
+        """, [id_seguimiento])
+
+        columnas_actualizaciones = [
+            columna[0] for columna in cursor.description
+        ]
+
+        actualizaciones = [
+            dict(zip(columnas_actualizaciones, actualizacion))
+            for actualizacion in cursor.fetchall()
+        ]
+
+    return render(
+        request,
+        'seguimientos/detalle_mi_seguimiento.html',
+        {
+            'seguimiento': seguimiento,
+            'imagenes': imagenes,
+            'actualizaciones': actualizaciones,
+        }
+    )
+
+
+
+
+def eliminar_seguimiento(request, id_seguimiento):
+
+    # Solo permitir solicitudes POST
+    if request.method != 'POST':
+        return redirect('mis_seguimientos')
+
+    # Verificar sesión
+    persona_id = request.session.get('backhome_user_id')
+    rol = request.session.get('backhome_rol')
+
+    if not persona_id:
+        return redirect('iniciar_sesion')
+
+    if rol != 'cliente':
+        return redirect('pagina_principal')
+
+    # Verificar que el seguimiento pertenezca al cliente
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                s.animal_id,
+                s.lugar_id
+            FROM seguimiento s
+            INNER JOIN cliente c
+                ON c.id_cliente = s.cliente_id
+            WHERE s.id_seguimiento = %s
+            AND c.persona_id = %s
+        """, [id_seguimiento, persona_id])
+
+        resultado = cursor.fetchone()
+
+    if not resultado:
+        return redirect('mis_seguimientos')
+
+    animal_id, lugar_id = resultado
+
+    # Verificar si existe un ingreso confirmado al refugio
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM ingresos_refugio
+            WHERE seguimiento_id = %s
+            AND estado = 'confirmado'
+        """, [id_seguimiento])
+
+        ingreso_confirmado = cursor.fetchone()[0]
+
+    if ingreso_confirmado > 0:
+        messages.error(
+            request,
+            'No puedes eliminar este seguimiento porque tiene '
+            'un ingreso al refugio confirmado.'
+        )
+        return redirect('mis_seguimientos')
+
+
+    
+
+    # Eliminar el seguimiento y sus registros relacionados
+    with transaction.atomic():
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM seguimiento
+                WHERE id_seguimiento = %s
+            """, [id_seguimiento])
+
+            # Eliminar el animal si ya no está siendo utilizado
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM seguimiento
+                WHERE animal_id = %s
+            """, [animal_id])
+
+            seguimientos_restantes = cursor.fetchone()[0]
+
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM ingresos_refugio
+                WHERE animal_id = %s
+            """, [animal_id])
+
+            ingresos_restantes = cursor.fetchone()[0]
+
+            if seguimientos_restantes == 0 and ingresos_restantes == 0:
+                cursor.execute("""
+                    DELETE FROM animal
+                    WHERE id_animal = %s
+                """, [animal_id])
+
+            # Eliminar el lugar si ya no está siendo utilizado
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM seguimiento
+                WHERE lugar_id = %s
+            """, [lugar_id])
+
+            lugares_restantes = cursor.fetchone()[0]
+
+            if lugares_restantes == 0:
+                cursor.execute("""
+                    DELETE FROM lugares
+                    WHERE id_lugar = %s
+                """, [lugar_id])
+
+    return redirect('mis_seguimientos')
+
 
 
 

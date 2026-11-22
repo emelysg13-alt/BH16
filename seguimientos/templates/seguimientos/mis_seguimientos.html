@@ -55,6 +55,14 @@
                         Mis <em>seguimientos.</em>
                     </h1>
 
+                    
+{% if messages %}
+    {% for message in messages %}
+        <div class="mensaje-error">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
                     <p>
                         Consulta tus casos registrados y conoce
                         el estado de cada uno de ellos.
@@ -98,12 +106,10 @@
                                         {{ seguimiento.localidad }}
                                     </p>
 
-                                    <p>
-                                        <strong>Estado del caso:</strong>
-                                        {{ seguimiento.estado_seguimiento|capfirst }}
-                                    </p>
-
-                                    <p>
+                                 <p>
+    <strong>Estado del caso:</strong>
+    {{ seguimiento.estado_seguimiento }}
+</p>
                                         <strong>Fecha de registro:</strong>
                                         {{ seguimiento.fecha_publicacion|date:"d/m/Y" }}
                                     </p>
@@ -121,7 +127,40 @@
 
                                     </p>
 
+                                    {% if seguimiento.estado_ingreso %}
+    <p>
+        <strong>Estado del ingreso al refugio:</strong>
+        {{ seguimiento.estado_ingreso|capfirst }}
+    </p>
+{% endif %}
+
+
                                 </div>
+
+                                
+<div class="seguimiento-acciones">
+
+    <a
+        href="{% url 'detalle_mi_seguimiento' seguimiento.id_seguimiento %}"
+        class="boton"
+    >
+        Ver detalles
+    </a>
+
+    <form
+        method="POST"
+        action="{% url 'eliminar_seguimiento' seguimiento.id_seguimiento %}"
+        onsubmit="return confirm('¿Estás seguro de que deseas eliminar este seguimiento? Esta acción no se puede deshacer.');"
+    >
+        {% csrf_token %}
+
+        <button type="submit" class="boton boton-eliminar">
+            Eliminar
+        </button>
+    </form>
+
+</div>
+
 
                             </article>
 

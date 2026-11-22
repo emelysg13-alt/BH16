@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -28,7 +29,7 @@
         }
 
         main {
-            width: min(100%, 620px);
+            width: min(100%, 650px);
             padding: 42px;
             text-align: center;
             background: white;
@@ -52,19 +53,44 @@
             font-size: 13px;
         }
 
-        button {
+        .acciones {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 30px 0;
+        }
+
+        .boton {
+            display: block;
+            width: 100%;
+            padding: 14px 20px;
             border: 0;
             border-radius: 12px;
-            padding: 13px 24px;
             background: #d87999;
             color: white;
+            text-decoration: none;
             cursor: pointer;
             font: inherit;
             font-size: 12px;
+            transition: background .2s ease, transform .2s ease;
         }
 
-        button:hover {
+        .boton:hover {
             background: #bd6384;
+            transform: translateY(-2px);
+        }
+
+        .boton-secundario {
+            background: #f5e5eb;
+            color: #89546a;
+        }
+
+        .boton-secundario:hover {
+            background: #efd3df;
+        }
+
+        form {
+            margin-top: 20px;
         }
 
         @media (max-width: 520px) {
@@ -84,19 +110,27 @@
         <h1>¡Hola, {{ nombre }}!</h1>
 
         <p>
-            Has iniciado sesión correctamente en BackHome.
+            Bienvenido a tu espacio de cliente en BackHome.
+            Desde aquí puedes gestionar tus seguimientos
+            y ayudar a reunir a las mascotas con sus familias.
         </p>
 
-        <p>
-            Tu espacio de cliente está preparado.
-            Aquí construiremos las funciones para gestionar
-            tus solicitudes y consultar la información de tus mascotas.
-        </p>
+        <div class="acciones">
+
+            <a href="{% url 'mis_seguimientos' %}" class="boton">
+                Mis seguimientos
+            </a>
+
+            <a href="{% url 'crear_seguimiento' %}" class="boton boton-secundario">
+                + Crear seguimiento
+            </a>
+
+        </div>
 
         <form method="post" action="{% url 'cerrar_sesion' %}">
             {% csrf_token %}
 
-            <button type="submit">
+            <button type="submit" class="boton">
                 Cerrar sesión
             </button>
         </form>

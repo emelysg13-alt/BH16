@@ -1,0 +1,339 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Detalles de tu seguimiento en BackHome.">
+
+    <title>{{ seguimiento.titulo }} | BackHome</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&family=Playwrite+NZ+Basic:wght@100..400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
+    <link rel="stylesheet" href="{% static 'seguimientos/css/seguimientos.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container nav-wrap">
+
+            <a class="brand" href="{% url 'pagina_principal' %}">
+                <span class="brand-mark">
+                    <i class="fa-solid fa-paw"></i>
+                </span>
+
+                <span>
+                    Back<span>Home</span>
+                    <small>Cada huellita importa</small>
+                </span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="{% url 'pagina_principal' %}">Inicio</a>
+                <a href="{% url 'lista_seguimientos' %}">Seguimientos</a>
+                <a href="{% url 'mis_seguimientos' %}">Mis seguimientos</a>
+            </nav>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="section">
+            <div class="container">
+
+                <a href="{% url 'mis_seguimientos' %}" class="btn-volver">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Volver a mis seguimientos
+                </a>
+
+                <div class="detalle-encabezado">
+
+                    <span class="eyebrow">
+                        Información de tu seguimiento
+                    </span>
+
+                    <h1>{{ seguimiento.titulo }}</h1>
+
+                    <div class="detalle-dato">
+                        <span>Estado de moderación</span>
+                        <strong>
+                            {{ seguimiento.estado_moderacion|capfirst }}
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div class="detalle-galeria">
+
+                    {% if imagenes %}
+
+                        {% for imagen in imagenes %}
+
+                            <div class="detalle-imagen">
+                                <img
+                                    src="/media/{{ imagen.ruta_imagen }}"
+                                    alt="Fotografía del animal"
+                                >
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="sin-imagen">
+                            <i class="fa-solid fa-image"></i>
+                            <p>No hay fotografías disponibles.</p>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="detalle-informacion">
+
+                    <div class="detalle-seccion-titulo">
+                        <span class="eyebrow">Conoce al protagonista</span>
+                        <h2>Información del animal</h2>
+                    </div>
+
+                    <div class="detalle-datos-grid">
+
+                        <div class="detalle-dato">
+                            <span>Nombre</span>
+                            <strong>
+                                {{ seguimiento.animal_nombre|default:"Sin nombre" }}
+                            </strong>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Especie</span>
+                            <strong>
+                                {{ seguimiento.especie|default:"No especificada" }}
+                            </strong>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Raza</span>
+                            <strong>
+                                {{ seguimiento.raza|default:"No especificada" }}
+                            </strong>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Sexo</span>
+                            <strong>{{ seguimiento.sexo|capfirst }}</strong>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Color</span>
+                            <strong>{{ seguimiento.color }}</strong>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Tamaño</span>
+                            <strong>
+                                {{ seguimiento.tamano|default:"No especificado"|capfirst }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    {% if seguimiento.descripcion_animal %}
+                        <p class="detalle-descripcion">
+                            {{ seguimiento.descripcion_animal }}
+                        </p>
+                    {% endif %}
+
+                </div>
+
+                <div class="detalle-informacion">
+
+                    <div class="detalle-seccion-titulo">
+                        <span class="eyebrow">La historia del caso</span>
+                        <h2>Descripción del seguimiento</h2>
+                    </div>
+
+                    <p class="detalle-descripcion">
+                        {{ seguimiento.descripcion }}
+                    </p>
+
+                </div>
+
+                <div class="detalle-informacion">
+
+                    <div class="detalle-seccion-titulo">
+                        <span class="eyebrow">Ubicación</span>
+                        <h2>¿Dónde ocurrió?</h2>
+                    </div>
+
+                    <div class="detalle-dato">
+                        <span>Dirección registrada</span>
+                        <strong>{{ seguimiento.direccion }}</strong>
+                    </div>
+
+                    <div class="detalle-dato">
+                        <span>Localidad</span>
+                        <strong>{{ seguimiento.localidad }}</strong>
+                    </div>
+
+                </div>
+
+                <div class="detalle-informacion">
+
+                    {% if seguimiento.fecha_perdida %}
+
+                        <div class="detalle-seccion-titulo">
+                            <span class="eyebrow">Información del caso</span>
+                            <h2>Datos de la pérdida</h2>
+                        </div>
+
+                        <div class="detalle-datos-grid">
+
+                            <div class="detalle-dato">
+                                <span>Fecha de pérdida</span>
+                                <strong>
+                                    {{ seguimiento.fecha_perdida|date:"d/m/Y H:i" }}
+                                </strong>
+                            </div>
+
+                            {% if seguimiento.ultima_fecha_visto %}
+                                <div class="detalle-dato">
+                                    <span>Última vez visto</span>
+                                    <strong>
+                                        {{ seguimiento.ultima_fecha_visto|date:"d/m/Y H:i" }}
+                                    </strong>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        {% if seguimiento.descripcion_ultima_ubicacion %}
+                            <p class="detalle-descripcion">
+                                <strong>Última ubicación conocida:</strong>
+                                {{ seguimiento.descripcion_ultima_ubicacion }}
+                            </p>
+                        {% endif %}
+
+                    {% elif seguimiento.fecha_encontrado %}
+
+                        <div class="detalle-seccion-titulo">
+                            <span class="eyebrow">Información del caso</span>
+                            <h2>Datos del hallazgo</h2>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Fecha del hallazgo</span>
+                            <strong>
+                                {{ seguimiento.fecha_encontrado|date:"d/m/Y H:i" }}
+                            </strong>
+                        </div>
+
+                        {% if seguimiento.descripcion_lugar_encontrado %}
+                            <p class="detalle-descripcion">
+                                <strong>Lugar donde fue encontrado:</strong>
+                                {{ seguimiento.descripcion_lugar_encontrado }}
+                            </p>
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+                <div class="detalle-informacion">
+
+                    <div class="detalle-seccion-titulo">
+                        <span class="eyebrow">Situación actual</span>
+                        <h2>Estado del seguimiento</h2>
+                    </div>
+
+                    <div class="detalle-dato">
+                        <span>Estado actual</span>
+                        <strong>
+                            {{ seguimiento.estado_seguimiento|capfirst }}
+                        </strong>
+                    </div>
+
+                    {% if seguimiento.refugio_nombre %}
+
+                        <div class="detalle-seccion-titulo">
+                            <h2>Información del refugio</h2>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Nombre del refugio</span>
+                            <strong>{{ seguimiento.refugio_nombre }}</strong>
+                        </div>
+
+                        <div class="detalle-dato">
+                            <span>Dirección</span>
+                            <strong>{{ seguimiento.refugio_direccion }}</strong>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="detalle-informacion">
+
+                    <div class="detalle-seccion-titulo">
+                        <span class="eyebrow">Cada avance cuenta</span>
+                        <h2>Historial de actualizaciones</h2>
+                    </div>
+
+                    {% if actualizaciones %}
+
+                        <div class="historial-actualizaciones">
+
+                            {% for actualizacion in actualizaciones %}
+
+                                <article class="actualizacion-item">
+
+                                    <div class="actualizacion-icono">
+                                        <i class="fa-solid fa-paw"></i>
+                                    </div>
+
+                                    <div class="actualizacion-contenido">
+
+                                        <span class="actualizacion-fecha">
+                                            {{ actualizacion.created_at|date:"d/m/Y H:i" }}
+                                        </span>
+
+                                        <p>{{ actualizacion.mensaje }}</p>
+
+                                    </div>
+
+                                </article>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="sin-actualizaciones">
+                            Este seguimiento todavía no tiene actualizaciones.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
