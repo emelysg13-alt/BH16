@@ -9,8 +9,10 @@ urlpatterns = [
     path('', include('cliente.urls')),
     path('admin/', admin.site.urls),
     path('panel/', include('panel_admin.urls')),
+    path('panel/seguimientos/', include('gestion_seguimientos.urls')),
     path('', include('donaciones.public_urls')),
     path('seguimientos/', include('seguimientos.urls')),
+    
 ]
 
 if settings.DEBUG:

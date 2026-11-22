@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'consejos',
     'soporte',
     'panel_admin',
+    'gestion_seguimientos',
 ]
 
 MIDDLEWARE = [

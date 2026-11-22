@@ -1,0 +1,409 @@
+{% extends 'panel_admin/dashboard.html' %}
+
+{% block content %}
+<style>
+    .sg-container {
+        padding: 25px;
+        color: #493844;
+    }
+
+    .sg-header {
+        margin-bottom: 25px;
+    }
+
+    .sg-header h2 {
+        color: #684d5e;
+        font-size: 25px;
+        margin-bottom: 6px;
+    }
+
+    .sg-header p {
+        color: #8b7b87;
+        font-size: 14px;
+    }
+
+    .sg-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .sg-stat {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 3px 12px rgba(80, 50, 70, .06);
+        border-left: 4px solid #c45d89;
+    }
+
+    .sg-stat span {
+        display: block;
+        color: #8b7b87;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .sg-stat strong {
+        color: #684d5e;
+        font-size: 27px;
+    }
+
+    .sg-panel {
+        background: #fff;
+        border-radius: 15px;
+        padding: 22px;
+        box-shadow: 0 3px 12px rgba(80, 50, 70, .06);
+    }
+
+    .sg-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .sg-panel-header h3 {
+        color: #684d5e;
+        font-size: 18px;
+    }
+
+    .sg-search {
+        display: flex;
+        gap: 8px;
+    }
+
+    .sg-search input {
+        border: 1px solid #e5d7df;
+        border-radius: 8px;
+        padding: 10px 13px;
+        outline: none;
+        min-width: 230px;
+    }
+
+    .sg-search input:focus {
+        border-color: #c45d89;
+    }
+
+    .sg-search button {
+        background: #684d5e;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 17px;
+        cursor: pointer;
+    }
+
+    .sg-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-bottom: 20px;
+    }
+
+    .sg-filter {
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        background: #f7eff3;
+        color: #795e70;
+        font-size: 13px;
+        transition: .2s;
+    }
+
+    .sg-filter:hover,
+    .sg-filter.active {
+        background: #684d5e;
+        color: white;
+    }
+
+    .sg-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .sg-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 950px;
+    }
+
+    .sg-table th {
+        background: #f8f1f5;
+        color: #684d5e;
+        font-size: 12px;
+        text-align: left;
+        padding: 13px 12px;
+        white-space: nowrap;
+    }
+
+    .sg-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f0e8ed;
+        font-size: 13px;
+        color: #5d4c58;
+    }
+
+    .sg-table tbody tr:hover {
+        background: #fffafd;
+    }
+
+    .sg-id {
+        color: #a16b88;
+        font-weight: 600;
+    }
+
+    .sg-title {
+        font-weight: 600;
+        color: #684d5e;
+    }
+
+    .sg-subtitle {
+        display: block;
+        color: #9a8b95;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .sg-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .sg-pendiente {
+        background: #fff2d9;
+        color: #a8751c;
+    }
+
+    .sg-aprobado {
+        background: #e2f3e8;
+        color: #398052;
+    }
+
+    .sg-rechazado {
+        background: #fbe5e7;
+        color: #b34e5b;
+    }
+
+    .sg-tipo-perdido {
+        background: #fce8ee;
+        color: #ad5276;
+    }
+
+    .sg-tipo-encontrado {
+        background: #e8f1f8;
+        color: #527c9b;
+    }
+
+    .sg-empty {
+        text-align: center;
+        padding: 35px !important;
+        color: #9a8b95 !important;
+    }
+
+    @media (max-width: 1000px) {
+        .sg-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .sg-container {
+            padding: 15px;
+        }
+
+        .sg-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .sg-panel {
+            padding: 15px;
+        }
+
+        .sg-search {
+            width: 100%;
+        }
+
+        .sg-search input {
+            min-width: 0;
+            flex: 1;
+        }
+    }
+</style>
+
+<div class="sg-container">
+
+    <div class="sg-header">
+        <h2>Gestión de seguimientos</h2>
+        <p>Consulta y administra los reportes de animales perdidos y encontrados.</p>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="sg-stats">
+
+        <div class="sg-stat">
+            <span>Total de reportes</span>
+            <strong>{{ estadisticas.total|default:0 }}</strong>
+        </div>
+
+        <div class="sg-stat">
+            <span>Pendientes de revisión</span>
+            <strong>{{ estadisticas.pendientes|default:0 }}</strong>
+        </div>
+
+        <div class="sg-stat">
+            <span>Reportes aprobados</span>
+            <strong>{{ estadisticas.aprobados|default:0 }}</strong>
+        </div>
+
+        <div class="sg-stat">
+            <span>Reportes rechazados</span>
+            <strong>{{ estadisticas.rechazados|default:0 }}</strong>
+        </div>
+
+    </div>
+
+    <!-- TABLA Y FILTROS -->
+    <div class="sg-panel">
+
+        <div class="sg-panel-header">
+            <h3>Listado de reportes</h3>
+
+            <form method="GET" class="sg-search">
+                <input
+                    type="text"
+                    name="buscar"
+                    placeholder="Buscar reporte, animal o localidad..."
+                    value="{{ buscar }}"
+                >
+                {% if filtro_estado %}
+                    <input type="hidden" name="estado" value="{{ filtro_estado }}">
+                {% endif %}
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="sg-filters">
+
+            <a
+                href="{% url 'gestion_seguimientos' %}?buscar={{ buscar|urlencode }}"
+                class="sg-filter {% if not filtro_estado %}active{% endif %}"
+            >
+                Todos
+            </a>
+
+            <a
+                href="{% url 'gestion_seguimientos' %}?estado=pendiente&buscar={{ buscar|urlencode }}"
+                class="sg-filter {% if filtro_estado == 'pendiente' %}active{% endif %}"
+            >
+                Pendientes
+            </a>
+
+            <a
+                href="{% url 'gestion_seguimientos' %}?estado=aprobado&buscar={{ buscar|urlencode }}"
+                class="sg-filter {% if filtro_estado == 'aprobado' %}active{% endif %}"
+            >
+                Aprobados
+            </a>
+
+            <a
+                href="{% url 'gestion_seguimientos' %}?estado=rechazado&buscar={{ buscar|urlencode }}"
+                class="sg-filter {% if filtro_estado == 'rechazado' %}active{% endif %}"
+            >
+                Rechazados
+            </a>
+
+        </div>
+
+        <!-- TABLA -->
+        <div class="sg-table-wrapper">
+            <table class="sg-table">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Reporte</th>
+                        <th>Animal</th>
+                        <th>Tipo</th>
+                        <th>Localidad</th>
+                        <th>Fecha</th>
+                        <th>Estado del seguimiento</th>
+                        <th>Moderación</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for seguimiento in seguimientos %}
+                    <tr>
+
+                        <td class="sg-id">
+                            #{{ seguimiento.id_seguimiento }}
+                        </td>
+
+                        <td>
+                            <span class="sg-title">
+                                {{ seguimiento.titulo }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ seguimiento.nombre_animal|default:"Sin nombre" }}
+                            <span class="sg-subtitle">
+                                {{ seguimiento.especie|default:"Especie no especificada" }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if seguimiento.tipo_reporte == 'Perdido' %}
+                                <span class="sg-badge sg-tipo-perdido">Perdido</span>
+                            {% elif seguimiento.tipo_reporte == 'Encontrado' %}
+                                <span class="sg-badge sg-tipo-encontrado">Encontrado</span>
+                            {% else %}
+                                {{ seguimiento.tipo_reporte }}
+                            {% endif %}
+                        </td>
+
+                        <td>{{ seguimiento.n_localidad }}</td>
+
+                        <td>
+                            {{ seguimiento.fecha_publicacion|date:"d/m/Y" }}
+                        </td>
+
+                        <td>
+                            {{ seguimiento.estado_seguimiento|capfirst }}
+                        </td>
+
+                        <td>
+                            {% if seguimiento.estado_moderacion == 'pendiente' %}
+                                <span class="sg-badge sg-pendiente">Pendiente</span>
+                            {% elif seguimiento.estado_moderacion == 'aprobado' %}
+                                <span class="sg-badge sg-aprobado">Aprobado</span>
+                            {% elif seguimiento.estado_moderacion == 'rechazado' %}
+                                <span class="sg-badge sg-rechazado">Rechazado</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="sg-empty">
+                            No se encontraron seguimientos.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
