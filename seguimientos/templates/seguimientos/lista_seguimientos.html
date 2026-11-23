@@ -125,63 +125,99 @@
 
                 {% for seguimiento in seguimientos %}
 
-                    <article class="seguimiento-card">
+                    
+<article class="seguimiento-card">
 
-    {% if seguimiento.imagen_principal %}
-        <img
-            src="/media/{{ seguimiento.imagen_principal }}"
-            alt="Fotografía de {{ seguimiento.animal_nombre|default:'un animal' }}"
-        >
-    {% endif %}
+    <!-- IMAGEN Y VERIFICACIÓN -->
+    <div class="seguimiento-media">
 
-    <div class="seguimiento-info">
+        <div class="seguimiento-imagen">
+            {% if seguimiento.imagen_principal %}
+                <img
+                    src="/media/{{ seguimiento.imagen_principal }}"
+                    alt="Fotografía de {{ seguimiento.animal_nombre|default:'un animal' }}"
+                >
+            {% else %}
+                <i class="fa-solid fa-paw"></i>
+            {% endif %}
+        </div>
 
-        <h2>{{ seguimiento.titulo }}</h2>
-
-        <p>
-            <strong>Animal:</strong>
-            {{ seguimiento.animal_nombre|default:"Sin nombre" }}
-            · {{ seguimiento.especie|default:"No especificada" }}
-        </p>
-
-        <p>
-            <strong>Ubicación:</strong>
-            {{ seguimiento.localidad }}
-        </p>
-
-        <p>
-            <strong>Estado:</strong>
-            {{ seguimiento.estado_seguimiento|capfirst }}
-        </p>
-
-        <p>
-            <strong>Publicado:</strong>
-            {{ seguimiento.fecha_publicacion|date:"d/m/Y" }}
-        </p>
-
-        <span class="verificacion">
+        <span class="seguimiento-verificado">
             <i class="fa-solid fa-circle-check"></i>
-            Verificado por BackHome
+            Verificado
         </span>
 
+    </div>
+
+    <!-- INFORMACIÓN -->
+    <div class="seguimiento-info">
+
+        <div class="seguimiento-encabezado">
+            <span class="seguimiento-etiqueta">SEGUIMIENTO PUBLICADO</span>
+            <h2>{{ seguimiento.titulo }}</h2>
+        </div>
+
+        <div class="seguimiento-animal">
+            <div class="animal-icono">
+                <i class="fa-solid fa-paw"></i>
+            </div>
+
+            <div class="animal-identidad">
+                <strong>{{ seguimiento.animal_nombre|default:"Sin nombre" }}</strong>
+                <span>{{ seguimiento.especie|default:"Especie no especificada" }}</span>
+            </div>
+        </div>
+
+        <div class="seguimiento-datos">
+
+            <div class="seguimiento-dato">
+                <i class="fa-solid fa-location-dot"></i>
+                <div>
+                    <span>Ubicación</span>
+                    <strong>{{ seguimiento.localidad|default:"No especificada" }}</strong>
+                </div>
+            </div>
+
+            <div class="seguimiento-dato">
+                <i class="fa-regular fa-calendar"></i>
+                <div>
+                    <span>Fecha de publicación</span>
+                    <strong>{{ seguimiento.fecha_publicacion|date:"d/m/Y" }}</strong>
+                </div>
+            </div>
+
+            <div class="seguimiento-dato">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <div>
+                    <span>Estado del seguimiento</span>
+                    <strong>{{ seguimiento.estado_seguimiento|capfirst }}</strong>
+                </div>
+            </div>
+
+        </div>
+
         {% if seguimiento.ultima_actualizacion %}
-            <p>
-                <strong>Último avance:</strong>
-                {{ seguimiento.ultima_actualizacion|truncatewords:15 }}
-            </p>
+            <div class="seguimiento-avance">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <div>
+                    <span>Último avance</span>
+                    <p>{{ seguimiento.ultima_actualizacion|truncatewords:15 }}</p>
+                </div>
+            </div>
         {% endif %}
 
         <a
             href="{% url 'detalle_seguimiento' seguimiento.id_seguimiento %}"
             class="btn-detalles"
         >
-            Ver detalles
+            Consultar seguimiento
             <i class="fa-solid fa-arrow-right"></i>
         </a>
 
     </div>
 
 </article>
+
 
                 {% endfor %}
 
