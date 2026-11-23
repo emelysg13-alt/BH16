@@ -19,7 +19,9 @@
 <header class="site-header">
     <div class="container nav-wrap">
         <a class="brand" href="#inicio">
-            <span class="brand-mark"><i class="fa-solid fa-paw"></i></span>
+            <span class="brand-mark">
+    <img src="{% static 'inicio/img/logo_backhome.png' %}" alt="Logo BackHome">
+</span>
             <span>Back<span>Home</span><small>Cada huellita importa</small></span>
         </a>
 
@@ -192,13 +194,31 @@
                 </article>
             </div>
 
-                        <div class="follow-up-action">
-                <p>¿Quieres consultar los casos registrados o conocer sus avances?</p>
-                <a class="btn btn-primary" href="{% url 'lista_seguimientos' %}">
-                    Consultar seguimientos
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
+                       <div class="follow-up-action">
+    <p>¿Quieres consultar los casos registrados o compartir un nuevo reporte?</p>
+
+    <div class="follow-up-buttons">
+
+        <a class="btn btn-primary" href="{% url 'lista_seguimientos' %}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Consultar seguimientos
+        </a>
+
+        {% if request.session.backhome_user_id and request.session.backhome_rol == 'cliente' %}
+            <a class="btn btn-light" href="{% url 'crear_seguimiento' %}">
+                <i class="fa-solid fa-plus"></i>
+                Crear seguimiento
+            </a>
+        {% else %}
+            <a class="btn btn-light"
+               href="{% url 'iniciar_sesion' %}?next={% url 'crear_seguimiento' %}">
+                <i class="fa-solid fa-plus"></i>
+                Crear seguimiento
+            </a>
+        {% endif %}
+
+    </div>
+</div>
         </div>
     </section>
 

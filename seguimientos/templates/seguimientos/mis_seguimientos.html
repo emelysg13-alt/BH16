@@ -10,15 +10,23 @@
 
     <title>Mis seguimientos | BackHome</title>
 
-    <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
-    <link rel="stylesheet" href="{% static 'seguimientos/css/seguimientos.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800;900&family=Playwrite+NZ+Basic:wght@100..400&display=swap" rel="stylesheet">
+   
+
+<link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
+<link rel="stylesheet" href="{% static 'seguimientos/css/mis_seguimientos.css' %}">
+
 
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
-<body>
+<body class="pagina-mis-seguimientos">
 
+    <!-- ENCABEZADO -->
     <header class="site-header">
         <div class="container nav-wrap">
 
@@ -33,11 +41,44 @@
                 </span>
             </a>
 
+            <button class="menu-toggle" type="button"
+                aria-label="Abrir menú" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
             <nav class="main-nav">
-    <a href="{% url 'pagina_principal' %}">Inicio</a>
-    <a href="{% url 'lista_seguimientos' %}">Seguimientos</a>
-    <a href="{% url 'mis_seguimientos' %}">Mis seguimientos</a>
-</nav>
+                <a href="{% url 'pagina_principal' %}">Inicio</a>
+                <a href="{% url 'lista_seguimientos' %}">Seguimientos</a>
+                <a href="{% url 'mis_seguimientos' %}">Mis seguimientos</a>
+            </nav>
+
+            <div class="header-actions">
+                {% if request.session.backhome_user_id %}
+
+                    <a class="register-button" href="{% url 'mi_cuenta' %}">
+                        Mi perfil <i class="fa-solid fa-user"></i>
+                    </a>
+
+                    <form method="post" action="{% url 'cerrar_sesion' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="login-button">
+                            Cerrar sesión
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <a class="register-button" href="{% url 'registrar_cliente' %}">
+                        Crear cuenta <i class="fa-solid fa-user-plus"></i>
+                    </a>
+
+                    <a class="login-button" href="{% url 'iniciar_sesion' %}">
+                        Iniciar sesión <i class="fa-solid fa-user"></i>
+                    </a>
+
+                {% endif %}
+            </div>
 
         </div>
     </header>
@@ -47,6 +88,7 @@
         <section class="section">
             <div class="container">
 
+                <!-- TÍTULO -->
                 <div class="section-heading">
 
                     <span class="eyebrow">Tu espacio en BackHome</span>
@@ -55,14 +97,6 @@
                         Mis <em>seguimientos.</em>
                     </h1>
 
-                    
-{% if messages %}
-    {% for message in messages %}
-        <div class="mensaje-error">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
                     <p>
                         Consulta tus casos registrados y conoce
                         el estado de cada uno de ellos.
@@ -70,6 +104,16 @@
 
                 </div>
 
+                <!-- MENSAJES -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mensaje-error">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- LISTADO -->
                 {% if seguimientos %}
 
                     <section class="seguimientos-grid">
@@ -78,15 +122,28 @@
 
                             <article class="seguimiento-card">
 
-                                {% if seguimiento.fotografia %}
-    <div class="seguimiento-imagen">
-        <img
-            src="/media/{{ seguimiento.fotografia }}"
-            alt="Fotografía de {{ seguimiento.animal_nombre|default:'animal reportado' }}"
-        >
-    </div>
-{% endif %}
+                                <!-- FOTOGRAFÍA -->
+                                <div class="seguimiento-imagen">
 
+                                    {% if seguimiento.fotografia %}
+
+                                        <img
+                                            src="{% get_media_prefix %}{{ seguimiento.fotografia }}"
+                                            alt="Fotografía de {{ seguimiento.animal_nombre|default:'animal reportado' }}"
+                                            loading="lazy"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="imagen-placeholder">
+                                            <i class="fa-solid fa-paw"></i>
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <!-- INFORMACIÓN -->
                                 <div class="seguimiento-info">
 
                                     <h2>{{ seguimiento.titulo }}</h2>
@@ -103,13 +160,15 @@
 
                                     <p>
                                         <strong>Localidad:</strong>
-                                        {{ seguimiento.localidad }}
+                                        {{ seguimiento.localidad|default:"No especificada" }}
                                     </p>
 
-                                 <p>
-    <strong>Estado del caso:</strong>
-    {{ seguimiento.estado_seguimiento }}
-</p>
+                                    <p>
+                                        <strong>Estado del caso:</strong>
+                                        {{ seguimiento.estado_seguimiento|capfirst }}
+                                    </p>
+
+                                    <p>
                                         <strong>Fecha de registro:</strong>
                                         {{ seguimiento.fecha_publicacion|date:"d/m/Y" }}
                                     </p>
@@ -117,47 +176,49 @@
                                     <p>
                                         <strong>Revisión:</strong>
 
-{% if seguimiento.estado_moderacion == 'Pendiente' %}
-    Pendiente de revisión
-{% elif seguimiento.estado_moderacion == 'Aprobado' %}
-    Aprobado
-{% elif seguimiento.estado_moderacion == 'Rechazado' %}
-    Rechazado
-{% endif %}
-                                    {% if seguimiento.estado_ingreso %}
-    <p>
-        <strong>Estado del ingreso al refugio:</strong>
-        {{ seguimiento.estado_ingreso|capfirst }}
-    </p>
-{% endif %}
+                                        {% if seguimiento.estado_moderacion == 'pendiente' %}
+                                            Pendiente de revisión
+                                        {% elif seguimiento.estado_moderacion == 'aprobado' %}
+                                            Aprobado
+                                        {% elif seguimiento.estado_moderacion == 'rechazado' %}
+                                            Rechazado
+                                        {% else %}
+                                            No disponible
+                                        {% endif %}
+                                    </p>
 
+                                    {% if seguimiento.estado_ingreso %}
+                                        <p>
+                                            <strong>Estado del ingreso al refugio:</strong>
+                                            {{ seguimiento.estado_ingreso|capfirst }}
+                                        </p>
+                                    {% endif %}
 
                                 </div>
 
-                                
-<div class="seguimiento-acciones">
+                                <!-- ACCIONES -->
+                                <div class="seguimiento-acciones">
 
-    <a
-        href="{% url 'detalle_mi_seguimiento' seguimiento.id_seguimiento %}"
-        class="boton"
-    >
-        Ver detalles
-    </a>
+                                    <a
+                                        href="{% url 'detalle_mi_seguimiento' seguimiento.id_seguimiento %}"
+                                        class="boton"
+                                    >
+                                        Ver detalles
+                                    </a>
 
-    <form
-        method="POST"
-        action="{% url 'eliminar_seguimiento' seguimiento.id_seguimiento %}"
-        onsubmit="return confirm('¿Estás seguro de que deseas eliminar este seguimiento? Esta acción no se puede deshacer.');"
-    >
-        {% csrf_token %}
+                                    <form
+                                        method="POST"
+                                        action="{% url 'eliminar_seguimiento' seguimiento.id_seguimiento %}"
+                                        onsubmit="return confirm('¿Estás seguro de que deseas eliminar este seguimiento? Esta acción no se puede deshacer.');"
+                                    >
+                                        {% csrf_token %}
 
-        <button type="submit" class="boton boton-eliminar">
-            Eliminar
-        </button>
-    </form>
+                                        <button type="submit" class="boton boton-eliminar">
+                                            Eliminar
+                                        </button>
+                                    </form>
 
-</div>
-
+                                </div>
 
                             </article>
 
@@ -167,6 +228,7 @@
 
                 {% else %}
 
+                    <!-- ESTADO VACÍO -->
                     <div class="sin-seguimientos">
 
                         <i class="fa-solid fa-paw"></i>

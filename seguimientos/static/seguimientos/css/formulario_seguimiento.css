@@ -1,0 +1,389 @@
+
+/* =====================================================
+   BACKHOME - FORMULARIO DE REGISTRO POR PASOS
+===================================================== */
+
+/* CONTENEDOR PRINCIPAL */
+
+.form-seguimiento {
+    width: min(850px, calc(100% - 32px));
+    margin: 40px auto;
+    padding: 35px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    box-sizing: border-box;
+}
+
+/* PROGRESO */
+
+.progreso-formulario {
+    margin-bottom: 35px;
+}
+
+.progreso-pasos {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 12px;
+    color: var(--muted);
+    font-size: .95rem;
+}
+
+#numeroPaso {
+    color: var(--pink-dark);
+    font-weight: 700;
+}
+
+.progreso-barra {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    background: var(--pink-light);
+    border-radius: 20px;
+}
+
+.progreso-barra div {
+    width: 25%;
+    height: 100%;
+    background: var(--pink);
+    border-radius: 20px;
+    transition: width .3s ease;
+}
+
+/* PASOS */
+
+.form-paso {
+    display: none;
+}
+
+.form-paso.activo {
+    display: block;
+}
+
+.form-paso-encabezado {
+    margin-bottom: 25px;
+}
+
+.form-paso-encabezado h2 {
+    margin: 8px 0;
+    color: var(--dark);
+}
+
+.form-paso-encabezado p {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* CAMPOS */
+
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.campo-formulario label {
+    color: var(--dark);
+    font-weight: 700;
+}
+
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+    width: 100%;
+    padding: 13px 15px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--dark);
+    font: inherit;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(233, 135, 167, .12);
+}
+
+.campo-formulario textarea {
+    resize: vertical;
+}
+
+.campo-formulario small {
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+/* OPCIONES DEL TIPO DE CASO */
+
+.opciones-tipo-caso {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.opcion-caso {
+    cursor: pointer;
+}
+
+.opcion-caso input {
+    position: absolute;
+    opacity: 0;
+}
+
+.opcion-caso-contenido {
+    height: 100%;
+    padding: 25px;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    transition: .2s ease;
+    box-sizing: border-box;
+}
+
+.opcion-caso-contenido i {
+    margin-bottom: 12px;
+    color: var(--pink-dark);
+    font-size: 1.7rem;
+}
+
+.opcion-caso-contenido h3 {
+    margin-bottom: 8px;
+    color: var(--dark);
+}
+
+.opcion-caso-contenido p {
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.opcion-caso:has(input:checked) .opcion-caso-contenido {
+    border-color: var(--pink);
+    background: var(--pink-light);
+}
+
+.grupo-situacion {
+    margin-top: 30px;
+}
+
+/* NAVEGACIÓN DEL FORMULARIO */
+
+.navegacion-formulario {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid var(--line);
+}
+
+.navegacion-formulario button {
+    padding: 13px 22px;
+    border: none;
+    border-radius: 12px;
+    background: var(--pink);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.navegacion-formulario button:disabled {
+    background: #e8e1e5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* NOTA DE MODERACIÓN */
+
+.nota-moderacion {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 25px;
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--lilac);
+    color: var(--dark);
+}
+
+.nota-moderacion i {
+    margin-top: 3px;
+    color: var(--pink-dark);
+}
+
+.nota-moderacion p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* CONFIRMACIÓN */
+
+.confirmacion-registro {
+    margin-top: 25px;
+}
+
+.checkbox-confirmacion {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: var(--dark);
+    line-height: 1.5;
+}
+
+/* VISTA PREVIA DE IMÁGENES */
+
+.vista-previa-imagenes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+
+
+/* =====================================================
+   AJUSTES COMPLEMENTARIOS DEL FORMULARIO
+===================================================== */
+
+/* TÍTULOS DE LOS PASOS */
+
+.form-seguimiento .form-paso-encabezado h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.form-seguimiento .form-paso-encabezado h3 {
+    margin: 0 0 8px;
+    color: var(--dark);
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+/* ETIQUETAS */
+
+.form-seguimiento .campo-formulario label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+}
+
+/* OPCIONES DE TIPO DE CASO */
+
+.form-seguimiento .opcion-caso {
+    display: block;
+    position: relative;
+}
+
+.form-seguimiento .opcion-caso input:focus-visible
++ .opcion-caso-contenido {
+    outline: 3px solid rgba(189, 99, 132, .25);
+    outline-offset: 3px;
+}
+
+.form-seguimiento .opcion-caso-contenido:hover {
+    border-color: var(--pink);
+    transform: translateY(-2px);
+}
+
+/* VISTA PREVIA DE FOTOGRAFÍAS */
+
+.form-seguimiento .vista-previa-imagenes {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+}
+
+.form-seguimiento .vista-previa-imagenes img {
+    display: block;
+    width: 100%;
+    height: 125px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+/* SELECTORES */
+
+.form-seguimiento .campo-formulario select {
+    cursor: pointer;
+}
+
+.form-seguimiento .campo-formulario input[type="file"] {
+    padding: 11px;
+    cursor: pointer;
+}
+
+/* CONFIRMACIÓN */
+
+.form-seguimiento .checkbox-confirmacion input {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    margin-top: 3px;
+    accent-color: var(--pink-dark);
+    cursor: pointer;
+}
+
+.form-seguimiento .checkbox-confirmacion span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+}
+
+/* BOTONES */
+
+.form-seguimiento .navegacion-formulario button {
+    transition: background .2s ease, transform .2s ease;
+}
+
+.form-seguimiento .navegacion-formulario button:not(:disabled):hover {
+    background: var(--pink-dark);
+    transform: translateY(-2px);
+}
+
+.form-seguimiento .navegacion-formulario button:focus-visible {
+    outline: 3px solid rgba(189, 99, 132, .3);
+    outline-offset: 3px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+    .form-seguimiento .form-paso-encabezado h2 {
+        font-size: 20px;
+    }
+
+    .form-seguimiento .opcion-caso-contenido {
+        padding: 20px;
+    }
+
+    .form-seguimiento .navegacion-formulario button {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+}
+
+
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+    .form-seguimiento {
+        padding: 22px 17px;
+    }
+
+    .opciones-tipo-caso {
+        grid-template-columns: 1fr;
+    }
+
+    .progreso-pasos {
+        flex-direction: column;
+        gap: 5px;
+    }
+}

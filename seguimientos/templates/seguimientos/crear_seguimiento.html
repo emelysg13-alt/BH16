@@ -10,7 +10,7 @@
     <title>Registrar seguimiento | BackHome</title>
 
     <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
-    <link rel="stylesheet" href="{% static 'seguimientos/css/seguimientos.css' %}">
+    <link rel="stylesheet" href="{% static 'seguimientos/css/formulario_seguimiento.css' %}">
 
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -360,18 +360,21 @@
 
     <div class="campo-formulario">
 
-        <label for="direccion">Dirección del caso</label>
+    <label for="direccion">Dirección del caso</label>
 
-        <input
-            type="text"
-            id="direccion"
-            name="direccion"
-            maxlength="255"
-            placeholder="Ej. Calle 45 #20-15"
-            required
-        >
+    <input
+        type="text"
+        id="direccion"
+        name="direccion"
+        maxlength="255"
+        placeholder="Ej. Calle 45 #20-15"
+        required
+    >
 
-        <div class="campo-formulario">
+</div>
+
+<div class="campo-formulario">
+
     <label for="prioridad_id">Prioridad del caso</label>
 
     <select id="prioridad_id" name="prioridad_id" required>
@@ -388,9 +391,8 @@
         Selecciona el nivel que mejor represente las condiciones
         y necesidades actuales del animal.
     </small>
-</div>
 
-    </div>
+</div>
 
     <!-- INFORMACIÓN DE ANIMAL PERDIDO -->
     <div class="grupo-situacion" id="datosPerdido">

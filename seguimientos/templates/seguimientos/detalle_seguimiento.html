@@ -23,32 +23,66 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
-<body>
+<body class="pagina-detalle-publico">
 
     <!-- ENCABEZADO ORIGINAL -->
-    <header class="site-header">
-        <div class="container nav-wrap">
+    
+<header class="site-header">
+    <div class="container nav-wrap">
 
-            <a class="brand" href="{% url 'pagina_principal' %}">
-                <span class="brand-mark">
-                    <i class="fa-solid fa-paw"></i>
-                </span>
+        <a class="brand" href="{% url 'pagina_principal' %}">
+            <span class="brand-mark">
+                <i class="fa-solid fa-paw"></i>
+            </span>
 
-                <span>
-                    Back<span>Home</span>
-                    <small>Cada huellita importa</small>
-                </span>
-            </a>
+            <span>
+                Back<span>Home</span>
+                <small>Cada huellita importa</small>
+            </span>
+        </a>
 
-            <nav class="main-nav">
-                <a href="{% url 'pagina_principal' %}">Inicio</a>
-                <a href="{% url 'lista_seguimientos' %}">Seguimientos</a>
-                <a href="{% url 'pagina_principal' %}#refugios">Refugios</a>
-                <a href="{% url 'pagina_principal' %}#nosotros">Nosotros</a>
-            </nav>
+        <button class="menu-toggle" type="button"
+            aria-label="Abrir menú" aria-expanded="false">
+            <i class="fa-solid fa-bars"></i>
+        </button>
 
+        <nav class="main-nav">
+            <a href="{% url 'pagina_principal' %}">Inicio</a>
+            <a href="{% url 'lista_seguimientos' %}">Seguimientos</a>
+            <a href="{% url 'mis_seguimientos' %}">Mis seguimientos</a>
+        </nav>
+
+        <div class="header-actions">
+            {% if request.session.backhome_user_id %}
+
+                <a class="register-button" href="{% url 'mi_cuenta' %}">
+                    Mi perfil <i class="fa-solid fa-user"></i>
+                </a>
+
+                <form method="post" action="{% url 'cerrar_sesion' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="login-button">
+                        Cerrar sesión
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a class="register-button" href="{% url 'registrar_cliente' %}">
+                    Crear cuenta <i class="fa-solid fa-user-plus"></i>
+                </a>
+
+                <a class="login-button" href="{% url 'iniciar_sesion' %}">
+                    Iniciar sesión <i class="fa-solid fa-user"></i>
+                </a>
+
+            {% endif %}
         </div>
-    </header>
+
+    </div>
+</header>
+
 
 
     <!-- CONTENIDO PRINCIPAL -->

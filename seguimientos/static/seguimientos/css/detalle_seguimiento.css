@@ -777,3 +777,182 @@
     }
 
 }
+
+
+
+
+
+
+/* =========================================
+   DISEÑO DEL DETALLE PERSONAL
+========================================= */
+
+.pagina-detalle-mis main .section {
+    padding: 45px 0 75px;
+    background:
+        radial-gradient(circle at 5% 8%, rgba(246, 214, 224, .25), transparent 27%),
+        #FFFDF9;
+}
+
+.pagina-detalle-mis main .section > .container {
+    width: min(1080px, 92%);
+    margin: 0 auto;
+}
+
+/* ENCABEZADO */
+
+.pagina-detalle-mis .detalle-encabezado {
+    padding: 30px 35px;
+    margin-bottom: 28px;
+}
+
+.pagina-detalle-mis .detalle-encabezado h1 {
+    margin: 12px 0 20px;
+}
+
+.pagina-detalle-mis .detalle-encabezado > .detalle-dato {
+    display: inline-flex;
+    min-width: 230px;
+    padding: 12px 17px;
+}
+
+/* GALERÍA */
+
+.pagina-detalle-mis .detalle-galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 250px));
+    justify-content: start;
+    gap: 18px;
+    margin: 0 0 30px;
+}
+
+.pagina-detalle-mis .detalle-imagen {
+    width: 100%;
+    height: 190px;
+    aspect-ratio: auto;
+    border-radius: 17px;
+}
+
+.pagina-detalle-mis .detalle-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* SECCIONES DE INFORMACIÓN */
+
+.pagina-detalle-mis .detalle-informacion {
+    padding: 27px 30px;
+    margin-bottom: 23px;
+    background: #FFFFFF;
+    border: 1px solid var(--rose-200);
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+}
+
+.pagina-detalle-mis .detalle-seccion-titulo {
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #F3E4E9;
+}
+
+.pagina-detalle-mis .detalle-seccion-titulo .eyebrow {
+    margin-bottom: 7px;
+}
+
+.pagina-detalle-mis .detalle-seccion-titulo h2 {
+    margin: 0;
+    color: var(--wine-900);
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.4;
+}
+
+/* DATOS */
+
+.pagina-detalle-mis .detalle-datos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.pagina-detalle-mis .detalle-dato {
+    gap: 9px;
+    padding: 17px;
+    border-radius: 14px;
+}
+
+.pagina-detalle-mis .detalle-informacion > .detalle-dato {
+    margin-bottom: 13px;
+}
+
+.pagina-detalle-mis .detalle-informacion > .detalle-dato:last-child {
+    margin-bottom: 0;
+}
+
+/* DESCRIPCIONES */
+
+.pagina-detalle-mis .detalle-descripcion {
+    margin-top: 19px;
+    padding: 17px 19px;
+    background: var(--cream-warm);
+    border-left: 3px solid var(--rose-500);
+    border-radius: 5px 13px 13px 5px;
+}
+
+/* HISTORIAL */
+
+.pagina-detalle-mis .historial-actualizaciones {
+    gap: 5px;
+}
+
+.pagina-detalle-mis .actualizacion-item {
+    padding-bottom: 20px;
+}
+
+.pagina-detalle-mis .sin-actualizaciones {
+    margin: 0;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 760px) {
+    .pagina-detalle-mis main .section {
+        padding: 30px 0 55px;
+    }
+
+    .pagina-detalle-mis .detalle-informacion {
+        padding: 22px 20px;
+    }
+
+    .pagina-detalle-mis .detalle-datos-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pagina-detalle-mis .detalle-galeria {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    .pagina-detalle-mis .detalle-imagen {
+        height: 175px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagina-detalle-mis .detalle-datos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pagina-detalle-mis .detalle-galeria {
+        grid-template-columns: 1fr;
+    }
+
+    .pagina-detalle-mis .detalle-imagen {
+        height: 210px;
+    }
+
+    .pagina-detalle-mis .detalle-encabezado {
+        padding: 23px 20px;
+    }
+}
+

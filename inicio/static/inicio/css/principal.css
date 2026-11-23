@@ -82,15 +82,21 @@ button, input, textarea, select {
 }
 
 .brand-mark {
-    width: 43px;
-    height: 43px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: var(--pink-light);
-    color: var(--pink-dark);
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    flex-shrink: 0;
 }
 
+.brand-mark img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    display: block;
+}
 .main-nav {
     display: flex;
     align-items: center;
@@ -1397,4 +1403,38 @@ i[class*=" fa-"] {
 i.fab,
 i.fa-brands {
     font-family: "Font Awesome 6 Brands" !important;
+}
+
+/* BOTONES DE SEGUIMIENTOS */
+
+.follow-up-action {
+    margin-top: 35px;
+    text-align: center;
+}
+
+.follow-up-action > p {
+    margin-bottom: 20px;
+}
+
+.follow-up-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.follow-up-buttons .btn {
+    min-width: 210px;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .follow-up-buttons {
+        flex-direction: column;
+    }
+
+    .follow-up-buttons .btn {
+        width: 100%;
+    }
 }
