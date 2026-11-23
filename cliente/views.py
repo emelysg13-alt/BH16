@@ -12,6 +12,7 @@ from PIL import Image, UnidentifiedImageError
 from django.core.files.storage import default_storage
 
 
+
 @require_http_methods(["GET"])
 def mi_cuenta(request):
     """Muestra la información personal del cliente."""
@@ -43,12 +44,36 @@ def mi_cuenta(request):
                     p.email,
                     p.numero_tel,
                     p.estado,
-                    p.foto_perfil
+                    p.foto_perfil,
+
+                    (
+                        SELECT COUNT(*)
+                        FROM seguimiento s
+                        WHERE s.cliente_id = c.id_cliente
+                    ) AS total_seguimientos,
+
+                    (
+                        SELECT COUNT(*)
+                        FROM seguimiento s
+                        WHERE s.cliente_id = c.id_cliente
+                        AND s.estado_moderacion = 'pendiente'
+                    ) AS seguimientos_revision,
+
+                    (
+                        SELECT COUNT(*)
+                        FROM seguimiento s
+                        WHERE s.cliente_id = c.id_cliente
+                        AND s.estado_moderacion = 'rechazado'
+                    ) AS seguimientos_rechazados
+
                 FROM personas p
+
                 INNER JOIN cliente c
                     ON c.persona_id = p.id_persona
+
                 LEFT JOIN tipo_documento td
                     ON td.id_t_doc = p.t_documento_id
+
                 WHERE p.id_persona = %s
                 LIMIT 1
             """, [persona_id])
@@ -83,9 +108,10 @@ def mi_cuenta(request):
     return render(request, "cliente/mi_cuenta.html", {
         "persona": persona,
         "nombre": nombre_completo,
+        "total_seguimientos": persona["total_seguimientos"],
+        "seguimientos_revision": persona["seguimientos_revision"],
+        "seguimientos_rechazados": persona["seguimientos_rechazados"],
     })
-
-
 
 
 
