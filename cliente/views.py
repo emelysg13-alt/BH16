@@ -290,6 +290,8 @@ def editar_perfil(request):
                             )
 
                 # Actualizar información si no hay errores
+                
+                # Actualizar información si no hay errores
                 if not errores:
 
                     if foto_validada:
@@ -298,12 +300,11 @@ def editar_perfil(request):
                             f"{uuid4().hex}.{extension_foto}"
                         )
 
-                    nueva_foto = default_storage.save(
-                        nombre_archivo,
-                        foto_validada
-                    )
+                        nueva_foto = default_storage.save(
+                            nombre_archivo,
+                            foto_validada
+                        )
 
-                    if nueva_foto:
                         cursor.execute("""
                             UPDATE personas
                             SET
@@ -354,6 +355,7 @@ def editar_perfil(request):
                             datos["numero_tel"],
                             persona_id
                         ])
+
 
                     # Actualizar nombre de sesión
                     nombre_completo = " ".join(
