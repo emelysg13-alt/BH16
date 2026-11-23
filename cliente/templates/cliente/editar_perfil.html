@@ -1,0 +1,416 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Edita tu información personal en BackHome.">
+
+    <title>Editar perfil | BackHome</title>
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800;900&family=Playwrite+NZ+Basic:wght@100..400&display=swap"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'inicio/css/principal.css' %}">
+    <link rel="stylesheet" href="{% static 'cliente/css/mi_cuenta.css' %}">
+</head>
+
+<body>
+
+    <!-- FONDO DECORATIVO -->
+    <div class="site-background">
+        <div class="blob blob-one"></div>
+        <div class="blob blob-two"></div>
+        <div class="blob blob-three"></div>
+
+        <span class="paw paw-one">🐾</span>
+        <span class="paw paw-two">🐾</span>
+        <span class="paw paw-three">🐾</span>
+        <span class="paw paw-four">🐾</span>
+    </div>
+
+    <!-- ENCABEZADO -->
+    <header class="site-header">
+        <div class="container nav-wrap">
+
+            <a class="brand" href="{% url 'pagina_principal' %}">
+                <span class="brand-mark">
+                    <i class="fa-solid fa-paw"></i>
+                </span>
+
+                <span>
+                    Back<span>Home</span>
+                    <small>Cada huellita importa</small>
+                </span>
+            </a>
+
+            <button class="menu-toggle" type="button"
+                    aria-label="Abrir menú" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <nav class="main-nav">
+                <a href="{% url 'pagina_principal' %}">Inicio</a>
+
+                <a href="{% url 'lista_seguimientos' %}">
+                    Seguimientos
+                </a>
+
+                <a href="{% url 'pagina_principal' %}#refugios">
+                    Refugios
+                </a>
+
+                <a href="{% url 'pagina_principal' %}#nosotros">
+                    Nosotros
+                </a>
+
+                <a class="nav-advice-button"
+                   href="{% url 'pagina_principal' %}#consejos">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    Consejos
+                </a>
+            </nav>
+
+            <div class="header-actions">
+
+                <a class="register-button" href="{% url 'mi_cuenta' %}">
+                    Mi perfil <i class="fa-solid fa-user"></i>
+                </a>
+
+                <form method="post" action="{% url 'cerrar_sesion' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="login-button">
+                        Cerrar sesión
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="perfil-page">
+
+        <section class="perfil-intro">
+
+            <span class="eyebrow">
+                <i class="fa-solid fa-user-pen"></i>
+                CONFIGURACIÓN DE CUENTA
+            </span>
+
+            <h1>Editar perfil</h1>
+
+            <p>
+                Mantén tu información personal actualizada
+                para seguir disfrutando de BackHome.
+            </p>
+
+        </section>
+
+        <section class="perfil-layout">
+
+            <div class="perfil-card perfil-card-principal">
+
+                <div class="perfil-identidad">
+
+                    <div class="foto-perfil foto-perfil-edicion">
+    {% if persona.foto_perfil %}
+        <img
+            src="{% get_media_prefix %}{{ persona.foto_perfil }}"
+            alt="Fotografía de perfil"
+            id="vistaPreviaFoto">
+    {% else %}
+        <div class="foto-placeholder" id="fotoPlaceholder">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <img
+            id="vistaPreviaFoto"
+            alt="Vista previa de fotografía"
+            style="display: none;">
+    {% endif %}
+</div>
+
+                    <div class="identidad-texto">
+
+                        <span class="perfil-tag">
+                            CLIENTE BACKHOME
+                        </span>
+
+                        <h2>Actualiza tus datos</h2>
+
+                        <p>
+                            Modifica la información que deseas
+                            mantener actualizada en tu cuenta.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="linea-separadora"></div>
+
+                <section class="informacion-personal">
+
+                    <div class="section-heading">
+
+                        <div>
+                            <span class="section-icon">
+                                <i class="fa-solid fa-id-card"></i>
+                            </span>
+
+                            <div>
+                                <h3>Información personal</h3>
+                                <p>Los campos marcados son obligatorios</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {% if errores %}
+                        <div class="form-errors">
+                            {% for error in errores %}
+                                <p>
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post"
+                            class="formulario-perfil"
+                            enctype="multipart/form-data">
+                        {% csrf_token %}
+
+<div class="selector-foto">
+    <div class="selector-foto-info">
+        <span class="section-icon">
+            <i class="fa-solid fa-camera"></i>
+        </span>
+
+        <div>
+            <h3>Fotografía de perfil</h3>
+            <p>Selecciona una imagen para personalizar tu cuenta.</p>
+            <small>JPG, PNG o WEBP. Máximo 5 MB.</small>
+        </div>
+    </div>
+
+    <label for="foto_perfil" class="btn-secondary boton-seleccionar-foto">
+        <i class="fa-solid fa-upload"></i>
+        Seleccionar fotografía
+    </label>
+
+    <input
+        type="file"
+        id="foto_perfil"
+        name="foto_perfil"
+        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+
+    <span id="nombreArchivoFoto" class="nombre-archivo-foto">
+        No has seleccionado ninguna imagen.
+    </span>
+</div>
+
+                        <div class="datos-grid">
+
+                            <div class="dato">
+                                <label for="primer_nombre">Primer nombre *</label>
+                                <input
+                                    type="text"
+                                    id="primer_nombre"
+                                    name="primer_nombre"
+                                    value="{{ persona.primer_nombre|default:'' }}"
+                                    maxlength="100"
+                                    required>
+                            </div>
+
+                            <div class="dato">
+                                <label for="segundo_nombre">Segundo nombre</label>
+                                <input
+                                    type="text"
+                                    id="segundo_nombre"
+                                    name="segundo_nombre"
+                                    value="{{ persona.segundo_nombre|default:'' }}"
+                                    maxlength="100">
+                            </div>
+
+                            <div class="dato">
+                                <label for="primer_apellido">Primer apellido *</label>
+                                <input
+                                    type="text"
+                                    id="primer_apellido"
+                                    name="primer_apellido"
+                                    value="{{ persona.primer_apellido|default:'' }}"
+                                    maxlength="100"
+                                    required>
+                            </div>
+
+                            <div class="dato">
+                                <label for="segundo_apellido">Segundo apellido</label>
+                                <input
+                                    type="text"
+                                    id="segundo_apellido"
+                                    name="segundo_apellido"
+                                    value="{{ persona.segundo_apellido|default:'' }}"
+                                    maxlength="100">
+                            </div>
+
+                            <div class="dato">
+                                <label for="t_documento_id">Tipo de documento *</label>
+
+                                <select
+                                    id="t_documento_id"
+                                    name="t_documento_id"
+                                    required>
+
+                                    <option value="">Selecciona una opción</option>
+
+                                    {% for tipo in tipo_documentos %}
+                                        <option
+                                            value="{{ tipo.0 }}"
+                                            {% if persona.t_documento_id|stringformat:"s" == tipo.0|stringformat:"s" %}selected{% endif %}>
+                                            {{ tipo.1 }}
+                                        </option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+                            <div class="dato">
+                                <label for="n_documento">Número de documento *</label>
+                                <input
+                                    type="text"
+                                    id="n_documento"
+                                    name="n_documento"
+                                    value="{{ persona.n_documento|default:'' }}"
+                                    maxlength="30"
+                                    required>
+                            </div>
+
+                            <div class="dato dato-completo">
+                                <label for="email">Correo electrónico *</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value="{{ persona.email|default:'' }}"
+                                    maxlength="254"
+                                    required>
+                            </div>
+
+                            <div class="dato dato-completo">
+                                <label for="numero_tel">Número de teléfono *</label>
+                                <input
+                                    type="tel"
+                                    id="numero_tel"
+                                    name="numero_tel"
+                                    value="{{ persona.numero_tel|default:'' }}"
+                                    maxlength="20"
+                                    required>
+                            </div>
+
+                        </div>
+
+                        <div class="acciones-formulario">
+
+                            <a href="{% url 'mi_cuenta' %}"
+                               class="btn-secondary">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                Guardar cambios
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="perfil-footer">
+
+        <div class="footer-bottom-bar">
+            <p>
+                © 2026 BackHome. Cada huellita importa.
+            </p>
+        </div>
+
+    </footer>
+
+
+    <script>
+    const inputFoto = document.getElementById("foto_perfil");
+    const vistaPrevia = document.getElementById("vistaPreviaFoto");
+    const placeholder = document.getElementById("fotoPlaceholder");
+    const nombreArchivo = document.getElementById("nombreArchivoFoto");
+
+    inputFoto.addEventListener("change", function () {
+        const archivo = this.files[0];
+
+        if (!archivo) {
+            return;
+        }
+
+        const formatosPermitidos = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!formatosPermitidos.includes(archivo.type)) {
+            alert("Selecciona una imagen JPG, PNG o WEBP.");
+            this.value = "";
+            return;
+        }
+
+        if (archivo.size > 5 * 1024 * 1024) {
+            alert("La imagen no puede superar los 5 MB.");
+            this.value = "";
+            return;
+        }
+
+        const lector = new FileReader();
+
+        lector.onload = function (evento) {
+            vistaPrevia.src = evento.target.result;
+            vistaPrevia.style.display = "block";
+
+            if (placeholder) {
+                placeholder.style.display = "none";
+            }
+        };
+
+        lector.readAsDataURL(archivo);
+
+        nombreArchivo.textContent = archivo.name;
+    });
+</script>
+
+</body>
+</html>

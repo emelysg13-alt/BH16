@@ -7,4 +7,10 @@ urlpatterns = [
         views.mi_cuenta,
         name='mi_cuenta'
     ),
+
+    path(
+    'editar-perfil/',
+    views.editar_perfil,
+    name='editar_perfil'
+),
 ]
