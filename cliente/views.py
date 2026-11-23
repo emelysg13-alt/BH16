@@ -5,6 +5,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from uuid import uuid4
+from django.contrib.auth.hashers import check_password, make_password
+from django.utils.crypto import constant_time_compare
 
 from PIL import Image, UnidentifiedImageError
 from django.core.files.storage import default_storage
@@ -368,5 +370,112 @@ def editar_perfil(request):
     return render(request, "cliente/editar_perfil.html", {
         "persona": persona,
         "tipo_documentos": tipo_documentos,
+        "errores": errores,
+    })
+
+
+
+
+
+
+@require_http_methods(["GET", "POST"])
+def cambiar_password(request):
+    """Permite al cliente cambiar su contraseña."""
+
+    if not request.session.get("backhome_user_id"):
+        return redirect("/iniciar-sesion/?next=/mi-cuenta/cambiar-password/")
+
+    if request.session.get("backhome_rol") != "cliente":
+        return redirect("/mi-cuenta/")
+
+    errores = []
+
+    if request.method == "POST":
+        password_actual = request.POST.get("password_actual", "")
+        password_nueva = request.POST.get("password_nueva", "")
+        confirmar_password = request.POST.get("confirmar_password", "")
+
+        if not all([
+            password_actual,
+            password_nueva,
+            confirmar_password
+        ]):
+            errores.append("Completa todos los campos.")
+
+        if len(password_nueva) < 8:
+            errores.append(
+                "La nueva contraseña debe tener mínimo 8 caracteres."
+            )
+
+        if password_nueva != confirmar_password:
+            errores.append("Las nuevas contraseñas no coinciden.")
+
+        if password_actual == password_nueva:
+            errores.append(
+                "La nueva contraseña debe ser diferente a la actual."
+            )
+
+        if not errores:
+            persona_id = request.session.get("backhome_user_id")
+
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT password
+                        FROM personas
+                        WHERE id_persona = %s
+                        AND estado = 'activo'
+                        LIMIT 1
+                    """, [persona_id])
+
+                    fila = cursor.fetchone()
+
+                    if not fila:
+                        request.session.flush()
+                        return redirect("/iniciar-sesion/")
+
+                    password_guardada = fila[0]
+
+                    password_valida = check_password(
+                        password_actual,
+                        password_guardada
+                    )
+
+                    # Compatibilidad con contraseñas antiguas
+                    # almacenadas como texto plano.
+                    if not password_valida and constant_time_compare(
+                        password_actual,
+                        str(password_guardada or "")
+                    ):
+                        password_valida = True
+
+                    if not password_valida:
+                        errores.append(
+                            "La contraseña actual es incorrecta."
+                        )
+                    else:
+                        cursor.execute("""
+                            UPDATE personas
+                            SET password = %s
+                            WHERE id_persona = %s
+                        """, [
+                            make_password(password_nueva),
+                            persona_id
+                        ])
+
+                        messages.success(
+                            request,
+                            "¡Tu contraseña se actualizó correctamente!"
+                        )
+
+                        return redirect("cambiar_password")
+
+            except DatabaseError as error:
+                print("ERROR AL CAMBIAR CONTRASEÑA:", repr(error))
+                errores.append(
+                    "No fue posible actualizar la contraseña. Inténtalo nuevamente."
+                )
+
+    return render(request, "cliente/cambiar_password.html", {
         "errores": errores,
     })

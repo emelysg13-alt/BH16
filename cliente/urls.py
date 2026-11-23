@@ -9,8 +9,14 @@ urlpatterns = [
     ),
 
     path(
-    'editar-perfil/',
-    views.editar_perfil,
-    name='editar_perfil'
+        'editar-perfil/',
+        views.editar_perfil,
+        name='editar_perfil'
+    ),
+
+    path(
+    'mi-cuenta/cambiar-password/',
+    views.cambiar_password,
+    name='cambiar_password'
 ),
 ]
