@@ -235,6 +235,28 @@
             flex: 1;
         }
     }
+
+
+
+    .sg-btn-detalle {
+    display: inline-block;
+    background: #684d5e;
+    color: white;
+    text-decoration: none;
+    padding: 8px 13px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: .2s;
+}
+
+.sg-btn-detalle:hover {
+    background: #8b627b;
+    color: white;
+}
+
+
 </style>
 
 <div class="sg-container">
@@ -336,6 +358,7 @@
                         <th>Fecha</th>
                         <th>Estado del seguimiento</th>
                         <th>Moderación</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
 
@@ -390,10 +413,19 @@
                             {% endif %}
                         </td>
 
+                        <td>
+    <a
+        href="{% url 'admin_detalle_seguimiento' seguimiento.id_seguimiento %}"
+        class="sg-btn-detalle"
+    >
+        Ver detalle
+    </a>
+</td>
+
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="sg-empty">
+                        <td colspan="9" class="sg-empty">
                             No se encontraron seguimientos.
                         </td>
                     </tr>

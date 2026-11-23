@@ -1,0 +1,566 @@
+
+{% extends 'panel_admin/dashboard.html' %}
+
+{% block content %}
+<style>
+    .gd-container {
+        padding: 25px;
+        color: #493844;
+    }
+
+    .gd-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .gd-header h2 {
+        color: #684d5e;
+        font-size: 25px;
+        margin-bottom: 6px;
+    }
+
+    .gd-header p {
+        color: #8b7b87;
+        font-size: 14px;
+    }
+
+    .gd-back {
+        text-decoration: none;
+        background: #f3e4eb;
+        color: #684d5e;
+        padding: 10px 16px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .gd-card {
+        background: white;
+        padding: 22px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 12px rgba(80, 50, 70, .06);
+    }
+
+    .gd-card h3 {
+        color: #684d5e;
+        font-size: 17px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0e8ed;
+    }
+
+    .gd-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .gd-field span {
+        display: block;
+        color: #9a8995;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .gd-field strong {
+        display: block;
+        color: #594653;
+        font-size: 14px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .gd-description {
+        line-height: 1.6;
+        font-weight: normal !important;
+    }
+
+    .gd-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .gd-pendiente {
+        background: #fff2d9;
+        color: #a8751c;
+    }
+
+    .gd-aprobado {
+        background: #e2f3e8;
+        color: #398052;
+    }
+
+    .gd-rechazado {
+        background: #fbe5e7;
+        color: #b34e5b;
+    }
+
+    .gd-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 650px) {
+        .gd-container {
+            padding: 15px;
+        }
+
+        .gd-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .gd-card {
+            padding: 17px;
+        }
+    }
+</style>
+
+<div class="gd-container">
+
+    <div class="gd-header">
+        <div>
+            <h2>Detalle del seguimiento</h2>
+            <p>Consulta toda la información del reporte #{{ seguimiento.id_seguimiento }}.</p>
+        </div>
+
+        <a href="{% url 'gestion_seguimientos' %}" class="gd-back">
+            ← Volver a seguimientos
+        </a>
+    </div>
+
+    <!-- INFORMACIÓN DEL REPORTE -->
+    <div class="gd-card">
+        <h3>Información del reporte</h3>
+
+        <div class="gd-grid">
+            <div class="gd-field">
+                <span>Título</span>
+                <strong>{{ seguimiento.titulo }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Fecha de publicación</span>
+                <strong>{{ seguimiento.fecha_publicacion|date:"d/m/Y H:i" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Tipo de reporte</span>
+                <strong>
+                    {% if seguimiento.fecha_perdida %}
+                        Animal perdido
+                    {% elif seguimiento.fecha_encontrado %}
+                        Animal encontrado
+                    {% else %}
+                        No especificado
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Estado del seguimiento</span>
+                <strong>{{ seguimiento.estado_seguimiento|capfirst }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Estado de moderación</span>
+                <strong>
+                    {% if seguimiento.estado_moderacion == 'pendiente' %}
+                        <span class="gd-badge gd-pendiente">Pendiente</span>
+                    {% elif seguimiento.estado_moderacion == 'aprobado' %}
+                        <span class="gd-badge gd-aprobado">Aprobado</span>
+                    {% elif seguimiento.estado_moderacion == 'rechazado' %}
+                        <span class="gd-badge gd-rechazado">Rechazado</span>
+                    {% endif %}
+                </strong>
+            </div>
+        </div>
+
+        <div class="gd-field" style="margin-top: 20px;">
+            <span>Descripción del reporte</span>
+            <strong class="gd-description">{{ seguimiento.descripcion|default:"Sin descripción." }}</strong>
+        </div>
+    </div>
+
+    <!-- INFORMACIÓN DEL ANIMAL -->
+    <div class="gd-card">
+        <h3>Información del animal</h3>
+
+        <div class="gd-grid">
+            <div class="gd-field">
+                <span>Nombre</span>
+                <strong>{{ seguimiento.nombre_animal|default:"Sin nombre" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Especie</span>
+                <strong>{{ seguimiento.especie|default:"No especificada" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Raza</span>
+                <strong>{{ seguimiento.raza|default:"No especificada" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Sexo</span>
+                <strong>{{ seguimiento.sexo|capfirst }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Color</span>
+                <strong>{{ seguimiento.color|default:"No especificado" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Tamaño</span>
+                <strong>{{ seguimiento.tamano|capfirst|default:"No especificado" }}</strong>
+            </div>
+        </div>
+
+        <div class="gd-field" style="margin-top: 20px;">
+            <span>Descripción del animal</span>
+            <strong class="gd-description">
+                {{ seguimiento.descripcion_animal|default:"Sin descripción." }}
+            </strong>
+        </div>
+    </div>
+
+    <!-- UBICACIÓN -->
+    <div class="gd-card">
+        <h3>Ubicación</h3>
+
+        <div class="gd-grid">
+            <div class="gd-field">
+                <span>Dirección</span>
+                <strong>{{ seguimiento.direccion }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Localidad</span>
+                <strong>{{ seguimiento.n_localidad }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATOS ESPECÍFICOS -->
+    {% if seguimiento.fecha_perdida %}
+    <div class="gd-card">
+        <h3>Información de pérdida</h3>
+
+        <div class="gd-grid">
+            <div class="gd-field">
+                <span>Fecha de pérdida</span>
+                <strong>{{ seguimiento.fecha_perdida|date:"d/m/Y H:i" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Última vez visto</span>
+                <strong>
+                    {{ seguimiento.ultima_fecha_visto|date:"d/m/Y H:i"|default:"No especificada" }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="gd-field" style="margin-top: 20px;">
+            <span>Descripción de la última ubicación</span>
+            <strong class="gd-description">
+                {{ seguimiento.descripcion_ultima_ubicacion|default:"Sin información adicional." }}
+            </strong>
+        </div>
+    </div>
+
+    {% elif seguimiento.fecha_encontrado %}
+    <div class="gd-card">
+        <h3>Información del hallazgo</h3>
+
+        <div class="gd-grid">
+            <div class="gd-field">
+                <span>Fecha de hallazgo</span>
+                <strong>{{ seguimiento.fecha_encontrado|date:"d/m/Y H:i" }}</strong>
+            </div>
+
+            <div class="gd-field">
+                <span>¿Necesita refugio?</span>
+                <strong>
+                    {% if seguimiento.necesita_refugio %}
+                        Sí
+                    {% else %}
+                        No
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="gd-field">
+                <span>Refugio asignado</span>
+                <strong>{{ seguimiento.nombre_refugio|default:"Sin refugio asignado" }}</strong>
+            </div>
+        </div>
+
+        <div class="gd-field" style="margin-top: 20px;">
+            <span>Descripción del lugar donde fue encontrado</span>
+            <strong class="gd-description">
+                {{ seguimiento.descripcion_lugar_encontrado|default:"Sin información adicional." }}
+            </strong>
+        </div>
+    </div>
+    {% endif %}
+
+
+<!-- INFORMACIÓN DEL INGRESO AL REFUGIO -->
+{% if seguimiento.necesita_refugio %}
+<div class="gd-card">
+    <h3>Información del ingreso al refugio</h3>
+
+    {% if seguimiento.id_ingreso %}
+
+    <div class="gd-grid">
+
+        <div class="gd-field">
+            <span>Estado de la solicitud</span>
+            <strong>
+                {% if seguimiento.estado_ingreso == 'pendiente' %}
+                    <span class="gd-badge gd-pendiente">Pendiente</span>
+                {% elif seguimiento.estado_ingreso == 'confirmado' %}
+                    <span class="gd-badge gd-aprobado">Confirmado</span>
+                {% elif seguimiento.estado_ingreso == 'rechazado' %}
+                    <span class="gd-badge gd-rechazado">Rechazado</span>
+                {% endif %}
+            </strong>
+        </div>
+
+        <div class="gd-field">
+            <span>Fecha de solicitud</span>
+            <strong>
+                {{ seguimiento.fecha_ingreso|date:"d/m/Y H:i" }}
+            </strong>
+        </div>
+
+        <div class="gd-field">
+            <span>Refugio solicitado</span>
+            <strong>
+                {{ seguimiento.nombre_refugio_ingreso|default:"No especificado" }}
+            </strong>
+        </div>
+
+        <div class="gd-field">
+            <span>Dirección del refugio</span>
+            <strong>
+                {{ seguimiento.direccion_refugio_ingreso|default:"No especificada" }}
+            </strong>
+        </div>
+
+        <div class="gd-field">
+            <span>Localidad del refugio</span>
+            <strong>
+                {{ seguimiento.localidad_refugio_ingreso|default:"No especificada" }}
+            </strong>
+        </div>
+
+        <div class="gd-field">
+            <span>Fecha de verificación</span>
+            <strong>
+                {{ seguimiento.fecha_verificacion|date:"d/m/Y H:i"|default:"Sin verificar" }}
+            </strong>
+        </div>
+
+    </div>
+
+    <div class="gd-field" style="margin-top: 20px;">
+        <span>Observaciones del ingreso</span>
+        <strong class="gd-description">
+            {{ seguimiento.observacion_ingreso|default:"Sin observaciones." }}
+        </strong>
+    </div>
+
+    {% if seguimiento.estado_ingreso == 'pendiente' %}
+
+    <div class="gd-actions" style="margin-top: 22px;">
+
+        <form method="POST"
+              action="{% url 'confirmar_ingreso_refugio' seguimiento.id_ingreso %}">
+            {% csrf_token %}
+
+            <button type="submit"
+                    style="background: #398052; color: white; border: none;
+                    padding: 11px 20px; border-radius: 8px;
+                    cursor: pointer; font-weight: 600;"
+                    onclick="return confirm('¿Confirmar el ingreso de este animal al refugio?');">
+                Confirmar ingreso
+            </button>
+        </form>
+
+        <form method="POST"
+              action="{% url 'rechazar_ingreso_refugio' seguimiento.id_ingreso %}">
+            {% csrf_token %}
+
+            <button type="submit"
+                    style="background: #b34e5b; color: white; border: none;
+                    padding: 11px 20px; border-radius: 8px;
+                    cursor: pointer; font-weight: 600;"
+                    onclick="return confirm('¿Rechazar el ingreso de este animal al refugio?');">
+                Rechazar ingreso
+            </button>
+        </form>
+
+    </div>
+
+{% endif %}
+
+    {% if seguimiento.estado_ingreso == 'confirmado' %}
+
+        <div style="margin-top: 20px; padding: 14px; background: #e2f3e8; color: #398052; border-radius: 9px;">
+            El ingreso al refugio fue confirmado. El seguimiento puede continuar con su proceso de aprobación.
+        </div>
+
+    {% elif seguimiento.estado_ingreso == 'rechazado' %}
+
+        <div style="margin-top: 20px; padding: 14px; background: #fbe5e7; color: #b34e5b; border-radius: 9px;">
+            El ingreso al refugio fue rechazado. No es posible aprobar este seguimiento.
+        </div>
+
+    {% else %}
+
+        <div style="margin-top: 20px; padding: 14px; background: #fff2d9; color: #a8751c; border-radius: 9px;">
+            El ingreso todavía está pendiente de verificación. No es posible aprobar este seguimiento.
+        </div>
+
+    {% endif %}
+
+    {% else %}
+
+        <div style="padding: 14px; background: #fff2d9; color: #a8751c; border-radius: 9px;">
+            Este animal necesita refugio, pero todavía no tiene una solicitud de ingreso registrada.
+            No es posible aprobar el seguimiento.
+        </div>
+
+    {% endif %}
+</div>
+{% endif %}
+
+
+
+
+<!-- ACCIONES DE MODERACIÓN -->
+{% if seguimiento.estado_moderacion == 'pendiente' %}
+<div class="gd-card">
+    <h3>Moderación del reporte</h3>
+
+    <p style="color: #8b7b87; font-size: 13px; margin-bottom: 18px;">
+        Revisa la información antes de tomar una decisión.
+    </p>
+
+    <div class="gd-actions">
+
+        <!-- APROBAR -->
+        
+{% if not seguimiento.necesita_refugio or seguimiento.estado_ingreso == 'confirmado' %}
+
+    <form
+        method="POST"
+        action="{% url 'aprobar_seguimiento' seguimiento.id_seguimiento %}"
+    >
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            style="
+                background: #398052;
+                color: white;
+                border: none;
+                padding: 11px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+            "
+            onclick="return confirm('¿Estás seguro de que deseas aprobar este reporte?');"
+        >
+            Aprobar reporte
+        </button>
+    </form>
+
+{% else %}
+
+    <button
+        type="button"
+        disabled
+        title="El ingreso al refugio debe estar confirmado."
+        style="
+            background: #b9b0b6;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            cursor: not-allowed;
+            font-weight: 600;
+        "
+    >
+        Aprobar reporte
+    </button>
+
+{% endif %}
+
+    </div>
+
+    <!-- RECHAZAR -->
+    <form
+        method="POST"
+        action="{% url 'rechazar_seguimiento' seguimiento.id_seguimiento %}"
+        style="margin-top: 22px;"
+    >
+        {% csrf_token %}
+
+        <div class="gd-field">
+            <span>Motivo del rechazo (obligatorio)</span>
+
+            <textarea
+                name="motivo"
+                rows="4"
+                required
+                maxlength="1000"
+                placeholder="Explica por qué se rechaza este reporte..."
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #e5d7df;
+                    border-radius: 8px;
+                    resize: vertical;
+                    font-family: inherit;
+                    outline-color: #c45d89;
+                "
+            ></textarea>
+        </div>
+
+        <button
+            type="submit"
+            style="
+                background: #b34e5b;
+                color: white;
+                border: none;
+                padding: 11px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                margin-top: 12px;
+            "
+            onclick="return confirm('¿Estás seguro de que deseas rechazar este reporte?');"
+        >
+            Rechazar reporte
+        </button>
+    </form>
+</div>
+{% endif %}
+
+
+
+</div>
+{% endblock %}

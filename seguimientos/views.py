@@ -345,26 +345,26 @@ def mis_seguimientos(request):
         ]
 
     for seguimiento in seguimientos:
+
         seguimiento['estado_seguimiento'] = (
             seguimiento['estado_seguimiento']
         .replace('_', ' ')
         .capitalize()
     )
 
-    if seguimiento['estado_moderacion']:
-        seguimiento['estado_moderacion'] = (
-            seguimiento['estado_moderacion']
+        if seguimiento['estado_moderacion']:
+            seguimiento['estado_moderacion'] = (
+                seguimiento['estado_moderacion']
             .replace('_', ' ')
             .capitalize()
         )
 
-    if seguimiento['estado_ingreso']:
-        seguimiento['estado_ingreso'] = (
-            seguimiento['estado_ingreso']
+        if seguimiento['estado_ingreso']:
+            seguimiento['estado_ingreso'] = (
+                seguimiento['estado_ingreso']
             .replace('_', ' ')
             .capitalize()
         )
-
 
     return render(
         request,

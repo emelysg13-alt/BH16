@@ -117,16 +117,13 @@
                                     <p>
                                         <strong>Revisión:</strong>
 
-                                        {% if seguimiento.estado_moderacion == 'pendiente' %}
-                                            Pendiente de revisión
-                                        {% elif seguimiento.estado_moderacion == 'aprobado' %}
-                                            Aprobado
-                                        {% elif seguimiento.estado_moderacion == 'rechazado' %}
-                                            Rechazado
-                                        {% endif %}
-
-                                    </p>
-
+{% if seguimiento.estado_moderacion == 'Pendiente' %}
+    Pendiente de revisión
+{% elif seguimiento.estado_moderacion == 'Aprobado' %}
+    Aprobado
+{% elif seguimiento.estado_moderacion == 'Rechazado' %}
+    Rechazado
+{% endif %}
                                     {% if seguimiento.estado_ingreso %}
     <p>
         <strong>Estado del ingreso al refugio:</strong>
