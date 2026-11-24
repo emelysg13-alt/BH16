@@ -13,7 +13,78 @@ from django.contrib import messages
 MAX_FOTOGRAFIAS = 5
 MAX_TAMANO_IMAGEN = 5 * 1024 * 1024  # 5 MB
 
+
 def lista_seguimientos(request):
+
+    busqueda = request.GET.get('buscar', '').strip()
+    estado = request.GET.get('estado', '').strip()
+    localidad = request.GET.get('localidad', '').strip()
+    prioridad = request.GET.get('prioridad', '').strip()
+
+    estados_validos = [
+        'perdido',
+        'encontrado',
+        'en_busqueda',
+        'en_refugio',
+        'reunido',
+        'adoptado',
+        'cerrado',
+        'cancelado'
+    ]
+
+    condiciones = [
+        "s.estado_moderacion = 'aprobado'",
+        """
+        (
+            (
+                COALESCE(se.necesita_refugio, 0) = 0
+                AND se.refugio_id IS NULL
+            )
+            OR EXISTS (
+                SELECT 1
+                FROM ingresos_refugio ir
+                WHERE ir.seguimiento_id = s.id_seguimiento
+                AND ir.animal_id = s.animal_id
+                AND ir.estado = 'confirmado'
+                AND (
+                    se.refugio_id IS NULL
+                    OR ir.refugio_id = se.refugio_id
+                )
+            )
+        )
+        """
+    ]
+
+    parametros = []
+
+    # Filtro por título
+    if busqueda:
+        condiciones.append("s.titulo LIKE %s")
+        parametros.append(f"%{busqueda}%")
+
+    # Filtro por estado
+    if estado in estados_validos:
+        condiciones.append("s.estado_seguimiento = %s")
+        parametros.append(estado)
+    else:
+        estado = ''
+
+    # Filtro por localidad
+    if localidad.isdigit():
+        condiciones.append("l.localidad_id = %s")
+        parametros.append(int(localidad))
+    else:
+        localidad = ''
+
+    # Filtro por prioridad
+    if prioridad.isdigit():
+        condiciones.append("""
+            pr.id_prioridad = %s
+            AND pr.estado = 'activo'
+        """)
+        parametros.append(int(prioridad))
+    else:
+        prioridad = ''
 
     consulta = """
         SELECT
@@ -33,6 +104,8 @@ def lista_seguimientos(request):
 
             l.direccion,
             loc.n_localidad AS localidad,
+
+            pr.nombre AS prioridad_nombre,
 
             (
                 SELECT i.ruta_imagen
@@ -70,32 +143,36 @@ def lista_seguimientos(request):
         LEFT JOIN seguimiento_encontrado se
             ON se.seguimiento_id = s.id_seguimiento
 
-        WHERE s.estado_moderacion = 'aprobado'
+        LEFT JOIN prioridades pr
+            ON pr.id_prioridad = s.prioridad_id
 
-        AND (
-            (
-                COALESCE(se.necesita_refugio, 0) = 0
-                AND se.refugio_id IS NULL
-            )
-
-            OR EXISTS (
-                SELECT 1
-                FROM ingresos_refugio ir
-                WHERE ir.seguimiento_id = s.id_seguimiento
-                AND ir.animal_id = s.animal_id
-                AND ir.estado = 'confirmado'
-                AND (
-                    se.refugio_id IS NULL
-                    OR ir.refugio_id = se.refugio_id
-                )
-            )
-        )
+        WHERE
+    """ + " AND ".join(condiciones) + """
 
         ORDER BY s.fecha_publicacion DESC
     """
 
     with connection.cursor() as cursor:
-        cursor.execute(consulta)
+
+        # Obtener localidades para el filtro
+        cursor.execute("""
+            SELECT id_localidad, n_localidad
+            FROM localidades
+            ORDER BY n_localidad
+        """)
+        localidades = cursor.fetchall()
+
+        # Obtener prioridades activas
+        cursor.execute("""
+            SELECT id_prioridad, nombre
+            FROM prioridades
+            WHERE estado = 'activo'
+            ORDER BY nivel
+        """)
+        prioridades = cursor.fetchall()
+
+        # Consultar seguimientos aplicando los filtros
+        cursor.execute(consulta, parametros)
 
         columnas = [columna[0] for columna in cursor.description]
 
@@ -107,8 +184,19 @@ def lista_seguimientos(request):
     return render(
         request,
         'seguimientos/lista_seguimientos.html',
-        {'seguimientos': seguimientos}
+        {
+            'seguimientos': seguimientos,
+            'localidades': localidades,
+            'prioridades': prioridades,
+            'filtros': {
+                'buscar': busqueda,
+                'estado': estado,
+                'localidad': localidad,
+                'prioridad': prioridad
+            }
+        }
     )
+
 
 def detalle_seguimiento(request, id_seguimiento):
 

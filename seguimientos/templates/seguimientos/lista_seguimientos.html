@@ -118,10 +118,80 @@
 </section>
 
     <main>
+<section class="filtros-seguimientos">
+    <form method="get" action="{% url 'lista_seguimientos' %}" class="filtros-form">
 
-        {% if seguimientos %}
+        <div class="filtro-busqueda">
+            <label for="buscar">Buscar seguimiento</label>
+            <div class="input-busqueda">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    id="buscar"
+                    name="buscar"
+                    placeholder="Escribe el título del caso..."
+                    value="{{ filtros.buscar }}"
+                >
+            </div>
+        </div>
 
-            <section class="seguimientos-grid">
+        <div class="filtro-campo">
+            <label for="estado">Estado del caso</label>
+            <select name="estado" id="estado">
+                <option value="">Todos los estados</option>
+                <option value="perdido" {% if filtros.estado == 'perdido' %}selected{% endif %}>Perdido</option>
+                <option value="encontrado" {% if filtros.estado == 'encontrado' %}selected{% endif %}>Encontrado</option>
+                <option value="en_busqueda" {% if filtros.estado == 'en_busqueda' %}selected{% endif %}>En búsqueda</option>
+                <option value="en_refugio" {% if filtros.estado == 'en_refugio' %}selected{% endif %}>En refugio</option>
+                <option value="reunido" {% if filtros.estado == 'reunido' %}selected{% endif %}>Reunido</option>
+                <option value="adoptado" {% if filtros.estado == 'adoptado' %}selected{% endif %}>Adoptado</option>
+                <option value="cerrado" {% if filtros.estado == 'cerrado' %}selected{% endif %}>Cerrado</option>
+                <option value="cancelado" {% if filtros.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+
+        <div class="filtro-campo">
+            <label for="localidad">Localidad</label>
+            <select name="localidad" id="localidad">
+                <option value="">Todas las localidades</option>
+                {% for id, nombre in localidades %}
+                    <option value="{{ id }}" {% if filtros.localidad == id|stringformat:"s" %}selected{% endif %}>
+                        {{ nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filtro-campo">
+            <label for="prioridad">Prioridad</label>
+            <select name="prioridad" id="prioridad">
+                <option value="">Todas las prioridades</option>
+                {% for id, nombre in prioridades %}
+                    <option value="{{ id }}" {% if filtros.prioridad == id|stringformat:"s" %}selected{% endif %}>
+                        {{ nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filtros-acciones">
+            <button type="submit" class="btn-filtrar">
+                <i class="fa-solid fa-filter"></i>
+                Aplicar filtros
+            </button>
+
+            <a href="{% url 'lista_seguimientos' %}" class="btn-limpiar">
+                <i class="fa-solid fa-rotate-left"></i>
+                Limpiar
+            </a>
+        </div>
+
+    </form>
+</section>
+
+{% if seguimientos %}
+
+    <section class="seguimientos-grid">
 
                 {% for seguimiento in seguimientos %}
 
