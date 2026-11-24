@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'soporte',
     'panel_admin',
     'gestion_seguimientos',
+    'mensajes_soporte',
 ]
 
 MIDDLEWARE = [

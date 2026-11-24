@@ -12,6 +12,7 @@ urlpatterns = [
     path('panel/seguimientos/', include('gestion_seguimientos.urls')),
     path('', include('donaciones.public_urls')),
     path('seguimientos/', include('seguimientos.urls')),
+    path('mensajes_soporte/', include('mensajes_soporte.urls'))
     
 ]
 
