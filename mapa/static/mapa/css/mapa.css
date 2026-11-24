@@ -1,0 +1,535 @@
+/* CONTENEDOR PRINCIPAL */
+
+.mapa-contenedor {
+    width: 90%;
+    max-width: 1300px;
+    margin: 45px auto;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* TÍTULO */
+
+.mapa-contenedor h1 {
+    color: #55152B;
+    font-family: 'Nunito', sans-serif;
+    font-size: 30px;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+/* DESCRIPCIÓN */
+
+.mapa-contenedor p {
+    color: #817681;
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+/* MAPA */
+
+#mapa {
+    width: 100%;
+    height: 600px;
+    border-radius: 20px;
+    border: 1px solid #F1DCE4;
+    box-shadow: 0 12px 30px rgba(85, 21, 43, 0.10);
+    z-index: 1;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+    .mapa-contenedor {
+        width: 94%;
+        margin: 30px auto;
+    }
+
+    .mapa-contenedor h1 {
+        font-size: 23px;
+    }
+
+    #mapa {
+        height: 450px;
+    }
+}
+
+
+
+/* Leyenda del mapa */
+.leyenda-mapa {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    margin-top: 20px;
+    padding: 18px 22px;
+    background: #FFF9FB;
+    border: 1px solid #F1DCE4;
+    border-radius: 14px;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6E5360;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.leyenda-color {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 0 0 1px rgba(85, 21, 43, 0.15);
+}
+
+.leyenda-color.perdido {
+    background: #E53935;
+}
+
+.leyenda-color.encontrado {
+    background: #ffdd00;
+}
+
+.leyenda-color.en-busqueda {
+    background: #FB8C00;
+}
+
+.leyenda-color.en-refugio {
+    background: #8E44AD;
+}
+
+.leyenda-color.reunido {
+    background: #1E88E5;
+}
+
+.leyenda-color.adoptado {
+    background: #2E7D32;
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 600px) {
+    .leyenda-mapa {
+        gap: 13px;
+        padding: 15px;
+    }
+
+    .leyenda-item {
+        font-size: 12px;
+    }
+}
+
+
+
+/* Distribución principal: mapa y estadísticas */
+.contenido-mapa {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* Columna izquierda */
+.seccion-mapa {
+    min-width: 0;
+}
+
+.seccion-mapa #mapa {
+    height: 600px;
+    width: 100%;
+}
+
+/* Columna derecha */
+.panel-estadisticas {
+    min-width: 0;
+    padding: 22px;
+    background: #FFFFFF;
+    border: 1px solid #F1DCE4;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(85, 21, 43, 0.07);
+}
+
+.panel-estadisticas h2 {
+    color: #55152B;
+    font-family: 'Nunito', sans-serif;
+    font-size: 21px;
+    font-weight: 900;
+    margin: 0 0 8px;
+}
+
+.estadisticas-descripcion {
+    color: #817681;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de la tabla */
+.tabla-estadisticas-contenedor {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-estadisticas {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: #6E5360;
+}
+
+.tabla-estadisticas th {
+    padding: 12px 9px;
+    background: #FFF3F7;
+    color: #6E2136;
+    text-align: left;
+    font-weight: 800;
+    border-bottom: 1px solid #F1DCE4;
+}
+
+.tabla-estadisticas td {
+    padding: 12px 9px;
+    border-bottom: 1px solid #F5E9EE;
+    vertical-align: middle;
+}
+
+.tabla-estadisticas tbody tr:hover {
+    background: #FFF9FB;
+}
+
+.tabla-estadisticas td strong {
+    color: #A33C60;
+    font-weight: 900;
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 900px) {
+    .contenido-mapa {
+        grid-template-columns: 1fr;
+    }
+
+    .seccion-mapa #mapa {
+        height: 450px;
+    }
+
+    .panel-estadisticas {
+        padding: 18px;
+    }
+}
+
+
+/* ========================================
+   PANEL DERECHO DE INFORMACIÓN
+======================================== */
+
+.panel-estadisticas {
+    height: 600px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 25px;
+    overflow-y: auto;
+    background: #FFFFFF;
+    border: 1px solid #F1DCE4;
+    border-radius: 20px;
+    box-shadow: 0 8px 28px rgba(85, 21, 43, 0.07);
+}
+
+/* Barra de desplazamiento */
+
+.panel-estadisticas::-webkit-scrollbar {
+    width: 5px;
+}
+
+.panel-estadisticas::-webkit-scrollbar-thumb {
+    background: #EBCBD8;
+    border-radius: 10px;
+}
+
+/* ========================================
+   SECCIONES
+======================================== */
+
+.panel-informacion,
+.panel-ranking {
+    min-width: 0;
+}
+
+.panel-informacion {
+    padding-bottom: 24px;
+    border-bottom: 1px solid #F1E5EA;
+}
+
+/* ========================================
+   ENCABEZADOS
+======================================== */
+
+.panel-titulo {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.panel-icono {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #FFF1F5;
+    border: 1px solid #F5DFE7;
+    border-radius: 13px;
+}
+
+.panel-icono svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: #A33C60;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.panel-titulo h2 {
+    margin: 0;
+    color: #55152B;
+    font-family: 'Nunito', sans-serif;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.panel-titulo p {
+    margin: 4px 0 0;
+    color: #968491;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* ========================================
+   INFORMACIÓN INICIAL
+======================================== */
+
+.panel-vacio {
+    min-height: 145px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 13px;
+    padding: 20px;
+    text-align: center;
+    background: #FFFAFC;
+    border: 1px dashed #EBCBD8;
+    border-radius: 15px;
+}
+
+.panel-vacio svg {
+    width: 34px;
+    height: 34px;
+    fill: none;
+    stroke: #C66D88;
+    stroke-width: 1.5;
+}
+
+.panel-vacio p {
+    max-width: 250px;
+    margin: 0;
+    color: #968491;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ========================================
+   INFORMACIÓN SELECCIONADA
+======================================== */
+
+#detalle-seleccion {
+    padding: 19px;
+    background: #FFFAFC;
+    border: 1px solid #F3E2E9;
+    border-radius: 15px;
+}
+
+#detalle-seleccion h3 {
+    margin: 0 0 15px;
+    color: #55152B;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+#detalle-seleccion p {
+    margin: 0;
+    padding: 10px 0;
+    color: #745D69;
+    font-size: 13px;
+    line-height: 1.5;
+    border-bottom: 1px solid #F1E5EA;
+}
+
+#detalle-seleccion p:last-of-type {
+    border-bottom: none;
+}
+
+/* Botón de detalles */
+
+#detalle-seleccion .boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    padding: 10px 17px;
+    background: #8A2C46;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#detalle-seleccion .boton:hover {
+    background: #55152B;
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   RANKING DE LOCALIDADES
+======================================== */
+
+.ranking-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px;
+    background: #FFFFFF;
+    border: 1px solid #F0E2E8;
+    border-radius: 14px;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.ranking-item:hover {
+    border-color: #DFA9BC;
+    transform: translateX(3px);
+}
+
+.ranking-posicion {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F9E8EE;
+    color: #8A2C46;
+    font-size: 15px;
+    font-weight: 900;
+    border-radius: 11px;
+}
+
+.ranking-item:first-child .ranking-posicion {
+    background: #8A2C46;
+    color: #FFFFFF;
+}
+
+.ranking-datos {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 5px;
+}
+
+.ranking-datos strong {
+    color: #55152B;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.ranking-datos span {
+    color: #968491;
+    font-size: 11px;
+}
+
+.ranking-tasa {
+    color: #A33C60;
+    font-size: 16px;
+    font-weight: 900;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.ranking-tasa small {
+    display: block;
+    margin-top: 3px;
+    color: #968491;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+/* ========================================
+   EXPLICACIÓN DE LA TASA
+======================================== */
+
+.explicacion-tasa {
+    margin-top: 18px;
+    padding: 16px;
+    background: #FFF5F8;
+    border-left: 3px solid #C66D88;
+    border-radius: 5px 12px 12px 5px;
+}
+
+.explicacion-tasa strong {
+    color: #6E2136;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.explicacion-tasa p {
+    margin: 7px 0 0;
+    color: #817681;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 900px) {
+    .panel-estadisticas {
+        height: auto;
+        max-height: none;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel-estadisticas {
+        padding: 16px;
+        border-radius: 15px;
+    }
+
+    .ranking-item {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .ranking-tasa {
+        font-size: 14px;
+    }
+}

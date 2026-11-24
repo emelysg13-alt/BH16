@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'panel_admin',
     'gestion_seguimientos',
     'mensajes_soporte',
+    'mapa'
 ]
 
 MIDDLEWARE = [
@@ -150,3 +151,7 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+# Permitir que OpenStreetMap reciba el encabezado Referer
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
