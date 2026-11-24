@@ -1,0 +1,504 @@
+
+{% extends 'panel_admin/dashboard.html' %}
+{% block content %}
+
+<style>
+.animales-page {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 30px;
+    color: #574652;
+}
+
+.animales-page * { box-sizing: border-box; }
+
+.animales-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 23px;
+}
+
+.animales-eyebrow {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: #c45d89;
+}
+
+.animales-top h1 {
+    margin: 7px 0;
+    color: #684d5e;
+    font-size: 27px;
+    font-weight: 900;
+}
+
+.animales-top p {
+    margin: 0;
+    color: #a18d99;
+    font-size: 13px;
+}
+
+.animales-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 15px;
+    border-radius: 10px;
+    background: #fff0f6;
+    color: #bd5484;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.animales-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.animales-stat,
+.animales-panel {
+    background: #fff;
+    border: 1px solid #f3e4eb;
+    border-radius: 16px;
+    box-shadow: 0 6px 25px #be6e910d;
+}
+
+.animales-stat { padding: 17px 19px; }
+
+.animales-stat span {
+    font-size: 11px;
+    color: #a18d99;
+    font-weight: 800;
+}
+
+.animales-stat strong {
+    display: block;
+    margin-top: 8px;
+    color: #684d5e;
+    font-size: 27px;
+    font-weight: 900;
+}
+
+.animales-panel {
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.animales-panel-head {
+    padding: 19px 21px;
+    border-bottom: 1px solid #f7edf1;
+}
+
+.animales-panel-head h2 {
+    margin: 0;
+    color: #684d5e;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.animales-panel-head p {
+    margin: 5px 0 0;
+    color: #a18d99;
+    font-size: 12px;
+}
+
+.animales-filter {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+    padding: 15px 20px;
+}
+
+.animales-filter input,
+.animales-filter select {
+    min-height: 40px;
+    border: 1px solid #efdee6;
+    border-radius: 9px;
+    background: #fffafd;
+    padding: 9px 12px;
+    color: #574652;
+    font: 600 12px 'Nunito', sans-serif;
+}
+
+.animales-filter input {
+    flex: 1;
+    min-width: 210px;
+}
+
+.animales-filter button {
+    border: 0;
+    border-radius: 9px;
+    background: #d85f91;
+    color: white;
+    padding: 9px 15px;
+    font: 800 12px 'Nunito', sans-serif;
+    cursor: pointer;
+}
+
+.animales-table-wrap { overflow-x: auto; }
+
+.animales-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.animales-table th {
+    padding: 12px 15px;
+    background: #fff8fb;
+    color: #a77b91;
+    font-size: 10px;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+}
+
+.animales-table td {
+    padding: 14px 15px;
+    border-top: 1px solid #f7edf1;
+    color: #796675;
+    font-size: 12px;
+    vertical-align: top;
+}
+
+.animal-name {
+    font-weight: 900;
+    color: #684d5e;
+}
+
+.animal-muted {
+    display: block;
+    margin-top: 4px;
+    color: #a18d99;
+    font-size: 11px;
+}
+
+.animal-status {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 5px 9px;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: capitalize;
+}
+
+.animal-status.confirmado {
+    background: #e8f8ef;
+    color: #32845c;
+}
+
+.animal-status.pendiente {
+    background: #fff5df;
+    color: #a97822;
+}
+
+.animal-status.rechazado {
+    background: #fff0ef;
+    color: #bd5a55;
+}
+
+.animales-empty {
+    text-align: center;
+    padding: 35px !important;
+    color: #a18d99 !important;
+}
+
+.historial-list { padding: 5px 21px 18px; }
+
+.historial-item {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #f7edf1;
+}
+
+.historial-item:last-child { border-bottom: 0; }
+
+.historial-icon {
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+    background: #fff0f6;
+    color: #d85f91;
+    display: grid;
+    place-items: center;
+}
+
+.historial-item strong {
+    color: #684d5e;
+    font-size: 12px;
+}
+
+.historial-item p {
+    margin: 4px 0;
+    color: #887583;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.historial-item small {
+    color: #aa99a3;
+    font-size: 10px;
+}
+
+@media(max-width:750px) {
+    .animales-page { padding: 20px 13px; }
+    .animales-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .animales-top h1 { font-size: 23px; }
+}
+</style>
+
+<div class="animales-page">
+
+    <header class="animales-top">
+        <div>
+            <span class="animales-eyebrow">
+                <i class="fa-solid fa-paw"></i>
+                BackHome / Gestión de refugios
+            </span>
+
+            <h1>Animales de {{ refugio.nombre }}</h1>
+
+            <p>
+                {{ refugio.direccion }}
+                · Registro de ingresos y movimientos del refugio
+            </p>
+        </div>
+
+        <a class="animales-back" href="{% url 'gestion_refugios' %}">
+            <i class="fa-solid fa-arrow-left"></i>
+            Volver a refugios
+        </a>
+    </header>
+
+    <!-- ESTADÍSTICAS -->
+    <section class="animales-stats">
+
+        <article class="animales-stat">
+            <span>Total de ingresos</span>
+            <strong>{{ resumen.total }}</strong>
+        </article>
+
+        <article class="animales-stat">
+            <span>Confirmados</span>
+            <strong>{{ resumen.confirmados }}</strong>
+        </article>
+
+        <article class="animales-stat">
+            <span>Pendientes</span>
+            <strong>{{ resumen.pendientes }}</strong>
+        </article>
+
+        <article class="animales-stat">
+            <span>Rechazados</span>
+            <strong>{{ resumen.rechazados }}</strong>
+        </article>
+
+    </section>
+
+    <!-- LISTADO DE ANIMALES -->
+    <section class="animales-panel">
+
+        <div class="animales-panel-head">
+            <h2>
+                <i class="fa-solid fa-paw" style="color:#d85f91"></i>
+                Registro de animales
+            </h2>
+
+            <p>
+                Consulta los animales asociados a este refugio
+                y el estado de cada solicitud de ingreso.
+            </p>
+        </div>
+
+        <form method="get" class="animales-filter">
+
+            <input
+                type="search"
+                name="buscar"
+                value="{{ buscar }}"
+                placeholder="Buscar por nombre, especie, raza o color"
+            >
+
+            <select name="estado">
+                <option value="">Todos los estados</option>
+
+                <option value="confirmado"
+                    {% if filtro_estado == 'confirmado' %}selected{% endif %}>
+                    Confirmados
+                </option>
+
+                <option value="pendiente"
+                    {% if filtro_estado == 'pendiente' %}selected{% endif %}>
+                    Pendientes
+                </option>
+
+                <option value="rechazado"
+                    {% if filtro_estado == 'rechazado' %}selected{% endif %}>
+                    Rechazados
+                </option>
+            </select>
+
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Buscar
+            </button>
+
+        </form>
+
+        <div class="animales-table-wrap">
+
+            <table class="animales-table">
+
+                <thead>
+                    <tr>
+                        <th>Animal</th>
+                        <th>Características</th>
+                        <th>Ingreso</th>
+                        <th>Estado</th>
+                        <th>Observación</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for ingreso in ingresos %}
+
+                    <tr>
+
+                        <td>
+                            <span class="animal-name">
+                                {{ ingreso.nombre_animal|default:"Sin nombre" }}
+                            </span>
+
+                            <span class="animal-muted">
+                                Animal #{{ ingreso.id_animal }}
+                                · Ingreso #{{ ingreso.id_ingreso }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ ingreso.especie }}
+
+                            {% if ingreso.raza != 'No especificada' %}
+                                · {{ ingreso.raza }}
+                            {% endif %}
+
+                            <span class="animal-muted">
+                                {{ ingreso.sexo|capfirst }}
+                                · {{ ingreso.color }}
+                                · {{ ingreso.tamano|default:"Tamaño no especificado"|capfirst }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ ingreso.fecha_ingreso|date:"d/m/Y H:i"|default:"Sin fecha" }}
+                        </td>
+
+                        <td>
+                            <span class="animal-status {{ ingreso.estado }}">
+                                {{ ingreso.estado }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ ingreso.observacion|default:"Sin observaciones" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="5" class="animales-empty">
+                            <i class="fa-solid fa-paw"></i>
+                            <br>
+                            No hay ingresos que coincidan con la búsqueda.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="animales-panel">
+
+        <div class="animales-panel-head">
+
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left"
+                   style="color:#d85f91"></i>
+                Historial de movimientos
+            </h2>
+
+            <p>
+                Cambios de estado registrados para los ingresos de este refugio.
+            </p>
+
+        </div>
+
+        <div class="historial-list">
+
+            {% for movimiento in historial %}
+
+            <article class="historial-item">
+
+                <div class="historial-icon">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ movimiento.nombre_animal|default:"Animal" }}
+                        · Ingreso #{{ movimiento.id_ingreso }}
+                    </strong>
+
+                    <p>
+                        {% if movimiento.estado_anterior %}
+                            {{ movimiento.estado_anterior|capfirst }} →
+                        {% endif %}
+
+                        {{ movimiento.estado_nuevo|default:"Cambio registrado"|capfirst }}
+
+                        {% if movimiento.observacion %}
+                            · {{ movimiento.observacion }}
+                        {% endif %}
+                    </p>
+
+                    <small>
+                        {{ movimiento.fecha_cambio|date:"d/m/Y H:i" }}
+                    </small>
+
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <p class="animales-empty">
+                Todavía no hay movimientos registrados para este refugio.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

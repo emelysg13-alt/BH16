@@ -1,10 +1,8 @@
 
+from datetime import date
 from django.db import connection
+from django.core.exceptions import ValidationError
 
-
-# ==========================================================
-# TABLAS DISPONIBLES PARA GENERAR REPORTES
-# ==========================================================
 
 TABLAS_REPORTES = {
     "personas": "Usuarios y personas",
@@ -33,16 +31,19 @@ TABLAS_REPORTES = {
     "donaciones": "Donaciones",
 }
 
-
-# No se permite exportar contraseñas ni tokens.
 COLUMNAS_PRIVADAS = {
     "password",
     "remember_token",
+    "token",
+    "access_token",
+    "refresh_token",
 }
 
 
-def obtener_columnas(tabla):
-    """Obtiene las columnas reales de una tabla permitida."""
+def obtener_configuracion(tabla):
+
+    if tabla not in TABLAS_REPORTES:
+        raise ValidationError("El módulo seleccionado no es válido.")
 
     with connection.cursor() as cursor:
         cursor.execute(f"SHOW COLUMNS FROM `{tabla}`")
@@ -57,27 +58,30 @@ def obtener_columnas(tabla):
         if nombre.lower() in COLUMNAS_PRIVADAS:
             continue
 
+        es_fecha = any(
+            palabra in tipo
+            for palabra in ("date", "time", "year")
+        )
+
+        es_numerico = any(
+            palabra in tipo
+            for palabra in (
+                "int", "decimal", "float",
+                "double", "numeric"
+            )
+        )
+
         columnas.append({
             "nombre": nombre,
             "tipo": tipo,
-            "es_fecha": any(
-                palabra in tipo
-                for palabra in ["date", "time", "year"]
-            ),
-            "es_numerico": any(
-                palabra in tipo
-                for palabra in [
-                    "int", "decimal", "float",
-                    "double", "numeric"
-                ]
-            ),
+            "es_fecha": es_fecha,
+            "es_numerico": es_numerico,
         })
 
-    return columnas
-
-
-def obtener_configuracion(tabla):
-    columnas = obtener_columnas(tabla)
+    if not columnas:
+        raise ValidationError(
+            "No hay columnas disponibles para este reporte."
+        )
 
     return {
         "columnas": columnas,
@@ -92,60 +96,93 @@ def obtener_configuracion(tabla):
 
 
 def construir_consulta(request, tabla, configuracion):
-    """Construye una consulta segura con filtros combinables."""
 
     columnas_validas = configuracion["nombres"]
 
     seleccionadas = request.GET.getlist("columnas")
 
-    if seleccionadas:
-        seleccionadas = [
-            columna for columna in seleccionadas
-            if columna in columnas_validas
-        ]
-    else:
-        seleccionadas = columnas_validas[:]
-
     if not seleccionadas:
         seleccionadas = columnas_validas[:]
 
-    nombres_sql = ", ".join(
-        f"`{columna}`" for columna in seleccionadas
-    )
+    seleccionadas = [
+        c for c in seleccionadas if c in columnas_validas
+    ]
 
-    consulta = f"SELECT {nombres_sql} FROM `{tabla}` WHERE 1=1"
+    if not seleccionadas:
+        raise ValidationError(
+            "Debes seleccionar al menos una columna."
+        )
+
+    condiciones = []
     parametros = []
 
-    # BÚSQUEDA GENERAL
     buscar = request.GET.get("buscar", "").strip()
 
+    # BÚSQUEDA GENERAL
+
     if buscar:
-        condiciones = []
+        partes = []
 
         for columna in columnas_validas:
-            condiciones.append(f"CAST(`{columna}` AS CHAR) LIKE %s")
+            partes.append(
+                f"CAST(`{columna}` AS CHAR) LIKE %s"
+            )
             parametros.append(f"%{buscar}%")
 
-        consulta += " AND (" + " OR ".join(condiciones) + ")"
+        condiciones.append(
+            "(" + " OR ".join(partes) + ")"
+        )
 
     # FILTRO DE FECHAS
-    fecha_columna = request.GET.get("fecha_columna", "")
 
-    if fecha_columna in configuracion["fechas"]:
+    fecha_columna = request.GET.get(
+        "fecha_columna", ""
+    )
 
-        fecha_desde = request.GET.get("fecha_desde", "").strip()
-        fecha_hasta = request.GET.get("fecha_hasta", "").strip()
+    fecha_desde = request.GET.get(
+        "fecha_desde", ""
+    ).strip()
+
+    fecha_hasta = request.GET.get(
+        "fecha_hasta", ""
+    ).strip()
+
+    if fecha_columna:
+
+        if fecha_columna not in configuracion["fechas"]:
+            raise ValidationError(
+                "La columna de fecha seleccionada no es válida."
+            )
+
+        if fecha_desde and fecha_hasta:
+            if fecha_desde > fecha_hasta:
+                raise ValidationError(
+                    "La fecha inicial no puede ser posterior a la fecha final."
+                )
 
         if fecha_desde:
-            consulta += f" AND DATE(`{fecha_columna}`) >= %s"
+            condiciones.append(
+                f"DATE(`{fecha_columna}`) >= %s"
+            )
             parametros.append(fecha_desde)
 
         if fecha_hasta:
-            consulta += f" AND DATE(`{fecha_columna}`) <= %s"
+            condiciones.append(
+                f"DATE(`{fecha_columna}`) <= %s"
+            )
             parametros.append(fecha_hasta)
 
-    # FILTROS POR COLUMNA
+    # FILTROS INDIVIDUALES
+
     filtros_aplicados = []
+
+    operadores_permitidos = {
+        "contiene",
+        "igual",
+        "diferente",
+        "mayor",
+        "menor",
+    }
 
     for columna in columnas_validas:
 
@@ -160,33 +197,37 @@ def construir_consulta(request, tabla, configuracion):
             f"operador_{columna}", "contiene"
         )
 
-        if operador not in [
-            "contiene",
-            "igual",
-            "diferente",
-            "mayor",
-            "menor",
-        ]:
-            operador = "contiene"
+        if operador not in operadores_permitidos:
+            continue
+
+        es_numerico = any(
+            c["nombre"] == columna and c["es_numerico"]
+            for c in configuracion["columnas"]
+        )
+
+        if operador in ("mayor", "menor") and not es_numerico:
+            continue
 
         if operador == "contiene":
-            consulta += f" AND CAST(`{columna}` AS CHAR) LIKE %s"
+            condiciones.append(
+                f"CAST(`{columna}` AS CHAR) LIKE %s"
+            )
             parametros.append(f"%{valor}%")
 
         elif operador == "igual":
-            consulta += f" AND `{columna}` = %s"
+            condiciones.append(f"`{columna}` = %s")
             parametros.append(valor)
 
         elif operador == "diferente":
-            consulta += f" AND `{columna}` != %s"
+            condiciones.append(f"`{columna}` != %s")
             parametros.append(valor)
 
         elif operador == "mayor":
-            consulta += f" AND `{columna}` > %s"
+            condiciones.append(f"`{columna}` > %s")
             parametros.append(valor)
 
         elif operador == "menor":
-            consulta += f" AND `{columna}` < %s"
+            condiciones.append(f"`{columna}` < %s")
             parametros.append(valor)
 
         filtros_aplicados.append({
@@ -195,20 +236,34 @@ def construir_consulta(request, tabla, configuracion):
             "valor": valor,
         })
 
+    # CONSULTA SQL
+
+    consulta = (
+        f"SELECT {', '.join(f'`{c}`' for c in seleccionadas)} "
+        f"FROM `{tabla}`"
+    )
+
+    if condiciones:
+        consulta += " WHERE " + " AND ".join(condiciones)
+
     # ORDENAMIENTO
+
     ordenar = request.GET.get("ordenar", "")
 
     if ordenar not in columnas_validas:
         ordenar = seleccionadas[0]
 
-    direccion = request.GET.get("direccion", "DESC").upper()
+    direccion = request.GET.get(
+        "direccion", "DESC"
+    ).upper()
 
-    if direccion not in ["ASC", "DESC"]:
+    if direccion not in ("ASC", "DESC"):
         direccion = "DESC"
 
     consulta += f" ORDER BY `{ordenar}` {direccion}"
 
-    # Límite para proteger el rendimiento.
+    # LÍMITE DE SEGURIDAD
+
     consulta += " LIMIT 10000"
 
     with connection.cursor() as cursor:
@@ -221,8 +276,8 @@ def construir_consulta(request, tabla, configuracion):
         "buscar": buscar,
         "filtros_aplicados": filtros_aplicados,
         "fecha_columna": fecha_columna,
-        "fecha_desde": request.GET.get("fecha_desde", ""),
-        "fecha_hasta": request.GET.get("fecha_hasta", ""),
+        "fecha_desde": fecha_desde,
+        "fecha_hasta": fecha_hasta,
         "ordenar": ordenar,
         "direccion": direccion,
     }
