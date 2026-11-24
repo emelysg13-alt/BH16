@@ -3,24 +3,23 @@
 
 {% block content %}
 
-<div class="reportes-container">
+<div class="reportes">
 
-    <div class="reportes-header">
+    <header class="reporte-banner">
         <div>
-            <span class="reportes-etiqueta">BACKHOME / ADMINISTRACIÓN</span>
+            <span class="reporte-tag">BACKHOME / ADMINISTRACIÓN</span>
             <h1><i class="fa-solid fa-chart-pie"></i> Gestión de reportes</h1>
-            <p>Genera informes personalizados utilizando múltiples criterios de búsqueda.</p>
+            <p>Consulta, organiza y exporta información de BackHome.</p>
         </div>
-
-        <div class="header-icon">
+        <div class="banner-icon">
             <i class="fa-solid fa-file-circle-check"></i>
         </div>
-    </div>
+    </header>
 
     {% if error %}
-    <div class="alerta-error">
+    <div class="mensaje-error">
         <i class="fa-solid fa-circle-exclamation"></i>
-        No se pudo generar el reporte: {{ error }}
+        {{ error }}
     </div>
     {% endif %}
 
@@ -28,75 +27,82 @@
 
         <input type="hidden" name="generar" value="1">
 
-        <section class="panel-reporte">
+        <!-- SELECCIÓN DEL REPORTE -->
 
-            <div class="panel-titulo">
-                <div class="panel-icono">
+        <section class="reporte-card">
+
+            <div class="card-heading">
+                <div class="card-icon">
                     <i class="fa-solid fa-database"></i>
                 </div>
                 <div>
-                    <h2>1. Selecciona la información</h2>
-                    <p>Elige el módulo del que deseas obtener los datos.</p>
+                    <h2>Información del reporte</h2>
+                    <p>Selecciona el módulo que deseas consultar.</p>
                 </div>
             </div>
 
-            <div class="campo-principal">
-                <label for="tabla">Tipo de reporte</label>
+            <div class="form-grid">
 
-                <select name="tabla" id="tabla" onchange="cambiarTabla()">
-                    {% for tabla in tablas %}
-                    <option value="{{ tabla.nombre }}"
-                        {% if tabla.nombre == tabla_actual %}selected{% endif %}>
-                        {{ tabla.titulo }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+                <div class="campo">
+                    <label for="tabla">Tipo de reporte</label>
+                    <select name="tabla" id="tabla"
+                            onchange="cambiarTabla()">
 
-            <div class="campo-principal">
-                <label for="buscar">Búsqueda general</label>
+                        {% for tabla in tablas %}
+                        <option value="{{ tabla.nombre }}"
+                            {% if tabla.nombre == tabla_actual %}selected{% endif %}>
+                            {{ tabla.titulo }}
+                        </option>
+                        {% endfor %}
 
-                <div class="input-icono">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input
-                        type="text"
-                        name="buscar"
-                        id="buscar"
-                        value="{{ buscar }}"
-                        placeholder="Busca por cualquier dato de la tabla..."
-                    >
+                    </select>
                 </div>
+
+                <div class="campo">
+                    <label for="buscar">Buscar información</label>
+                    <div class="input-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input
+                            type="text"
+                            name="buscar"
+                            id="buscar"
+                            value="{{ buscar }}"
+                            placeholder="Escribe un dato para buscar..."
+                        >
+                    </div>
+                </div>
+
             </div>
 
         </section>
 
+        <!-- FILTROS -->
 
-        <section class="panel-reporte">
+        <section class="reporte-card">
 
-            <div class="panel-titulo">
-                <div class="panel-icono">
-                    <i class="fa-solid fa-sliders"></i>
+            <div class="card-heading">
+                <div class="card-icon">
+                    <i class="fa-solid fa-filter"></i>
                 </div>
                 <div>
-                    <h2>2. Filtros multicriterio</h2>
-                    <p>Combina diferentes condiciones para obtener resultados específicos.</p>
+                    <h2>Filtros del reporte</h2>
+                    <p>Define las condiciones para obtener información específica.</p>
                 </div>
             </div>
 
             {% if fechas %}
 
-            <div class="subtitulo-filtros">
+            <div class="subheading">
                 <i class="fa-regular fa-calendar"></i>
-                Filtro por fechas
+                Filtrar por fecha
             </div>
 
-            <div class="filtros-fecha">
+            <div class="form-grid tres-columnas">
 
-                <div class="campo-principal">
+                <div class="campo">
                     <label>Campo de fecha</label>
-
                     <select name="fecha_columna">
-                        <option value="">Seleccionar fecha</option>
+                        <option value="">Seleccionar campo</option>
 
                         {% for fecha in fechas %}
                         <option value="{{ fecha }}"
@@ -104,25 +110,28 @@
                             {{ fecha|capfirst }}
                         </option>
                         {% endfor %}
+
                     </select>
                 </div>
 
-                <div class="campo-principal">
+                <div class="campo">
                     <label>Desde</label>
-                    <input type="date" name="fecha_desde" value="{{ fecha_desde }}">
+                    <input type="date" name="fecha_desde"
+                           value="{{ fecha_desde }}">
                 </div>
 
-                <div class="campo-principal">
+                <div class="campo">
                     <label>Hasta</label>
-                    <input type="date" name="fecha_hasta" value="{{ fecha_hasta }}">
+                    <input type="date" name="fecha_hasta"
+                           value="{{ fecha_hasta }}">
                 </div>
 
             </div>
+
             {% endif %}
 
-
-            <div class="subtitulo-filtros">
-                <i class="fa-solid fa-filter"></i>
+            <div class="subheading">
+                <i class="fa-solid fa-sliders"></i>
                 Condiciones por campo
             </div>
 
@@ -130,22 +139,45 @@
 
                 {% for columna in columnas %}
 
-                <div class="filtro-campo">
+                <div class="filtro-item">
+
                     <label>{{ columna.nombre|capfirst }}</label>
 
-                    <div class="filtro-controles">
+                    <div class="filtro-inputs">
 
                         <select name="operador_{{ columna.nombre }}">
-                            <option value="contiene">Contiene</option>
-                            <option value="igual">Igual a</option>
-                            <option value="diferente">Diferente de</option>
-                            <option value="mayor">Mayor que</option>
-                            <option value="menor">Menor que</option>
+                            <option value="contiene"
+                                {% if columna.operador == "contiene" %}selected{% endif %}>
+                                Contiene
+                            </option>
+
+                            <option value="igual"
+                                {% if columna.operador == "igual" %}selected{% endif %}>
+                                Igual a
+                            </option>
+
+                            <option value="diferente"
+                                {% if columna.operador == "diferente" %}selected{% endif %}>
+                                Diferente
+                            </option>
+
+                            {% if columna.es_numerico %}
+                            <option value="mayor"
+                                {% if columna.operador == "mayor" %}selected{% endif %}>
+                                Mayor que
+                            </option>
+
+                            <option value="menor"
+                                {% if columna.operador == "menor" %}selected{% endif %}>
+                                Menor que
+                            </option>
+                            {% endif %}
                         </select>
 
                         <input
                             type="text"
                             name="filtro_{{ columna.nombre }}"
+                            value="{{ columna.valor_filtro }}"
                             placeholder="Valor..."
                         >
 
@@ -156,32 +188,36 @@
 
             </div>
 
-            <p class="ayuda-filtros">
+            <p class="ayuda">
                 <i class="fa-solid fa-circle-info"></i>
-                Los filtros que dejes vacíos no se aplicarán. Puedes combinar tantos como necesites.
+                Los campos vacíos no se utilizan como filtros. Puedes combinar
+                varias condiciones.
             </p>
 
         </section>
 
+        <!-- COLUMNAS -->
 
-        <section class="panel-reporte">
+        <section class="reporte-card">
 
-            <div class="panel-titulo">
-                <div class="panel-icono">
+            <div class="card-heading">
+                <div class="card-icon">
                     <i class="fa-solid fa-table-columns"></i>
                 </div>
                 <div>
-                    <h2>3. Personaliza las columnas</h2>
-                    <p>Selecciona los campos que deseas incluir en tu reporte.</p>
+                    <h2>Personalizar columnas</h2>
+                    <p>Elige exactamente qué información aparecerá en el archivo.</p>
                 </div>
             </div>
 
-            <div class="columnas-acciones">
+            <div class="columnas-actions">
                 <button type="button" onclick="marcarColumnas(true)">
+                    <i class="fa-solid fa-check-double"></i>
                     Seleccionar todas
                 </button>
 
                 <button type="button" onclick="marcarColumnas(false)">
+                    <i class="fa-solid fa-xmark"></i>
                     Desmarcar todas
                 </button>
             </div>
@@ -190,7 +226,7 @@
 
                 {% for columna in columnas %}
 
-                <label class="columna-opcion">
+                <label class="columna-item">
                     <input
                         type="checkbox"
                         name="columnas"
@@ -204,9 +240,9 @@
 
             </div>
 
-            <div class="ordenamiento">
+            <div class="form-grid dos-columnas ordenamiento">
 
-                <div class="campo-principal">
+                <div class="campo">
                     <label>Ordenar por</label>
 
                     <select name="ordenar">
@@ -219,7 +255,7 @@
                     </select>
                 </div>
 
-                <div class="campo-principal">
+                <div class="campo">
                     <label>Dirección</label>
 
                     <select name="direccion">
@@ -239,80 +275,88 @@
 
         </section>
 
+        <!-- ACCIONES -->
 
-        <div class="acciones-generacion">
+        <div class="acciones">
 
-            <button type="submit" class="btn-generar">
+            <button type="submit" class="btn-vista">
                 <i class="fa-solid fa-magnifying-glass-chart"></i>
                 Generar vista previa
             </button>
 
-            <button
-                type="submit"
-                name="formato"
-                value="excel"
-                class="btn-excel"
-                formtarget="_blank">
+            <button type="submit" name="formato" value="excel"
+                    class="btn-excel">
                 <i class="fa-solid fa-file-excel"></i>
-                Exportar a Excel
+                Descargar Excel
             </button>
 
-            <button
-                type="submit"
-                name="formato"
-                value="pdf"
-                class="btn-pdf"
-                formtarget="_blank">
+            <button type="submit" name="formato" value="pdf"
+                    class="btn-pdf">
                 <i class="fa-solid fa-file-pdf"></i>
-                Generar PDF
+                Descargar PDF
             </button>
 
             <a href="{% url 'gestion_reportes' %}" class="btn-limpiar">
                 <i class="fa-solid fa-rotate-left"></i>
-                Limpiar filtros
+                Limpiar
             </a>
 
         </div>
 
     </form>
 
+    <!-- RESULTADOS -->
 
     {% if generado %}
 
-    <section class="panel-resultados">
+    <section class="reporte-card resultados">
 
-        <div class="resultado-header">
+        <div class="resultado-top">
 
             <div>
-                <span class="resultado-etiqueta">RESULTADO DE LA CONSULTA</span>
+                <span class="resultado-tag">RESULTADOS DE CONSULTA</span>
                 <h2>{{ titulo_tabla }}</h2>
-                <p>Información obtenida según los criterios seleccionados.</p>
+                <p>Información correspondiente a los filtros seleccionados.</p>
             </div>
 
-            <div class="contador-resultados">
+            <div class="contador">
                 <strong>{{ total }}</strong>
                 <span>Registros encontrados</span>
             </div>
 
         </div>
 
+        <div class="resumen-filtros">
 
-        {% if filtros_aplicados %}
-        <div class="filtros-resumen">
-            <strong><i class="fa-solid fa-filter"></i> Filtros aplicados:</strong>
+            {% if buscar %}
+            <span><i class="fa-solid fa-search"></i> Búsqueda: {{ buscar }}</span>
+            {% endif %}
+
+            {% if fecha_desde %}
+            <span>Desde: {{ fecha_desde }}</span>
+            {% endif %}
+
+            {% if fecha_hasta %}
+            <span>Hasta: {{ fecha_hasta }}</span>
+            {% endif %}
 
             {% for filtro in filtros_aplicados %}
             <span>
-                {{ filtro.columna }} {{ filtro.operador }} {{ filtro.valor }}
+                {{ filtro.columna }}:
+                {{ filtro.valor }}
             </span>
             {% endfor %}
-        </div>
-        {% endif %}
 
+            {% if not buscar and not fecha_desde and not fecha_hasta and not filtros_aplicados %}
+            <span>Sin filtros adicionales</span>
+            {% endif %}
+
+        </div>
 
         {% if filas %}
 
-        <div class="tabla-contenedor">
+        <div class="tabla-scroll">
+
             <table class="tabla-resultados">
 
                 <thead>
@@ -324,31 +368,36 @@
                 </thead>
 
                 <tbody>
+
                     {% for fila in filas %}
+
                     <tr>
                         {% for valor in fila %}
                         <td>{{ valor|default_if_none:"—" }}</td>
                         {% endfor %}
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
 
             </table>
+
         </div>
 
         {% else %}
 
         <div class="sin-resultados">
             <i class="fa-solid fa-folder-open"></i>
-            <h3>No se encontraron resultados</h3>
-            <p>Prueba cambiando o quitando algunos filtros.</p>
+            <h3>No se encontraron registros</h3>
+            <p>Prueba modificando los filtros o seleccionando otro módulo.</p>
         </div>
 
         {% endif %}
 
-        <div class="nota-limite">
-            <i class="fa-solid fa-circle-info"></i>
-            La vista previa y las exportaciones están limitadas a 10.000 registros por consulta.
+        <div class="pie-resultados">
+            <i class="fa-solid fa-shield-heart"></i>
+            BackHome · Reporte administrativo · Máximo 10.000 registros.
         </div>
 
     </section>
@@ -357,363 +406,376 @@
 
 </div>
 
-
 <style>
-.reportes-container {
+
+.reportes {
     padding: 28px;
-    color: #51434d;
+    color: #594957;
+    font-family: inherit;
 }
 
-.reportes-header {
+.reporte-banner {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: linear-gradient(120deg, #f8eaf1, #f4edf8);
-    border-radius: 22px;
+    justify-content: space-between;
     padding: 30px;
-    margin-bottom: 25px;
+    border-radius: 22px;
+    background: linear-gradient(120deg,#f9e8f0,#f5edf8,#fff5f8);
+    border: 1px solid #f0dce7;
+    margin-bottom: 24px;
 }
 
-.reportes-etiqueta,
-.resultado-etiqueta {
-    color: #a47791;
-    font-size: 11px;
-    font-weight: 800;
+.reporte-tag,
+.resultado-tag {
+    color: #bd7d9d;
+    font-size: 10px;
+    font-weight: 900;
     letter-spacing: 1.5px;
 }
 
-.reportes-header h1 {
-    color: #76566b;
-    margin: 10px 0;
-    font-size: 28px;
+.reporte-banner h1 {
+    color: #a96888;
+    font-size: 27px;
+    margin: 12px 0;
 }
 
-.reportes-header p {
-    color: #8b7885;
-    margin: 0;
+.reporte-banner p {
+    color: #967f8e;
+    font-size: 13px;
 }
 
-.header-icon {
+.banner-icon {
     width: 75px;
     height: 75px;
     border-radius: 22px;
-    background: white;
     display: flex;
-    justify-content: center;
     align-items: center;
-    color: #bd8ba7;
-    font-size: 32px;
+    justify-content: center;
+    background: white;
+    color: #c584a4;
+    font-size: 30px;
 }
 
-.panel-reporte,
-.panel-resultados {
+.reporte-card {
     background: white;
-    padding: 26px;
-    border-radius: 20px;
+    border: 1px solid #f0e5eb;
+    border-radius: 19px;
+    padding: 25px;
     margin-bottom: 22px;
-    box-shadow: 0 5px 22px rgba(103, 69, 91, .06);
-    border: 1px solid #f0e7ed;
+    box-shadow: 0 5px 20px rgba(120,80,105,.05);
 }
 
-.panel-titulo {
+.card-heading {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
+    gap: 14px;
+    margin-bottom: 24px;
 }
 
-.panel-icono {
-    width: 48px;
-    height: 48px;
-    border-radius: 15px;
-    background: #f8edf3;
-    color: #ad7896;
+.card-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #fbedf3;
+    color: #b87596;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 19px;
 }
 
-.panel-titulo h2 {
-    margin: 0 0 5px;
-    font-size: 18px;
-    color: #76566b;
+.card-heading h2 {
+    color: #79566d;
+    font-size: 17px;
+    margin-bottom: 5px;
 }
 
-.panel-titulo p {
-    margin: 0;
-    font-size: 13px;
-    color: #9b8994;
+.card-heading p {
+    color: #a38e9b;
+    font-size: 12px;
 }
 
-.campo-principal {
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 17px;
+}
+
+.tres-columnas {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+}
+
+.dos-columnas {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+}
+
+.campo {
     display: flex;
     flex-direction: column;
     gap: 8px;
     min-width: 0;
 }
 
-.campo-principal label,
-.filtro-campo label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #745a6b;
+.campo label,
+.filtro-item label {
+    color: #765c6d;
+    font-size: 12px;
+    font-weight: 800;
 }
 
-.campo-principal input,
-.campo-principal select,
-.filtro-controles input,
-.filtro-controles select {
+.campo input,
+.campo select,
+.filtro-inputs input,
+.filtro-inputs select {
     width: 100%;
-    min-width: 0;
     height: 43px;
     border: 1px solid #eadde5;
     border-radius: 10px;
-    padding: 0 12px;
-    outline: none;
     background: #fff;
-    color: #594956;
+    padding: 0 12px;
+    color: #665361;
+    font-size: 12px;
+    outline: none;
     box-sizing: border-box;
 }
 
-.campo-principal input:focus,
-.campo-principal select:focus,
-.filtro-controles input:focus,
-.filtro-controles select:focus {
-    border-color: #bd8ba7;
-    box-shadow: 0 0 0 3px rgba(189, 139, 167, .12);
+.campo input:focus,
+.campo select:focus,
+.filtro-inputs input:focus,
+.filtro-inputs select:focus {
+    border-color: #c58ba8;
+    box-shadow: 0 0 0 3px #fbedf3;
 }
 
-.campo-principal + .campo-principal {
-    margin-top: 20px;
-}
-
-.input-icono {
+.input-search {
     position: relative;
 }
 
-.input-icono i {
+.input-search i {
     position: absolute;
-    top: 14px;
     left: 13px;
-    color: #b58ca5;
+    top: 15px;
+    color: #bb86a1;
 }
 
-.input-icono input {
-    padding-left: 40px;
+.input-search input {
+    padding-left: 39px;
 }
 
-.subtitulo-filtros {
-    font-size: 14px;
-    font-weight: 800;
-    color: #8f6981;
+.subheading {
+    color: #a36d8a;
+    font-size: 13px;
+    font-weight: 900;
     margin: 22px 0 15px;
 }
 
-.subtitulo-filtros i {
-    margin-right: 7px;
-}
-
-.filtros-fecha,
-.ordenamiento {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 15px;
+.subheading i {
+    margin-right: 6px;
 }
 
 .filtros-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 14px;
 }
 
-.filtro-campo {
-    min-width: 0;
+.filtro-item {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 }
 
-.filtro-controles {
+.filtro-inputs {
     display: grid;
-    grid-template-columns: minmax(105px, .85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(100px,.85fr) minmax(0,1.15fr);
     gap: 7px;
 }
 
-.filtro-controles select,
-.filtro-controles input {
-    font-size: 12px;
+.filtro-inputs input,
+.filtro-inputs select {
+    font-size: 11px;
 }
 
-.ayuda-filtros {
-    color: #9b8994;
-    font-size: 12px;
+.ayuda {
+    color: #a38f9c;
+    font-size: 11px;
     margin-top: 18px;
 }
 
-.ayuda-filtros i {
-    color: #b58ca5;
-    margin-right: 5px;
+.ayuda i {
+    color: #c38aa6;
 }
 
-.columnas-acciones {
+.columnas-actions {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 16px;
 }
 
-.columnas-acciones button {
+.columnas-actions button {
+    background: #fbedf3;
+    color: #a36c89;
     border: none;
-    background: #f8edf3;
-    color: #956d85;
-    border-radius: 8px;
     padding: 9px 13px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 800;
     cursor: pointer;
-    font-weight: 700;
-    font-size: 12px;
 }
 
 .columnas-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 9px;
 }
 
-.columna-opcion {
+.columna-item {
     display: flex;
     align-items: center;
     gap: 9px;
-    background: #fcf8fa;
-    border: 1px solid #f0e5ec;
-    border-radius: 9px;
     padding: 11px;
-    color: #735e6b;
-    font-size: 12px;
+    border: 1px solid #f0e5eb;
+    background: #fdf9fb;
+    border-radius: 9px;
+    font-size: 11px;
+    color: #755e6c;
     cursor: pointer;
+    overflow-wrap: anywhere;
 }
 
-.columna-opcion input {
-    accent-color: #b77e9d;
-    width: 15px;
-    height: 15px;
+.columna-item input {
+    accent-color: #bd7d9d;
+    flex-shrink: 0;
 }
 
 .ordenamiento {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 22px;
+    margin-top: 23px;
 }
 
-.acciones-generacion {
+.acciones {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin: 25px 0;
+    gap: 11px;
+    margin: 24px 0;
 }
 
-.acciones-generacion button,
+.acciones button,
 .btn-limpiar {
+    border: none;
+    border-radius: 11px;
+    padding: 13px 17px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 9px;
-    border: none;
-    border-radius: 11px;
-    padding: 13px 18px;
-    color: white;
-    font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 800;
     cursor: pointer;
     text-decoration: none;
+    transition: .2s;
 }
 
-.btn-generar {
-    background: #a87996;
+.acciones button:hover,
+.btn-limpiar:hover {
+    transform: translateY(-2px);
+    filter: brightness(.97);
+}
+
+.btn-vista {
+    background: #ad7795;
+    color: white;
 }
 
 .btn-excel {
-    background: #62977d;
+    background: #719b83;
+    color: white;
 }
 
 .btn-pdf {
-    background: #bd777e;
+    background: #bd7b8b;
+    color: white;
 }
 
 .btn-limpiar {
-    background: #eee7ec;
+    background: #f3edf1;
     color: #806b79;
 }
 
-.acciones-generacion button:hover,
-.btn-limpiar:hover {
-    filter: brightness(.96);
-    transform: translateY(-1px);
+.resultados {
+    margin-top: 25px;
 }
 
-.resultado-header {
+.resultado-top {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 15px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
-.resultado-header h2 {
-    margin: 7px 0;
-    color: #76566b;
+.resultado-top h2 {
+    color: #79566d;
+    margin: 8px 0;
+    font-size: 20px;
 }
 
-.resultado-header p {
-    color: #9b8994;
-    font-size: 13px;
-    margin: 0;
+.resultado-top p {
+    font-size: 12px;
+    color: #a18d99;
 }
 
-.contador-resultados {
-    background: #f8edf3;
-    padding: 14px 20px;
-    border-radius: 13px;
+.contador {
     display: flex;
     flex-direction: column;
-    text-align: center;
-    color: #946c84;
+    align-items: center;
+    justify-content: center;
+    min-width: 115px;
+    padding: 13px;
+    background: #fbedf3;
+    border-radius: 13px;
+    color: #a76f8e;
 }
 
-.contador-resultados strong {
-    font-size: 25px;
+.contador strong {
+    font-size: 27px;
 }
 
-.contador-resultados span {
-    font-size: 11px;
+.contador span {
+    font-size: 10px;
 }
 
-.filtros-resumen {
+.resumen-filtros {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    align-items: center;
     margin-bottom: 18px;
-    font-size: 12px;
 }
 
-.filtros-resumen span {
-    background: #f7edf3;
-    color: #936d84;
-    border-radius: 20px;
+.resumen-filtros span {
     padding: 7px 11px;
+    border-radius: 20px;
+    background: #faf0f5;
+    color: #986c83;
+    font-size: 10px;
 }
 
-.tabla-contenedor {
+.tabla-scroll {
     overflow-x: auto;
+    border: 1px solid #f0e5eb;
+    border-radius: 12px;
 }
 
 .tabla-resultados {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .tabla-resultados th {
-    background: #a87996;
+    background: #ae7896;
     color: white;
     padding: 13px;
     text-align: left;
@@ -723,177 +785,146 @@
 .tabla-resultados td {
     padding: 12px;
     border-bottom: 1px solid #f0e8ed;
-    color: #665662;
+    color: #685766;
     max-width: 260px;
     overflow-wrap: anywhere;
 }
 
 .tabla-resultados tbody tr:nth-child(even) {
-    background: #fcf8fa;
+    background: #fdf8fb;
 }
 
 .sin-resultados {
-    text-align: center;
     padding: 45px 15px;
-    color: #a28b9a;
+    text-align: center;
+    color: #a38f9c;
 }
 
 .sin-resultados i {
-    font-size: 35px;
-    margin-bottom: 12px;
+    font-size: 36px;
+    color: #d5a4bb;
 }
 
 .sin-resultados h3 {
-    color: #795e70;
+    color: #79566d;
+    margin: 13px 0 7px;
 }
 
-.nota-limite {
-    color: #9b8994;
-    font-size: 11px;
+.sin-resultados p {
+    font-size: 12px;
+}
+
+.pie-resultados {
+    padding-top: 17px;
     margin-top: 18px;
+    border-top: 1px solid #f0e8ed;
+    color: #aa96a2;
+    font-size: 10px;
 }
 
-.nota-limite i {
-    color: #b58ca5;
+.pie-resultados i {
+    color: #c184a1;
+    margin-right: 5px;
 }
 
-.alerta-error {
+.mensaje-error {
+    padding: 15px;
     background: #fff0f0;
     color: #a64e58;
-    padding: 15px;
     border-radius: 12px;
     margin-bottom: 20px;
+    font-size: 13px;
 }
 
-@media (max-width: 850px) {
-    .filtros-fecha,
+@media(max-width:900px) {
     .columnas-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+
+    .tres-columnas {
+        grid-template-columns: repeat(2,minmax(0,1fr));
     }
 }
 
-@media (max-width: 600px) {
-    .reportes-container {
+@media(max-width:600px) {
+    .reportes {
         padding: 12px;
     }
 
-    .reportes-header {
+    .reporte-banner {
         padding: 20px;
     }
 
-    .header-icon {
+    .banner-icon {
         display: none;
     }
 
+    .form-grid,
+    .tres-columnas,
+    .dos-columnas,
     .filtros-grid,
-    .filtros-fecha,
-    .columnas-grid,
-    .ordenamiento {
+    .columnas-grid {
         grid-template-columns: 1fr;
     }
 
-    .resultado-header {
-        align-items: flex-start;
+    .reporte-card {
+        padding: 17px;
+    }
+
+    .acciones {
         flex-direction: column;
     }
 
-    .acciones-generacion {
-        flex-direction: column;
-    }
-
-    .acciones-generacion button,
+    .acciones button,
     .btn-limpiar {
         width: 100%;
         box-sizing: border-box;
     }
-}
 
-@media print {
-
-    body {
-        background: white !important;
-    }
-
-    .sidebar,
-    .topbar,
-    .main-footer,
-    .reportes-header,
-    #formReporte,
-    .nota-limite {
-        display: none !important;
-    }
-
-    .main-content {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-    }
-
-    .reportes-container {
-        padding: 0;
-    }
-
-    .panel-resultados {
-        box-shadow: none;
-        border: none;
-        padding: 0;
-    }
-
-    .tabla-resultados {
-        font-size: 9px;
-    }
-
-    .tabla-resultados th {
-        background: #a87996 !important;
-        color: white !important;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-    }
-
-    .tabla-resultados tr {
-        page-break-inside: avoid;
-    }
-
-    @page {
-        size: landscape;
-        margin: 12mm;
+    .resultado-top {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
+
 </style>
 
-
 <script>
+
 function cambiarTabla() {
+
     const formulario = document.getElementById("formReporte");
 
+    // Evitar que se envíen los filtros del módulo anterior.
     formulario.querySelectorAll(
-        'input[name^="filtro_"], input[name^="operador_"]'
-    ).forEach(campo => campo.disabled = true);
+        'input[name^="filtro_"], input[name^="operador_"], input[name="columnas"], input[name="buscar"], input[name="fecha_desde"], input[name="fecha_hasta"], select[name="fecha_columna"], select[name="ordenar"], select[name="direccion"]'
+    ).forEach(campo => {
+        campo.disabled = true;
+    });
 
-    formulario.querySelectorAll(
-        'input[name="columnas"]'
-    ).forEach(campo => campo.disabled = true);
+    // Eliminar el estado de generación y formato.
+    const generar = formulario.querySelector(
+        'input[name="generar"]'
+    );
 
-    formulario.querySelectorAll(
-        'input[name="buscar"], input[name="fecha_desde"], input[name="fecha_hasta"], select[name="fecha_columna"], select[name="ordenar"], select[name="direccion"]'
-    ).forEach(campo => campo.disabled = true);
+    if (generar) {
+        generar.disabled = true;
+    }
 
     formulario.submit();
 }
 
+
 function marcarColumnas(estado) {
+
     document.querySelectorAll(
         'input[name="columnas"]'
     ).forEach(campo => {
         campo.checked = estado;
     });
+
 }
 
-{% if es_pdf %}
-window.addEventListener("load", function() {
-    window.print();
-});
-{% endif %}
 </script>
 
 {% endblock %}
