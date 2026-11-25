@@ -1438,3 +1438,83 @@ i.fa-brands {
         width: 100%;
     }
 }
+
+
+/* Tarjeta de acceso al mapa */
+.mapa-seguimientos-acceso {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-top: 32px;
+    padding: 26px;
+    background: #ffffff;
+    border: 1px solid #f0dce7;
+    border-radius: 20px;
+    box-shadow: 0 5px 18px rgba(91, 48, 70, 0.06);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.mapa-seguimientos-acceso::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: #c66b91;
+}
+
+.mapa-acceso-icono {
+    width: 62px;
+    height: 62px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fceaf2;
+    color: #b84f7c;
+    border-radius: 17px;
+    font-size: 27px;
+}
+
+.mapa-acceso-info {
+    flex: 1;
+}
+
+.mapa-acceso-info h3 {
+    margin: 2px 0 9px;
+    color: #493541;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.mapa-acceso-info p {
+    margin: 0;
+    color: #806d78;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.mapa-seguimientos-acceso .btn {
+    flex-shrink: 0;
+    align-self: center;
+    white-space: nowrap;
+    border-radius: 12px;
+    padding: 13px 20px;
+}
+
+@media (max-width: 650px) {
+    .mapa-seguimientos-acceso {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+
+    .mapa-seguimientos-acceso .btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 5px;
+    }
+}

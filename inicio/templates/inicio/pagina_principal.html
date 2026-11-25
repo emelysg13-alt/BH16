@@ -219,6 +219,32 @@
         {% endif %}
 
     </div>
+
+   <div class="mapa-seguimientos-acceso">
+    <div class="mapa-acceso-icono">
+        <i class="fa-solid fa-map-location-dot"></i>
+    </div>
+
+    <div class="mapa-acceso-info">
+        <h3>Explora los seguimientos en Bogotá</h3>
+
+        <p>
+            Conoce cómo se distribuyen los reportes por localidad,
+            consulta las estadísticas y descubre dónde se concentran
+            los casos de animales perdidos y encontrados.
+        </p>
+
+        <span class="mapa-acceso-etiqueta">
+            <i class="fa-solid fa-location-dot"></i>
+            Bogotá, Colombia
+        </span>
+    </div>
+
+    <a href="{% url 'mapa_localidades' %}" class="btn btn-primary">
+        Ver mapa
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+</div>
 </div>
         </div>
     </section>
