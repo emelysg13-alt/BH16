@@ -8,6 +8,9 @@ from django.contrib import messages
 from django.db import transaction, IntegrityError
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from .models import Persona
+from openpyxl import load_workbook
+from django.core.files.uploadedfile import UploadedFile
 
 def _destino_por_rol(rol):
     return "/panel/" if rol == "administrador" else "/"
@@ -689,3 +692,219 @@ def gestion_usuarios(request):
     }
 
     return render(request, 'usuarios/gestion_usuarios.html', contexto)
+
+
+
+
+
+
+
+
+
+def validar_persona(fila):
+    errores = []
+
+    nombres = str(fila[0] or '').strip()
+    apellidos = str(fila[1] or '').strip()
+    tipo_documento = str(fila[2] or '').strip().upper()
+    numero_documento = str(fila[3] or '').strip()
+    correo = str(fila[4] or '').strip().lower()
+    telefono = str(fila[5] or '').strip()
+
+    if not nombres:
+        errores.append('Faltan los nombres.')
+
+    if not apellidos:
+        errores.append('Faltan los apellidos.')
+
+    if tipo_documento not in ['CC', 'CE', 'TI', 'PP']:
+        errores.append('Tipo de documento no válido.')
+
+    if not numero_documento:
+        errores.append('Falta el número de documento.')
+
+    if not correo:
+        errores.append('Falta el correo electrónico.')
+    else:
+        try:
+            validate_email(correo)
+        except ValidationError:
+            errores.append('El correo electrónico no es válido.')
+
+    if not telefono:
+        errores.append('Falta el teléfono.')
+
+    return errores
+
+
+
+def documento_existe(numero_documento):
+    return Persona.objects.filter(
+        numero_documento=numero_documento
+    ).exists()
+
+
+
+@require_http_methods(["GET", "POST"])
+def carga_masiva_personas(request):
+
+    # Verificar acceso del administrador
+    if (
+        request.session.get('backhome_rol') != 'administrador'
+        or not request.session.get('backhome_user_id')
+    ):
+        messages.error(request, 'No tienes permisos para acceder.')
+        return redirect('iniciar_sesion')
+
+    if request.method == 'POST':
+
+        archivo = request.FILES.get('archivo')
+
+        if not archivo:
+            messages.error(request, 'Selecciona un archivo Excel.')
+            return redirect('carga_masiva_personas')
+
+        if not archivo.name.lower().endswith('.xlsx'):
+            messages.error(request, 'El archivo debe ser .xlsx.')
+            return redirect('carga_masiva_personas')
+
+        if archivo.size > 5 * 1024 * 1024:
+            messages.error(request, 'El archivo supera los 5 MB.')
+            return redirect('carga_masiva_personas')
+
+        try:
+            libro = load_workbook(
+                archivo,
+                read_only=True,
+                data_only=True
+            )
+            hoja = libro.active
+
+            encabezados = [
+                str(celda or '').strip().lower()
+                for celda in next(hoja.iter_rows(
+                    min_row=1,
+                    max_row=1,
+                    values_only=True
+                ))
+            ]
+
+            encabezados_esperados = [
+                'nombres',
+                'apellidos',
+                'tipo_documento',
+                'numero_documento',
+                'correo',
+                'telefono'
+            ]
+
+            if encabezados != encabezados_esperados:
+                libro.close()
+                messages.error(
+                    request,
+                    'Los encabezados del Excel no coinciden con la plantilla.'
+                )
+                return redirect('carga_masiva_personas')
+
+            registrados = 0
+            errores = 0
+            documentos_excel = set()
+
+            personas_registradas = []
+            personas_rechazadas = []
+
+            for numero_fila, fila in enumerate(
+                hoja.iter_rows(min_row=2, values_only=True),
+                start=2
+            ):
+
+                if not any(valor is not None for valor in fila):
+                    continue
+
+                datos = list(fila[:6])
+                datos += [None] * (6 - len(datos))
+
+                problemas = validar_persona(datos)
+
+                nombres = str(datos[0] or '').strip()
+                apellidos = str(datos[1] or '').strip()
+                tipo_documento = str(datos[2] or '').strip().upper()
+                numero_documento = str(datos[3] or '').strip()
+                correo = str(datos[4] or '').strip().lower()
+                telefono = str(datos[5] or '').strip()
+
+                if numero_documento in documentos_excel:
+                    problemas.append(
+                        'Documento repetido dentro del archivo.'
+                    )
+
+                documentos_excel.add(numero_documento)
+
+                if not problemas and documento_existe(numero_documento):
+                    problemas.append(
+                        'El documento ya está registrado en BackHome.'
+                    )
+
+                if problemas:
+                    errores += 1
+
+                    personas_rechazadas.append({
+                    'fila': numero_fila,
+                    'nombres': nombres,
+                    'apellidos': apellidos,
+                    'documento': numero_documento,
+                    'motivos': problemas
+                })
+
+                    continue
+
+                try:
+                    Persona.objects.create(
+                        nombres=nombres,
+                        apellidos=apellidos,
+                        tipo_documento=tipo_documento,
+                        numero_documento=numero_documento,
+                        correo=correo,
+                        telefono=telefono
+                    )
+
+                    registrados += 1
+
+                    personas_registradas.append({
+                        'nombres': nombres,
+                        'apellidos': apellidos,
+                        'documento': numero_documento,
+                        'correo': correo
+                    })
+
+                except IntegrityError:
+                    errores += 1
+                    messages.warning(
+                        request,
+                        f'Fila {numero_fila}: el documento ya existe.'
+                    )
+
+            libro.close()
+
+            return render(
+                request,
+                'usuarios/carga_masiva_personas.html',
+                {
+                    'resultado': True,
+                    'registrados': registrados,
+                    'errores': errores,
+                    'personas_registradas': personas_registradas,
+                    'personas_rechazadas': personas_rechazadas
+                }
+            )
+
+        except Exception as error:
+            print('ERROR EN CARGA MASIVA:', repr(error))
+            messages.error(
+                request,
+                'No fue posible procesar el Excel. Verifica su contenido.'
+            )
+
+            return redirect('carga_masiva_personas')
+
+    return render(request, 'usuarios/carga_masiva_personas.html')

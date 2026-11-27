@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Carga masiva de personas | BackHome</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 35px 20px;
+            font-family: Arial, sans-serif;
+            background: #f7f3f5;
+            color: #35232c;
+        }
+
+        .contenedor {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        .encabezado {
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #681d3b;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #681d3b;
+            margin-top: 30px;
+        }
+
+        h3 {
+            color: #681d3b;
+            margin-bottom: 15px;
+        }
+
+        .descripcion {
+            color: #77636d;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(70, 20, 45, 0.07);
+        }
+
+        .formulario {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddcbd3;
+            border-radius: 7px;
+            background: #fff;
+            max-width: 100%;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 7px;
+            background: #751f43;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #54152f;
+        }
+
+        .resumen {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tarjeta {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border-left: 5px solid #a64d75;
+            box-shadow: 0 3px 12px rgba(70, 20, 45, 0.07);
+        }
+
+        .tarjeta.exito {
+            border-left-color: #36865d;
+        }
+
+        .tarjeta.error {
+            border-left-color: #c64b5b;
+        }
+
+        .numero {
+            display: block;
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #eee3e9;
+            vertical-align: top;
+        }
+
+        th {
+            background: #681d3b;
+            color: white;
+        }
+
+        tbody tr:hover {
+            background: #fcf6f9;
+        }
+
+        .motivos {
+            color: #a52e43;
+            padding-left: 18px;
+            margin: 0;
+        }
+
+        .mensaje {
+            padding: 12px 16px;
+            border-radius: 7px;
+            margin-bottom: 12px;
+            background: #f4e5eb;
+            color: #681d3b;
+        }
+
+        .sin-resultados {
+            color: #36865d;
+            background: #eaf5ee;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .resumen {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <div class="encabezado">
+        <h1>Carga masiva de personas</h1>
+        <p class="descripcion">
+            Importa múltiples personas mediante un archivo Excel.
+        </p>
+    </div>
+
+    <section class="panel">
+
+        <h3>Seleccionar archivo</h3>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mensaje">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              class="formulario">
+
+            {% csrf_token %}
+
+            <input
+                type="file"
+                name="archivo"
+                accept=".xlsx"
+                required
+            >
+
+            <button type="submit">
+                Importar personas
+            </button>
+
+        </form>
+
+    </section>
+
+    {% if resultado %}
+
+        <h2>Resultado de la importación</h2>
+
+        <div class="resumen">
+
+            <div class="tarjeta exito">
+                Personas registradas correctamente
+                <span class="numero">{{ registrados }}</span>
+            </div>
+
+            <div class="tarjeta error">
+                Filas con errores
+                <span class="numero">{{ errores }}</span>
+            </div>
+
+        </div>
+
+        {% if personas_registradas %}
+
+            <section class="panel">
+
+                <h3>Personas registradas correctamente</h3>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Documento</th>
+                                <th>Correo</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for persona in personas_registradas %}
+                                <tr>
+                                    <td>{{ persona.nombres }}</td>
+                                    <td>{{ persona.apellidos }}</td>
+                                    <td>{{ persona.documento }}</td>
+                                    <td>{{ persona.correo }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
+        {% endif %}
+
+        {% if personas_rechazadas %}
+
+            <section class="panel">
+
+                <h3>Personas que no pudieron registrarse</h3>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fila del Excel</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Documento</th>
+                                <th>Motivos del error</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for persona in personas_rechazadas %}
+                                <tr>
+                                    <td>{{ persona.fila }}</td>
+                                    <td>{{ persona.nombres }}</td>
+                                    <td>{{ persona.apellidos }}</td>
+                                    <td>{{ persona.documento }}</td>
+                                    <td>
+                                        <ul class="motivos">
+                                            {% for motivo in persona.motivos %}
+                                                <li>{{ motivo }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
+        {% endif %}
+
+        {% if not personas_registradas and not personas_rechazadas %}
+            <p class="sin-resultados">
+                El archivo no contenía registros para importar.
+            </p>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
